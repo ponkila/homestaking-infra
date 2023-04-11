@@ -4,6 +4,8 @@
 {
 
   inputs = {
+    darwin.inputs.nixpkgs.follows = "nixpkgs";
+    darwin.url = "github:lnl7/nix-darwin";
     ethereum-nix.inputs.nixpkgs.follows = "nixpkgs";
     ethereum-nix.url = "github:nix-community/ethereum.nix";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
@@ -17,6 +19,7 @@
   # add the inputs declared above to the argument attribute set
   outputs =
     { self
+    , darwin
     , ethereum-nix
     , home-manager
     , nixos-generators
@@ -71,6 +74,14 @@
         ];
         customFormats = customFormats;
         format = "kexecTree";
+      };
+
+      darwinConfigurations."ponkila-persistent-epsilon" = darwin.lib.darwinSystem {
+        specialArgs = { inherit inputs outputs; };
+        system = "x86_64-darwin";
+        modules = [
+          ./hosts/ponkila-persistent-epsilon/default.nix
+        ];
       };
 
       # Devshell for bootstrapping
