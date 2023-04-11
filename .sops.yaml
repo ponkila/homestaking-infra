@@ -1,0 +1,10 @@
+keys:
+  - &ponkila-ephemeral-beta age1rahna5rce9mj0js0p7dgt6wseqyzxjawva82tfdelzuvmngr5fdqa2geuy
+  - &juuso 8F84B8738E67A3453F05D29BC2DC6A67CB7F891F
+creation_rules:
+  - path_regex: hosts/ponkila-ephemeral-beta/secrets/[^/]+\.yaml$
+    key_groups:
+      - pgp:
+        - *juuso
+        age:
+        - *ponkila-ephemeral-beta
