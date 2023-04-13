@@ -15,6 +15,19 @@ in {
     exec.endpoint = mkOption { 
       type = types.str; 
     };
+    slasher = {
+      enable = mkOption { 
+        type = types.bool;
+      };
+      history-lenght = mkOption { 
+        type = types.int;
+        default = 4096; 
+      };
+      max-db-size = mkOption { 
+        type = types.int;
+        default = 256;
+      };
+    };
     mev-boost = {
       endpoint = mkOption {
         type = types.str;
@@ -74,11 +87,14 @@ in {
         --execution-endpoint ${cfg.exec.endpoint} \
         --execution-jwt ${cfg.datadir}/jwt.hex \
         --builder ${cfg.mev-boost.endpoint} \
-        --slasher --slasher-history-length 256 --slasher-max-db-size 16 \
         --prune-payloads false \
-        --metrics
+        --metrics \
+        ${if cfg.slasher.enable then
+          "--slasher " 
+          + " --slasher-history-length " + (toString cfg.slasher.history-lenght)
+          + " --slasher-max-db-size " + (toString cfg.slasher.max-db-size)
+        else "" }
       '';
-
       wantedBy = [ "multi-user.target" ];
     };
 

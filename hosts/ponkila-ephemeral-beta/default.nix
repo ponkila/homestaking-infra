@@ -33,6 +33,11 @@ in
     datadir = "/var/mnt/lighthouse";
     exec.endpoint = "http://${infra.ip}:8551";
     mev-boost.endpoint = "http://${infra.ip}:18550";
+    slasher = {
+      enable = true;
+      history-lenght = 256;
+      max-db-size = 16;
+    };
     mount = {
       source = "/dev/disk/by-label/lighthouse";
       target = datadir;
