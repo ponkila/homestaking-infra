@@ -1,10 +1,14 @@
 
-{ lib, pkgs, config, ... }:
+{ pkgs, config, lib, ... }:
 with lib;
 let
-  cfg = config.erigon_cfg;
+  cfg = config.erigon;
 in {
-  options.erigon_cfg = {
+  options.erigon = {
+    enable = mkOption {
+      type = types.bool;
+      default = true;
+    };
     endpoint = mkOption { 
       type = types.str; 
     };
@@ -17,7 +21,7 @@ in {
     };
   };
 
-  config = {
+  config = mkIf cfg.enable {
     # package
     environment.systemPackages = with pkgs; [
       erigon
