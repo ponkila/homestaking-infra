@@ -6,24 +6,24 @@ let
 in
 {
   # Erigon options
-  erigon_cfg = rec {
+  erigon = rec {
     endpoint = infra.ip;
     datadir = "/var/mnt/erigon";
     mount = {
       source = "/dev/disk/by-label/erigon";
-      target = "/var/mnt/erigon";
+      target = datadir;
     };
   };
 
   # Lighthouse options
-  lighthouse_cfg = rec {
+  lighthouse = rec {
     endpoint = infra.ip;
-    exec.endpoint = infra.ip;
-    mev-boost.endpoint = infra.ip;
     datadir = "/var/mnt/lighthouse";
+    exec.endpoint = "http://${infra.ip}:8551";
+    mev-boost.endpoint = "http://${infra.ip}:18550";
     mount = {
       source = "/dev/disk/by-label/lighthouse";
-      target = "/var/mnt/lighthouse";
+      target = datadir;
     };
   };
 
@@ -65,7 +65,7 @@ in
     "aarch64-linux"
   ];
 
-  ## Allow passwordless sudo from nixos user
+  ## Allow passwordless sudo from wheel group
   security.sudo = {
     enable = lib.mkDefault true;
     wheelNeedsPassword = lib.mkForce false;
