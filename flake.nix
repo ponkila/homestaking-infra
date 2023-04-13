@@ -61,6 +61,10 @@
         modules = [
           ./home-manager/core.nix
           ./hosts/ponkila-ephemeral-beta
+          ./modules/eth/erigon.nix
+          ./modules/eth/lighthouse-beacon.nix
+          ./modules/eth/mev-boost.nix
+          ./system/global.nix
           ./system/ramdisk.nix
           home-manager.nixosModules.home-manager
           ({ pkgs, ... }: {

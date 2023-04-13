@@ -5,13 +5,6 @@ let
   infra.ip = "192.168.100.10";
 in
 {
-  imports = [
-    ../../system/global.nix
-    ../../modules/eth/lighthouse.nix
-    ../../modules/eth/mev-boost.nix
-    ../../modules/eth/erigon.nix
-  ];
-
   # Erigon options
   erigon_cfg = rec {
     endpoint = infra.ip;
