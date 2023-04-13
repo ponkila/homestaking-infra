@@ -2,20 +2,26 @@
 { pkgs, config, lib, ... }:
 with lib;
 let
-  cfg = config.lighthouse_cfg;
+  cfg = config.lighthouse;
 in {
-  options.lighthouse_cfg = {
+  options.lighthouse = {
+    enable = mkOption {
+      type = types.bool;
+      default = true;
+    };
     endpoint = mkOption { 
       type = types.str; 
     };
     exec.endpoint = mkOption { 
       type = types.str; 
     };
-    mev-boost.endpoint = mkOption {
-      type = types.str;
+    mev-boost = {
+      endpoint = mkOption {
+        type = types.str;
+      };
     };
     datadir = mkOption { 
-      type = types.str; 
+      type = types.str;
     };
     mount = {
       source = mkOption { type = types.str; };
@@ -23,7 +29,7 @@ in {
     };
   };
 
-  config = {
+  config = mkIf cfg.enable {
     # package
     environment.systemPackages = with pkgs; [
       lighthouse
@@ -65,9 +71,9 @@ in {
         --datadir ${cfg.datadir} \
         --network mainnet \
         --http --http-address ${cfg.endpoint} \
-        --execution-endpoint http://${cfg.exec.endpoint}:8551 \
+        --execution-endpoint ${cfg.exec.endpoint} \
         --execution-jwt ${cfg.datadir}/jwt.hex \
-        --builder http://${cfg.mev-boost.endpoint}:18550 \
+        --builder ${cfg.mev-boost.endpoint} \
         --slasher --slasher-history-length 256 --slasher-max-db-size 16 \
         --prune-payloads false \
         --metrics
