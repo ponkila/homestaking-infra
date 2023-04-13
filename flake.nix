@@ -59,13 +59,13 @@
         system = "x86_64-linux";
         specialArgs = { inherit inputs outputs; };
         modules = [
-          ./home-manager/core.nix
           ./hosts/ponkila-ephemeral-beta
           ./modules/eth/erigon.nix
           ./modules/eth/lighthouse-beacon.nix
           ./modules/eth/mev-boost.nix
           ./system/global.nix
           ./system/ramdisk.nix
+          ./home-manager # user is defined in /hosts/<hostname>/default.nix
           home-manager.nixosModules.home-manager
           ({ pkgs, ... }: {
             nixpkgs.overlays = [ ethereum-nix.overlays.default ];
