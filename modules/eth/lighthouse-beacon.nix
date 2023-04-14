@@ -99,8 +99,11 @@ in {
     };
 
     # firewall
-    networking.firewall.interfaces."wg0".allowedTCPPorts = [
-      5052 # lighthouse
-    ];
+    networking.firewall = {
+      allowedTCPPorts = [ 9000 ];
+      allowedUDPPorts = [ 9000 ];
+      interfaces."wg0".allowedTCPPorts = [
+        5052 # lighthouse
+      ];
   };
 }
