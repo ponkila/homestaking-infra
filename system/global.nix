@@ -24,6 +24,22 @@
     package = pkgs.nix;
   };
 
+  systemd.services.linger = {
+    enable = true;
+
+    requires = [ "local-fs.target" ];
+    after = [ "local-fs.target" ];
+
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = ''
+        /run/current-system/sw/bin/loginctl enable-linger core
+      '';
+    };
+
+    wantedBy = [ "multi-user.target" ];
+  };
+
   boot.kernelParams = [
     "mitigations=off"
     "l1tf=off"
@@ -45,4 +61,35 @@
     kexec-tools
     fuse-overlayfs
   ];
+
+  boot.binfmt.emulatedSystems = [
+    "aarch64-linux"
+  ];
+
+  services.timesyncd.enable = false;
+  services.chrony = {
+    enable = true;
+    servers = [
+      "ntp1.hetzner.de"
+      "ntp2.hetzner.com"
+      "ntp3.hetzner.net"
+    ];
+  };
+
+  systemd.watchdog.device = "/dev/watchdog";
+  systemd.watchdog.runtimeTime = "30s";
+
+  ## Allow passwordless sudo from wheel group
+  security.sudo = {
+    enable = lib.mkDefault true;
+    wheelNeedsPassword = lib.mkForce false;
+  };
+  services.openssh = {
+    enable = true;
+    settings.PasswordAuthentication = false;
+    hostKeys = [{
+      path = "/var/mnt/secrets/ssh/id_ed25519";
+      type = "ed25519";
+    }];
+  };
 }
