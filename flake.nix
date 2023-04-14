@@ -65,7 +65,7 @@
           ./modules/eth/mev-boost.nix
           ./system/global.nix
           ./system/ramdisk.nix
-          ./home-manager # user is defined in /hosts/<hostname>/default.nix
+          ./home-manager/core.nix
           home-manager.nixosModules.home-manager
           ({ pkgs, ... }: {
             nixpkgs.overlays = [ ethereum-nix.overlays.default ];
