@@ -105,5 +105,6 @@ in {
       interfaces."wg0".allowedTCPPorts = [
         5052 # lighthouse
       ];
+    };
   };
 }
