@@ -80,6 +80,31 @@
         format = "kexecTree";
       };
 
+      "dinar-ephemeral-alpha" = nixos-generators.nixosGenerate {
+        system = "x86_64-linux";
+        specialArgs = { inherit inputs outputs; };
+        modules = [
+          ./hosts/dinar-ephemeral-alpha
+          ./modules/eth/erigon.nix
+          ./modules/eth/lighthouse-beacon.nix
+          ./modules/eth/mev-boost.nix
+          ./system/global.nix
+          ./system/ramdisk.nix
+          ./home-manager/core.nix
+          home-manager.nixosModules.home-manager
+          ({ pkgs, ... }: {
+            nixpkgs.overlays = [ ethereum-nix.overlays.default ];
+          })
+          {
+            home-manager.sharedModules = [
+              sops-nix.homeManagerModules.sops
+            ];
+          }
+        ];
+        customFormats = customFormats;
+        format = "kexecTree";
+      };
+
       darwinConfigurations."ponkila-persistent-epsilon" = darwin.lib.darwinSystem {
         specialArgs = { inherit inputs outputs; };
         system = "x86_64-darwin";
