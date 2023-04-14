@@ -14,6 +14,10 @@ in
       "sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAINwWpZR5WuzyJlr7jYoe0mAYp+MJ12doozfqGz9/8NP/AAAABHNzaDo= da@pusu"
     ];
   };
+  
+  # Localization
+  networking.hostName = "ponkila-ephemeral-beta";
+  time.timeZone = "Europe/Helsinki";
 
   # Erigon options
   erigon = rec {
@@ -32,7 +36,7 @@ in
     exec.endpoint = "http://${infra.ip}:8551";
     mev-boost.endpoint = "http://${infra.ip}:18550";
     slasher = {
-      enable = true;
+      enable = false;
       history-lenght = 256;
       max-db-size = 16;
     };
@@ -53,14 +57,6 @@ in
     };
   };
 
-  networking.firewall = {
-    allowedTCPPorts = [ 30303 30304 42069 9000 ];
-    allowedUDPPorts = [ 30303 30304 42069 9000 ];
-  };
-
-  systemd.watchdog.device = "/dev/watchdog";
-  systemd.watchdog.runtimeTime = "30s";
-
   systemd.mounts = [
     {
       enable = true;
@@ -76,40 +72,7 @@ in
     }
   ];
 
-  systemd.services.wg0 = {
-    enable = true;
-
-    description = "wireguard interface for cross-node communication";
-    requires = [ "network-online.target" ];
-    after = [ "network-online.target" ];
-
-    serviceConfig = {
-      Type = "oneshot";
-    };
-
-    script = ''${pkgs.wireguard-tools}/bin/wg-quick \
-      up /run/user/1000/wireguard/wg0.conf
-    '';
-
-    wantedBy = [ "multi-user.target" ];
-  };
-
-  systemd.services.linger = {
-    enable = true;
-
-    requires = [ "local-fs.target" ];
-    after = [ "local-fs.target" ];
-
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = ''
-        /run/current-system/sw/bin/loginctl enable-linger core
-      '';
-    };
-
-    wantedBy = [ "multi-user.target" ];
-  };
-
+  # Prometheus
   services.prometheus = {
     enable = false;
     port = 9001;
