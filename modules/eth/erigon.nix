@@ -71,5 +71,12 @@ in {
 
       wantedBy = [ "multi-user.target" ];
     };
+
+    # firewall
+    networking.firewall = {
+      allowedTCPPorts = [ 30303 30304 42069 ];
+      allowedUDPPorts = [ 30303 30304 42069 ];
+    };
   };
+
 }
