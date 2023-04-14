@@ -42,36 +42,15 @@ in
     };
   };
 
-  # Localization
-  networking.hostName = "ponkila-ephemeral-beta";
-  time.timeZone = "Europe/Helsinki";
-
-  boot.binfmt.emulatedSystems = [
-    "aarch64-linux"
-  ];
-
-  ## Allow passwordless sudo from wheel group
-  security.sudo = {
-    enable = lib.mkDefault true;
-    wheelNeedsPassword = lib.mkForce false;
-  };
-  services.openssh = {
-    enable = true;
-    settings.PasswordAuthentication = false;
-    hostKeys = [{
-      path = "/var/mnt/secrets/ssh/id_ed25519";
-      type = "ed25519";
-    }];
-  };
-
-  services.timesyncd.enable = false;
-  services.chrony = {
-    enable = true;
-    servers = [
-      "ntp1.hetzner.de"
-      "ntp2.hetzner.com"
-      "ntp3.hetzner.net"
-    ];
+  # Secrets
+  home-manager.users.core = { pkgs, ... }: {
+    sops = {
+      defaultSopsFile = ./secrets/default.yaml;
+      secrets."wireguard/wg0" = {
+        path = "%r/wireguard/wg0.conf";
+      };
+      age.sshKeyPaths = [ "/var/mnt/secrets/ssh/id_ed25519" ];
+    };
   };
 
   networking.firewall = {
