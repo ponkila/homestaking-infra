@@ -18,8 +18,8 @@ HOSTNAME="$1"
 # Paths
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 HOST_DIR="$SCRIPT_DIR/result/$HOSTNAME/"
-IMG_POOL_PATH="/var/lib/libvirt/images"
-#IMG_POOL_PATH="/mnt/data/da/var/lib/libvirt/images"
+IMAGE_DIR="/var/lib/libvirt/images"
+#IMAGE_DIR="/mnt/data/da/var/lib/libvirt/images"
 # if not default folder /var/lib/libvirt/images, do selinux fix:
 # sudo semanage fcontext -a -t svirt_image_t "/mnt/data/images(/.*)?"
 # sudo restorecon -vR /mnt/data/images
@@ -29,27 +29,27 @@ randomNumber=$((1 + $RANDOM % 9999))
 echo "Random number $randomNumber"
 
 # Define variables
-name="$HOSTNAME"
-cpucount="14"
-mem="12000" # MB
-disksize="60" # G
-qcow2="$IMG_POOL_PATH/$name-$randomNumber.qcow2"
+VM_NAME="$HOSTNAME"
+RAM=2048 # MB
+VCPUS=2
+DISK_SIZE=10 # G
 
-kernel=$(readlink -f "$HOST_DIR/initrd")
-initrd=$(readlink -f "$HOST_DIR/bzImage")
-kernel_args=$(sed -n '/--command-line/p' $HOST_DIR/kexec-boot | cut -d\" -f2)
+QCOW2_FILE="$IMAGE_DIR/$VM_NAME-$randomNumber.qcow2"
+INITRD_FILE=$(readlink -f "$HOST_DIR/initrd")
+BZIMAGE_FILE=$(readlink -f "$HOST_DIR/bzImage")
+KERNEL_ARGS=$(sed -n '/--command-line/p' $HOST_DIR/kexec-boot | cut -d\" -f2)
 
 # ERROR Guest name 'foobar' is already in use.
-sudo virsh destroy $name >/dev/null 2>&1
-sudo virsh undefine $name >/dev/null 2>&1
+sudo virsh destroy $VM_NAME >/dev/null 2>&1
+sudo virsh undefine $VM_NAME >/dev/null 2>&1
 
 # Create state disk
-sudo qemu-img create -f qcow2 -o preallocation=metadata $qcow2 ${disksize}G
+sudo qemu-img create -f qcow2 -o preallocation=metadata $QCOW2_FILE ${DISK_SIZE}G
 
 # Create new server
-sudo virt-install -n $name --vcpus $cpucount -r $mem \
+sudo virt-install -n $VM_NAME --vcpus $VCPUS -r $RAM \
   --os-variant=fedora31 --import \
   --network bridge=virbr0 \
-  --disk $qcow2,format=qcow2,bus=virtio \
-  --install kernel=${kernel},initrd=${initrd},kernel_args_overwrite=yes,kernel_args="${kernel_args}" \
+  --disk $QCOW2_FILE,format=qcow2,bus=virtio \
+  --install kernel=${BZIMAGE_FILE},initrd=${INITRD_FILE},kernel_args_overwrite=yes,kernel_args="${KERNEL_ARGS}" \
   --noautoconsole
