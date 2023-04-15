@@ -2,7 +2,7 @@
 
 let
   # General
-  infra.ip = "192.168.100.10"; # FIXME
+  infra.ip = "192.168.100.31";
 in
 {
   # User options
