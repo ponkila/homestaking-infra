@@ -14,7 +14,7 @@ in
       "sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAINwWpZR5WuzyJlr7jYoe0mAYp+MJ12doozfqGz9/8NP/AAAABHNzaDo= da@pusu"
     ];
   };
-  
+
   # Localization
   networking.hostName = "dinar-ephemeral-alpha";
   time.timeZone = "Europe/Helsinki";

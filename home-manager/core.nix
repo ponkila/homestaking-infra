@@ -1,13 +1,13 @@
-
 { pkgs, config, inputs, lib, ... }:
 with lib;
 let
   cfg = config.user;
-in {
+in
+{
   options.user = {
     authorizedKeys = mkOption {
-      type =  types.listOf types.str;
-      default = [];
+      type = types.listOf types.str;
+      default = [ ];
     };
   };
 
@@ -22,7 +22,7 @@ in {
     users.groups.core = { };
     environment.shells = [ pkgs.fish ];
     programs.fish.enable = true;
-    
+
     home-manager.users.core = { pkgs, ... }: {
 
       home.packages = with pkgs; [

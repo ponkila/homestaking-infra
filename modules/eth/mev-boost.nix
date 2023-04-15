@@ -1,4 +1,3 @@
-
 { pkgs, lib, ... }:
 {
   virtualisation.podman.enable = true;
@@ -7,7 +6,7 @@
   # NOTE: --net must be the same on the containers, and not eq "host"
   # TODO: extend this with flannel ontop of wireguard for cross-node comms
   virtualisation.podman.defaultNetwork.settings.dns_enabled = true;
-  
+
   systemd.services.mev-boost = {
     enable = true;
 

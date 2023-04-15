@@ -1,29 +1,29 @@
-
 { pkgs, config, lib, ... }:
 with lib;
 let
   cfg = config.lighthouse;
-in {
+in
+{
   options.lighthouse = {
     enable = mkOption {
       type = types.bool;
       default = true;
     };
-    endpoint = mkOption { 
-      type = types.str; 
+    endpoint = mkOption {
+      type = types.str;
     };
-    exec.endpoint = mkOption { 
-      type = types.str; 
+    exec.endpoint = mkOption {
+      type = types.str;
     };
     slasher = {
-      enable = mkOption { 
+      enable = mkOption {
         type = types.bool;
       };
-      history-lenght = mkOption { 
+      history-lenght = mkOption {
         type = types.int;
-        default = 4096; 
+        default = 4096;
       };
-      max-db-size = mkOption { 
+      max-db-size = mkOption {
         type = types.int;
         default = 256;
       };
@@ -33,7 +33,7 @@ in {
         type = types.str;
       };
     };
-    datadir = mkOption { 
+    datadir = mkOption {
       type = types.str;
     };
     mount = {

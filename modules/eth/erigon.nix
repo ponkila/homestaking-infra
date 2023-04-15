@@ -1,19 +1,19 @@
-
 { pkgs, config, lib, ... }:
 with lib;
 let
   cfg = config.erigon;
-in {
+in
+{
   options.erigon = {
     enable = mkOption {
       type = types.bool;
       default = true;
     };
-    endpoint = mkOption { 
-      type = types.str; 
+    endpoint = mkOption {
+      type = types.str;
     };
-    datadir = mkOption { 
-      type = types.str; 
+    datadir = mkOption {
+      type = types.str;
     };
     mount = {
       source = mkOption { type = types.str; };

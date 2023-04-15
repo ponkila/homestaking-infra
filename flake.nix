@@ -46,6 +46,10 @@
     in
     {
 
+      formatter = forAllSystems (system:
+        nixpkgs.legacyPackages.${system}.nixpkgs-fmt
+      );
+
       overlays = import ./overlays { inherit inputs; };
 
       # Your custom packages
