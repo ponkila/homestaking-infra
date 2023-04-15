@@ -67,7 +67,7 @@ in
       where = "/var/mnt/secrets";
       type = "btrfs";
 
-      before = [ "sops-nix.service" "sshd.service" ];
+      before = [ "sshd.service" ];
       wantedBy = [ "multi-user.target" ];
     }
   ];
