@@ -9,7 +9,6 @@
   virtualisation.podman.defaultNetwork.settings.dns_enabled = true;
   
   systemd.services.mev-boost = {
-    path = [ "/run/wrappers" ];
     enable = true;
 
     description = "MEV-boost allows proof-of-stake Ethereum consensus clients to outsource block construction";
@@ -24,13 +23,7 @@
       Type = "simple";
     };
 
-    preStart = "${pkgs.podman}/bin/podman stop mev-boost || true";
-    script = ''${pkgs.podman}/bin/podman \
-      --storage-opt "overlay.mount_program=${pkgs.fuse-overlayfs}/bin/fuse-overlayfs" run \
-      --replace --rmi \
-      --name mev-boost \
-      -p 18550:18550 \
-      docker.io/flashbots/mev-boost:latest \
+    script = ''${pkgs.mev-boost}/bin/mev-boost \
       -mainnet \
       -relay-check \
       -relays ${lib.concatStringsSep "," [
