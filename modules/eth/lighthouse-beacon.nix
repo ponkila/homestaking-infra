@@ -19,7 +19,7 @@ in
       enable = mkOption {
         type = types.bool;
       };
-      history-lenght = mkOption {
+      history-length = mkOption {
         type = types.int;
         default = 4096;
       };
@@ -90,8 +90,8 @@ in
         --prune-payloads false \
         --metrics \
         ${if cfg.slasher.enable then
-          "--slasher " 
-          + " --slasher-history-length " + (toString cfg.slasher.history-lenght)
+          "--slasher "
+          + " --slasher-history-length " + (toString cfg.slasher.history-length)
           + " --slasher-max-db-size " + (toString cfg.slasher.max-db-size)
         else "" }
       '';

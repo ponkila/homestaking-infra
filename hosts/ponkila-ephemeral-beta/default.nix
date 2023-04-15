@@ -37,7 +37,7 @@ in
     mev-boost.endpoint = "http://${infra.ip}:18550";
     slasher = {
       enable = false;
-      history-lenght = 256;
+      history-length = 256;
       max-db-size = 16;
     };
     mount = {
