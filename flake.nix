@@ -18,7 +18,7 @@
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     darwin.url = "github:lnl7/nix-darwin";
     ethereum-nix.inputs.nixpkgs.follows = "nixpkgs";
-    ethereum-nix.url = "github:nix-community/ethereum.nix";
+    ethereum-nix.url = "github:ponkila/ethereum.nix";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
     nixos-generators.inputs.nixpkgs.follows = "nixpkgs";
