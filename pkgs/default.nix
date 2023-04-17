@@ -3,4 +3,5 @@
 
 { pkgs ? (import ../nixpkgs.nix) { } }: {
   # example = pkgs.callPackage ./example { };
+    eth-duties = pkgs.callPackage ./eth-duties { };
 }
