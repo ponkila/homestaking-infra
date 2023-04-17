@@ -40,6 +40,8 @@
   };
 
   boot.kernelParams = [
+    "boot.shell_on_fail"
+
     "mitigations=off"
     "l1tf=off"
     "mds=off"
