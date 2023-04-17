@@ -6,9 +6,30 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # These kmodules are implicit requirements of netboot
-  boot.initrd.availableKernelModules = [ "squashfs" "overlay" ];
-  boot.initrd.kernelModules = [ "loop" "overlay" ];
+  boot.initrd.availableKernelModules = [
+    # netboot
+    "overlay"
+    "squashfs"
+
+    # kvm
+    "9p"
+    "9pnet_virtio"
+    "virtio_blk"
+    "virtio_mmio"
+    "virtio_net"
+    "virtio_pci"
+    "virtio_scsi"
+  ];
+  boot.initrd.kernelModules = [
+    # netboot
+    "loop"
+    "overlay"
+
+    # kvm
+    "virtio_balloon"
+    "virtio_console"
+    "virtio_rng"
+  ];
 
   fileSystems."/" = lib.mkImageMediaOverride {
     fsType = "tmpfs";
