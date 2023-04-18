@@ -7,8 +7,10 @@
   # This one contains whatever you want to overlay
   # You can change versions, add patches, set compilation flags, anything really.
   # https://nixos.wiki/wiki/Overlays
-  modifications = super: prev: with super.lib; {
-    lighthouse = prev.lighthouse.overrideAttrs (old: rec {
+  # final: # package set with all overlays applied, a "fixed" point
+  # prev: # state of the package set before applying this overlay
+  modifications = final: prev: {
+    lighthouse = prev.lighthouse.overrideAttrs (oldAttrs: rec {
       # Enables aggressive optimisations including full LTO
       PROFILE = "maxperf";
     });
