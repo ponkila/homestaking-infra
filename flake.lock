@@ -35,15 +35,15 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1681773339,
-        "narHash": "sha256-cFvUT4VFd6zSzm/E3Qn7Mct794R4UsGv78McdDth/6I=",
-        "owner": "ponkila",
+        "lastModified": 1681902544,
+        "narHash": "sha256-wVZnlOFHaqaWB+h+hbdD8pdSta3iKbWeyUGFTWNVGck=",
+        "owner": "nix-community",
         "repo": "ethereum.nix",
-        "rev": "78f0cfefa65c3db396333b8bf90db39582d48e98",
+        "rev": "127914027da6c7a04159a154ff3ee2ceeafd5d7d",
         "type": "github"
       },
       "original": {
-        "owner": "ponkila",
+        "owner": "nix-community",
         "repo": "ethereum.nix",
         "type": "github"
       }
