@@ -104,7 +104,6 @@
           ./modules/eth/lighthouse-beacon.nix
           ./modules/eth/mev-boost.nix
           ./system/global.nix
-          ./system/ramdisk.nix
           ./home-manager/core.nix
           home-manager.nixosModules.home-manager
           ({ pkgs, ... }: {
@@ -116,8 +115,7 @@
             ];
           }
         ];
-        customFormats = customFormats;
-        format = "kexecTree";
+        format = "install-iso";
       };
 
       darwinConfigurations."ponkila-persistent-epsilon" = darwin.lib.darwinSystem {
