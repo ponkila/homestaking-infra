@@ -22,27 +22,19 @@ in
   # Erigon options
   erigon = rec {
     endpoint = infra.ip;
-    datadir = "/var/mnt/erigon";
-    mount = {
-      source = "/dev/disk/by-label/erigon"; # FIXME
-      target = datadir;
-    };
+    datadir = "/var/mnt/eth/erigon";
   };
 
   # Lighthouse options
   lighthouse = rec {
     endpoint = infra.ip;
-    datadir = "/var/mnt/lighthouse";
+    datadir = "/var/mnt/eth/lighthouse";
     exec.endpoint = "http://${infra.ip}:8551";
     mev-boost.endpoint = "http://${infra.ip}:18550";
     slasher = {
       enable = false;
       history-length = 256;
       max-db-size = 16;
-    };
-    mount = {
-      source = "/dev/disk/by-label/lighthouse"; # FIXME
-      target = datadir;
     };
   };
 
@@ -53,24 +45,9 @@ in
       secrets."wireguard/wg0" = {
         path = "%r/wireguard/wg0.conf";
       };
-      age.sshKeyPaths = [ "/var/mnt/secrets/ssh/id_ed25519" ];
+      age.sshKeyPaths = [ "/var/mnt/eth/secrets/ssh/id_ed25519" ];
     };
   };
-
-  systemd.mounts = [
-    {
-      enable = true;
-
-      description = "secrets storage";
-
-      what = "/dev/disk/by-label/secrets"; # FIXME
-      where = "/var/mnt/secrets";
-      type = "btrfs";
-
-      before = [ "sops-nix.service" "sshd.service" ];
-      wantedBy = [ "multi-user.target" ];
-    }
-  ];
 
   # Prometheus
   services.prometheus = {
