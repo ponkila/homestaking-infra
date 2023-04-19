@@ -19,6 +19,8 @@ in
   networking.hostName = "dinar-ephemeral-alpha";
   time.timeZone = "Europe/Helsinki";
 
+  boot.kernelPackages = pkgs.linuxPackagesFor (pkgs.linux);
+
   # Erigon options
   erigon = rec {
     endpoint = infra.ip;
