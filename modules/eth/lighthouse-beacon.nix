@@ -36,33 +36,12 @@ in
     datadir = mkOption {
       type = types.str;
     };
-    mount = {
-      source = mkOption { type = types.str; };
-      target = mkOption { type = types.str; };
-      type = mkOption { type = types.str; };
-    };
   };
 
   config = mkIf cfg.enable {
     # package
     environment.systemPackages = with pkgs; [
       lighthouse
-    ];
-
-    # mount
-    systemd.mounts = [
-      {
-        enable = true;
-
-        description = "lighthouse storage";
-
-        what = cfg.mount.source;
-        where = cfg.mount.target;
-        options = "noatime";
-        type = cfg.mount.type;
-
-        wantedBy = [ "multi-user.target" ];
-      }
     ];
 
     # service
