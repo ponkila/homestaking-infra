@@ -55,7 +55,7 @@
     "tsx=on"
     "tsx_async_abort=off"
   ];
-  boot.kernelPackages = pkgs.linuxPackagesFor (pkgs.linux_latest);
+  boot.kernelPackages = lib.mkDefault (pkgs.linuxPackagesFor (pkgs.linux_latest));
 
   environment.systemPackages = with pkgs; [
     btrfs-progs
