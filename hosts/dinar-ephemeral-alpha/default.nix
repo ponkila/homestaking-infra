@@ -74,6 +74,16 @@ in
     }
   ];
 
+  # SSH
+  services.openssh = {
+    enable = true;
+    settings.PasswordAuthentication = false;
+    hostKeys = [{
+      path = "/var/mnt/secrets/ssh/id_ed25519"; 
+      type = "ed25519";
+    }];
+  };
+
   # Prometheus
   services.prometheus = {
     enable = false;
