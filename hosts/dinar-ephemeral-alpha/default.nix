@@ -25,6 +25,7 @@ in
     mount = {
       source = "/dev/sda3";
       target = datadir;
+      type = "ext4"
     };
   };
 
@@ -42,6 +43,7 @@ in
     mount = {
       source = "/dev/sda2";
       target = datadir;
+      type = "ext4"
     };
   };
 
