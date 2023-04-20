@@ -18,6 +18,7 @@ in
     mount = {
       source = mkOption { type = types.str; };
       target = mkOption { type = types.str; };
+      type = mkOption { type = types.str; };
     };
   };
 
@@ -37,7 +38,7 @@ in
         what = cfg.mount.source;
         where = cfg.mount.target;
         options = "noatime";
-        type = "btrfs";
+        type = cfg.mount.type;
 
         wantedBy = [ "multi-user.target" ];
       }
