@@ -17,6 +17,8 @@
   inputs = {
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     darwin.url = "github:lnl7/nix-darwin";
+    disko.inputs.nixpkgs.follows = "nixpkgs";
+    disko.url = "github:nix-community/disko";
     ethereum-nix.inputs.nixpkgs.follows = "nixpkgs";
     ethereum-nix.url = "github:nix-community/ethereum.nix";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
@@ -31,6 +33,7 @@
   outputs =
     { self
     , darwin
+    , disko
     , ethereum-nix
     , home-manager
     , nixos-generators
@@ -87,6 +90,7 @@
           ./system/ramdisk.nix
           ./home-manager/core.nix
           home-manager.nixosModules.home-manager
+          disko.nixosModules.disko
           ({ pkgs, ... }: {
             nixpkgs.overlays = [ ethereum-nix.overlays.default ];
           })
@@ -105,12 +109,14 @@
         specialArgs = { inherit inputs outputs; };
         modules = [
           ./hosts/dinar-ephemeral-alpha
+          ./hosts/dinar-ephemeral-alpha/mounts.nix
           ./modules/eth/erigon.nix
           ./modules/eth/lighthouse-beacon.nix
           ./modules/eth/mev-boost.nix
           ./system/global.nix
           ./home-manager/core.nix
           home-manager.nixosModules.home-manager
+          disko.nixosModules.disko
           ({ pkgs, ... }: {
             nixpkgs.overlays = [ ethereum-nix.overlays.default ];
           })

@@ -24,17 +24,18 @@ in
   # Erigon options
   erigon = rec {
     endpoint = infra.ip;
-    datadir = "/var/mnt/erigon";
+    datadir = "/mnt/eth/erigon";
     mount = {
-      source = "/dev/disk/by-label/erigon"; # FIXME
+      source = "/dev/sda3";
       target = datadir;
+      type = "ext4";
     };
   };
 
   # Lighthouse options
   lighthouse = rec {
     endpoint = infra.ip;
-    datadir = "/var/mnt/lighthouse";
+    datadir = "/mnt/eth/lighthouse";
     exec.endpoint = "http://${infra.ip}:8551";
     mev-boost.endpoint = "http://${infra.ip}:18550";
     slasher = {
@@ -43,8 +44,9 @@ in
       max-db-size = 16;
     };
     mount = {
-      source = "/dev/disk/by-label/lighthouse"; # FIXME
+      source = "/dev/sda2";
       target = datadir;
+      type = "ext4";
     };
   };
 
@@ -55,7 +57,7 @@ in
       secrets."wireguard/wg0" = {
         path = "%r/wireguard/wg0.conf";
       };
-      age.sshKeyPaths = [ "/var/mnt/secrets/ssh/id_ed25519" ];
+      age.sshKeyPaths = [ "/mnt/secrets/ssh/id_ed25519" ];
     };
   };
 
@@ -65,9 +67,9 @@ in
 
       description = "secrets storage";
 
-      what = "/dev/disk/by-label/secrets"; # FIXME
-      where = "/var/mnt/secrets";
-      type = "btrfs";
+      what = "/dev/sda1";
+      where = "/mnt/secrets";
+      type = "ext4";
 
       before = [ "sops-nix.service" "sshd.service" ];
       wantedBy = [ "multi-user.target" ];
@@ -79,7 +81,7 @@ in
     enable = true;
     settings.PasswordAuthentication = false;
     hostKeys = [{
-      path = "/var/mnt/secrets/ssh/id_ed25519";
+      path = "/mnt/secrets/ssh/id_ed25519";
       type = "ed25519";
     }];
   };

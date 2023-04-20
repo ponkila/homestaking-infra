@@ -39,6 +39,7 @@ in
     mount = {
       source = mkOption { type = types.str; };
       target = mkOption { type = types.str; };
+      type = mkOption { type = types.str; };
     };
   };
 
@@ -48,7 +49,6 @@ in
       lighthouse
     ];
 
-    # mount
     systemd.mounts = [
       {
         enable = true;
@@ -57,8 +57,8 @@ in
 
         what = cfg.mount.source;
         where = cfg.mount.target;
-        options = "noatime";
-        type = "btrfs";
+        options = lib.mkDefault "noatime";
+        type = cfg.mount.type;
 
         wantedBy = [ "multi-user.target" ];
       }
