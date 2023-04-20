@@ -120,7 +120,8 @@
             ];
           }
         ];
-        format = "install-iso";
+        customFormats = customFormats;
+        format = "copytoram-iso";
       };
 
       darwinConfigurations."ponkila-persistent-epsilon" = darwin.lib.darwinSystem {
