@@ -49,6 +49,21 @@ in
     };
   };
 
+  systemd.mounts = [
+    {
+      enable = true;
+
+      description = "secrets storage";
+
+      what = "/dev/disk/by-label/secrets"; # FIXME
+      where = "/var/mnt/secrets";
+      type = "btrfs";
+
+      before = [ "sops-nix.service" "sshd.service" ];
+      wantedBy = [ "multi-user.target" ];
+    }
+  ];
+
   # Prometheus
   services.prometheus = {
     enable = false;

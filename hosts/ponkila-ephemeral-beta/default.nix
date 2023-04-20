@@ -23,6 +23,10 @@ in
   erigon = rec {
     endpoint = infra.ip;
     datadir = "/var/mnt/erigon";
+    mount = {
+      source = "/dev/disk/by-label/erigon";
+      target = datadir;
+    };
   };
 
   # Lighthouse options
@@ -36,6 +40,10 @@ in
       history-length = 256;
       max-db-size = 16;
     };
+    mount = {
+      source = "/dev/disk/by-label/lighthouse";
+      target = datadir;
+    };
   };
 
   # Secrets
@@ -48,6 +56,21 @@ in
       age.sshKeyPaths = [ "/var/mnt/secrets/ssh/id_ed25519" ];
     };
   };
+
+  systemd.mounts = [
+    {
+      enable = true;
+
+      description = "secrets storage";
+
+      what = "/dev/disk/by-label/secrets";
+      where = "/var/mnt/secrets";
+      type = "btrfs";
+
+      before = [ "sshd.service" ];
+      wantedBy = [ "multi-user.target" ];
+    }
+  ];
 
   # Prometheus
   services.prometheus = {
