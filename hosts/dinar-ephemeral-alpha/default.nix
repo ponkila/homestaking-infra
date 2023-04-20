@@ -22,7 +22,10 @@ in
   # Erigon options
   erigon = rec {
     endpoint = infra.ip;
-    datadir = "/var/mnt/eth/erigon";
+    mount = {
+      source = "/dev/sda3";
+      target = datadir;
+    };
   };
 
   # Lighthouse options
@@ -35,6 +38,10 @@ in
       enable = false;
       history-length = 256;
       max-db-size = 16;
+    };
+    mount = {
+      source = "/dev/sda2";
+      target = datadir;
     };
   };
 
