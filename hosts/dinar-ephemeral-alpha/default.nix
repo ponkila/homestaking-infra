@@ -22,6 +22,7 @@ in
   # Erigon options
   erigon = rec {
     endpoint = infra.ip;
+    datadir = "/mnt/eth/erigon";
     mount = {
       source = "/dev/sda3";
       target = datadir;
@@ -32,7 +33,7 @@ in
   # Lighthouse options
   lighthouse = rec {
     endpoint = infra.ip;
-    datadir = "/var/mnt/eth/lighthouse";
+    datadir = "/mnt/eth/lighthouse";
     exec.endpoint = "http://${infra.ip}:8551";
     mev-boost.endpoint = "http://${infra.ip}:18550";
     slasher = {
@@ -54,7 +55,7 @@ in
       secrets."wireguard/wg0" = {
         path = "%r/wireguard/wg0.conf";
       };
-      age.sshKeyPaths = [ "/var/mnt/eth/secrets/ssh/id_ed25519" ];
+      age.sshKeyPaths = [ "/mnt/secrets/ssh/id_ed25519" ];
     };
   };
 
@@ -64,9 +65,9 @@ in
 
       description = "secrets storage";
 
-      what = "/dev/disk/by-label/secrets"; # FIXME
-      where = "/var/mnt/secrets";
-      type = "btrfs";
+      what = "/dev/sda1";
+      where = "/mnt/secrets";
+      type = "ext4";
 
       before = [ "sops-nix.service" "sshd.service" ];
       wantedBy = [ "multi-user.target" ];
