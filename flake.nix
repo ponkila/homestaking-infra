@@ -53,6 +53,11 @@
           formatAttr = "kexecTree";
           imports = [ ./system/netboot.nix ];
         };
+        "copytoram-iso" = {
+          formatAttr = "isoImage";
+          imports = [ ./system/copytoram-iso.nix ];
+          filename = "*.iso";
+        };
       };
     in
     {
