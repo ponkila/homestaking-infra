@@ -1,9 +1,9 @@
 # sudo nix run github:nix-community/disko -- --mode zap_create_mount ./dinar-disko-config.nix --arg disks '[ "/dev/sda" ]'
 
-{ disks ? [ "/dev/vdb" ], ... }: {
+{ disks ? [ "/dev/sda" ], ... }: {
   disko.devices = {
     disk = {
-      vdb = {
+      sda = {
         device = builtins.elemAt disks 0;
         type = "disk";
         content = {
