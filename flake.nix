@@ -74,13 +74,9 @@
           ./hosts/ponkila-ephemeral-beta
           ./system/ramdisk.nix
           home-manager.nixosModules.home-manager
-          {
-            nixpkgs.overlays = [
-              ethereum-nix.overlays.default
-              outputs.overlays.additions
-              outputs.overlays.modifications
-            ];
-          }
+          ({ pkgs, ... }: {
+            nixpkgs.overlays = [ ethereum-nix.overlays.default ];
+          })
           {
             home-manager.sharedModules = [
               sops-nix.homeManagerModules.sops
