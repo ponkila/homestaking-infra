@@ -19,8 +19,6 @@ in
   networking.hostName = "ponkila-ephemeral-beta";
   time.timeZone = "Europe/Helsinki";
 
-
-
   # Erigon options
   erigon = rec {
     endpoint = infra.ip;

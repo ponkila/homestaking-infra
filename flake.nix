@@ -83,7 +83,6 @@
         specialArgs = { inherit inputs outputs; };
         modules = [
           ./hosts/ponkila-ephemeral-beta
-          ./hosts/ponkila-ephemeral-beta/mounts.nix
           ./modules/eth/erigon.nix
           ./modules/eth/lighthouse-beacon.nix
           ./modules/eth/mev-boost.nix

@@ -15,12 +15,32 @@ in
     datadir = mkOption {
       type = types.str;
     };
+    mount = {
+      source = mkOption { type = types.str; };
+      target = mkOption { type = types.str; };
+      type = mkOption { type = types.str; };
+    };
   };
 
   config = mkIf cfg.enable {
     # package
     environment.systemPackages = with pkgs; [
       erigon
+    ];
+
+    systemd.mounts = [
+      {
+        enable = true;
+
+        description = "erigon storage";
+
+        what = cfg.mount.source;
+        where = cfg.mount.target;
+        options = lib.mkDefault "noatime";
+        type = cfg.mount.type;
+
+        wantedBy = [ "multi-user.target" ];
+      }
     ];
 
     # service
