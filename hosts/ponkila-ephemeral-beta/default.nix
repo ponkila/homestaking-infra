@@ -26,7 +26,7 @@ in
     mount = {
       source = "/dev/disk/by-label/erigon";
       target = datadir;
-      type = "btrfs"
+      type = "btrfs";
     };
   };
 
@@ -44,7 +44,7 @@ in
     mount = {
       source = "/dev/disk/by-label/lighthouse";
       target = datadir;
-      type = "btrfs"
+      type = "btrfs";
     };
   };
 
