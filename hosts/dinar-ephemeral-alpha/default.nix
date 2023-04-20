@@ -79,7 +79,7 @@ in
     enable = true;
     settings.PasswordAuthentication = false;
     hostKeys = [{
-      path = "/var/mnt/secrets/ssh/id_ed25519"; 
+      path = "/var/mnt/secrets/ssh/id_ed25519";
       type = "ed25519";
     }];
   };
