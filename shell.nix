@@ -15,8 +15,8 @@
     # Enable experimental features without having to specify the argument
     NIX_CONFIG = "extra-experimental-features = nix-command flakes";
     nativeBuildInputs = with pkgs; [
-      nix
       git
+      nix
       sops
     ];
   };
