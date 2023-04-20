@@ -1,24 +1,67 @@
-{ inputs
-, config
-, pkgs
-, lib
-, ...
-}:
+{ pkgs, config, inputs, lib, ... }:
+with lib;
+let
+  cfg = config.user;
+in
 {
-
-  users.users.core = {
-    isNormalUser = true;
-    group = "core";
-    extraGroups = [ "wheel" ];
-    openssh.authorizedKeys.keys = [
-      "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBNMKgTTpGSvPG4p8pRUWg1kqnP9zPKybTHQ0+Q/noY5+M6uOxkLy7FqUIEFUT9ZS/fflLlC/AlJsFBU212UzobA= ssh@secretive.sandbox.local"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKEdpdbTOz0h9tVvkn13k1e8X7MnctH3zHRFmYWTbz9T kari@torque"
-      "sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAID5aw7sqJrXdKdNVu9IAyCCw1OYHXFQmFu/s/K+GAmGfAAAABHNzaDo= da@pusu"
-      "sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAINwWpZR5WuzyJlr7jYoe0mAYp+MJ12doozfqGz9/8NP/AAAABHNzaDo= da@pusu"
-    ];
-    shell = pkgs.fish;
+  options.user = {
+    authorizedKeys = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+    };
   };
-  users.groups.core = { };
-  environment.shells = [ pkgs.fish ];
-  programs.fish.enable = true;
+
+  config = {
+    users.users.core = {
+      isNormalUser = true;
+      group = "core";
+      extraGroups = [ "wheel" ];
+      openssh.authorizedKeys.keys = cfg.authorizedKeys;
+      shell = pkgs.fish;
+    };
+    users.groups.core = { };
+    environment.shells = [ pkgs.fish ];
+    programs.fish.enable = true;
+
+    home-manager.users.core = { pkgs, ... }: {
+
+      home.packages = with pkgs; [
+        file
+        tree
+        bind # nslookup
+      ];
+
+      programs = {
+        tmux.enable = true;
+        htop.enable = true;
+        vim.enable = true;
+        git.enable = true;
+        fish.enable = true;
+        fish.loginShellInit = "fish_add_path --move --prepend --path $HOME/.nix-profile/bin /run/wrappers/bin /etc/profiles/per-user/$USER/bin /run/current-system/sw/bin /nix/var/nix/profiles/default/bin";
+
+        home-manager.enable = true;
+      };
+
+      home.stateVersion = "23.05";
+    };
+
+    systemd.services.wg0 = {
+      enable = true;
+
+      description = "wireguard interface for cross-node communication";
+      requires = [ "network-online.target" ];
+      after = [ "network-online.target" ];
+
+      serviceConfig = {
+        Type = "oneshot";
+      };
+
+      preStart = "${pkgs.wireguard-tools}/bin/wg-quick down /run/user/1000/wireguard/wg0.conf || true";
+      script = ''${pkgs.wireguard-tools}/bin/wg-quick \
+        up /run/user/1000/wireguard/wg0.conf
+      '';
+
+      wantedBy = [ "multi-user.target" ];
+    };
+  };
 }

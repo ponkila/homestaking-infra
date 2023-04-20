@@ -2,7 +2,7 @@
 
 let
   # General
-  infra.ip = "192.168.100.10";
+  infra.ip = "192.168.100.31";
 in
 {
   # User options
@@ -16,17 +16,17 @@ in
   };
 
   # Localization
-  networking.hostName = "ponkila-ephemeral-beta";
+  networking.hostName = "dinar-ephemeral-alpha";
   time.timeZone = "Europe/Helsinki";
 
-
+  boot.kernelPackages = pkgs.linuxPackagesFor (pkgs.linux);
 
   # Erigon options
   erigon = rec {
     endpoint = infra.ip;
     datadir = "/var/mnt/erigon";
     mount = {
-      source = "/dev/disk/by-label/erigon";
+      source = "/dev/disk/by-label/erigon"; # FIXME
       target = datadir;
     };
   };
@@ -43,7 +43,7 @@ in
       max-db-size = 16;
     };
     mount = {
-      source = "/dev/disk/by-label/lighthouse";
+      source = "/dev/disk/by-label/lighthouse"; # FIXME
       target = datadir;
     };
   };
@@ -65,11 +65,11 @@ in
 
       description = "secrets storage";
 
-      what = "/dev/disk/by-label/secrets";
+      what = "/dev/disk/by-label/secrets"; # FIXME
       where = "/var/mnt/secrets";
       type = "btrfs";
 
-      before = [ "sshd.service" ];
+      before = [ "sops-nix.service" "sshd.service" ];
       wantedBy = [ "multi-user.target" ];
     }
   ];
