@@ -8,10 +8,10 @@
 
   # GRUB timeout
   boot.loader.timeout = lib.mkForce 1;
-  
+
   # Load into a tmpfs during stage-1
   boot.kernelParams = [ "copytoram" ];
-  
+
   # EFI & USB booting
   isoImage = {
     makeEfiBootable = true;
