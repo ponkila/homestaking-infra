@@ -19,6 +19,8 @@ in
   networking.hostName = "ponkila-ephemeral-beta";
   time.timeZone = "Europe/Helsinki";
 
+
+
   # Erigon options
   erigon = rec {
     endpoint = infra.ip;
@@ -73,6 +75,16 @@ in
       wantedBy = [ "multi-user.target" ];
     }
   ];
+
+  # SSH
+  services.openssh = {
+    enable = true;
+    settings.PasswordAuthentication = false;
+    hostKeys = [{
+      path = "/var/mnt/secrets/ssh/id_ed25519";
+      type = "ed25519";
+    }];
+  };
 
   # Prometheus
   services.prometheus = {
