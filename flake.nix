@@ -63,6 +63,7 @@
           ./hosts/ponkila-ephemeral-beta
           ./system/ramdisk.nix
           home-manager.nixosModules.home-manager
+          disko.nixosModules.disko
           {
             nixpkgs.overlays = [
               ethereum-nix.overlays.default
@@ -78,6 +79,36 @@
         ];
         customFormats = customFormats;
         format = "kexecTree";
+      };
+
+      "dinar-ephemeral-alpha" = nixos-generators.nixosGenerate {
+        system = "x86_64-linux";
+        specialArgs = { inherit inputs outputs; };
+        modules = [
+          ./hosts/dinar-ephemeral-alpha
+          ./hosts/dinar-ephemeral-alpha/mounts.nix
+          ./modules/eth/erigon.nix
+          ./modules/eth/lighthouse-beacon.nix
+          ./modules/eth/mev-boost.nix
+          ./system/global.nix
+          ./home-manager/core.nix
+          home-manager.nixosModules.home-manager
+          disko.nixosModules.disko
+          {
+            nixpkgs.overlays = [
+              ethereum-nix.overlays.default
+              outputs.overlays.additions
+              outputs.overlays.modifications
+            ];
+          }
+          {
+            home-manager.sharedModules = [
+              sops-nix.homeManagerModules.sops
+            ];
+          }
+        ];
+        customFormats = customFormats;
+        format = "copytoram-iso";
       };
 
       darwinConfigurations."ponkila-persistent-epsilon" = darwin.lib.darwinSystem {
