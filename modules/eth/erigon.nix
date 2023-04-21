@@ -24,9 +24,9 @@ in
 
   config = mkIf cfg.enable (mkMerge [
     # package
-      environment.systemPackages = with pkgs; [
-        erigon
-      ];
+    environment.systemPackages = with pkgs; [
+      erigon
+    ];
 
     # only execute this if cfg.mounts are set
     (mkIf cfg.mounts {
@@ -43,10 +43,10 @@ in
 
           wantedBy = [ "multi-user.target" ];
         }
-      ]; 
+      ];
     })
     # always execute this
-    (mkIf cfg.enable { 
+    (mkIf cfg.enable {
       # service
       systemd.services.erigon = {
         enable = true;
