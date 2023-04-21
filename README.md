@@ -20,10 +20,22 @@ We are currently working on [HomeStakerOS](https://github.com/ponkila/Homestaker
 - `shell.nix`: Devshell for boostrapping (`nix develop` or `nix-shell`)
 - `home-manager`: Home-manager configuration
 - `hosts`: NixOS configurations, accessible via `nix build .#<hostname>`
-  - `ponkila-ephemeral-beta`
-  - `ponkila-persistent-epsilon`
-  - `dinar-ephemeral-alpha`
+  - `ponkila-ephemeral-beta`: x86_64-linux, kexecTree, lighthouse + erigon
+  - `ponkila-persistent-epsilon`: x86_64-darwin, persistent 
+  - `dinar-ephemeral-alpha`: x86_64-linux, copytoram-iso, lighthouse + erigon
 - `modules`: Shared module configurations
 - `overlay`: Patches and version overrides for some packages. Accessible via `nix build`
 - `pkgs`: Our custom packages. Also accessible via `nix build`
 - `system`: Shared system configurations
+
+## Supported formats
+format        | output
+--- | ---
+kexecTree     | initrd, bzImage and a kexec-boot script
+copytoram-iso | ISO image, loaded into a tmpfs during stage-1
+
+## Secrets and keys
+loading..
+
+## Deployment
+loading..
