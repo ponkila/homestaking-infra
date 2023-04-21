@@ -3,9 +3,22 @@
 # https://sourcegraph.com/github.com/shaunsingh/nix-darwin-dotfiles@8ce14d457f912f59645e167707c4d950ae1c3a6e/-/blob/flake.nix
 {
 
+  nixConfig = {
+    extra-substituters = [
+      "https://cache.nixos.org"
+      "https://nix-community.cachix.org"
+    ];
+    extra-trusted-public-keys = [
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+    ];
+  };
+
   inputs = {
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     darwin.url = "github:lnl7/nix-darwin";
+    disko.inputs.nixpkgs.follows = "nixpkgs";
+    disko.url = "github:nix-community/disko";
     ethereum-nix.inputs.nixpkgs.follows = "nixpkgs";
     ethereum-nix.url = "github:nix-community/ethereum.nix";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
@@ -20,6 +33,7 @@
   outputs =
     { self
     , darwin
+    , disko
     , ethereum-nix
     , home-manager
     , nixos-generators
@@ -42,9 +56,18 @@
           formatAttr = "kexecTree";
           imports = [ ./system/netboot.nix ];
         };
+        "copytoram-iso" = {
+          formatAttr = "isoImage";
+          imports = [ ./system/copytoram-iso.nix ];
+          filename = "*.iso";
+        };
       };
     in
     {
+
+      formatter = forAllSystems (system:
+        nixpkgs.legacyPackages.${system}.nixpkgs-fmt
+      );
 
       overlays = import ./overlays { inherit inputs; };
 
@@ -59,9 +82,13 @@
         system = "x86_64-linux";
         specialArgs = { inherit inputs outputs; };
         modules = [
-          ./home-manager/core.nix
           ./hosts/ponkila-ephemeral-beta
+          ./modules/eth/erigon.nix
+          ./modules/eth/lighthouse-beacon.nix
+          ./modules/eth/mev-boost.nix
+          ./system/global.nix
           ./system/ramdisk.nix
+          ./home-manager/core.nix
           home-manager.nixosModules.home-manager
           disko.nixosModules.disko
           {
