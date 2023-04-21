@@ -23,11 +23,6 @@ in
   };
 
   config = mkIf cfg.enable (mkMerge [
-    # package
-    environment.systemPackages = with pkgs; [
-      erigon
-    ];
-
     # only execute this if cfg.mounts are set
     (mkIf cfg.mounts {
       systemd.mounts = [
@@ -47,6 +42,11 @@ in
     })
     # always execute this
     (mkIf cfg.enable {
+      # package
+      environment.systemPackages = with pkgs; [
+        erigon
+      ];
+
       # service
       systemd.services.erigon = {
         enable = true;
