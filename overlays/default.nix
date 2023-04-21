@@ -1,15 +1,13 @@
-# This file defines overlays
 { inputs, ... }:
 {
-  # This one brings our custom packages from the 'pkgs' directory
+  # Adds custom packages
   additions = final: _prev: import ../pkgs { pkgs = final; };
 
-  # This one contains whatever you want to overlay
-  # You can change versions, add patches, set compilation flags, anything really.
-  # https://nixos.wiki/wiki/Overlays
+  # Modifies existing packages
   modifications = final: prev: {
-    # example = prev.example.overrideAttrs (oldAttrs: rec {
-    # ...
-    # });
+    lighthouse = prev.lighthouse.overrideAttrs (oldAttrs: rec {
+      # Enables aggressive optimisations including full LTO
+      PROFILE = "maxperf";
+    });
   };
 }
