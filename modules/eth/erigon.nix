@@ -23,23 +23,27 @@ in
   };
 
   config = mkIf cfg.enable (mkMerge [
-    # only execute this if cfg.mounts are set
-    (mkIf cfg.mounts {
-      systemd.mounts = [
-        {
-          enable = true;
+    # only execute this if mount options are set
+    (mkIf
+      (cfg.mount ? cfg.mount.source &&
+        cfg.mount ? cfg.mount.target &&
+        cfg.mount ? cfg.mount.type)
+      {
+        systemd.mounts = [
+          {
+            enable = true;
 
-          description = "erigon storage";
+            description = "erigon storage";
 
-          what = cfg.mount.source;
-          where = cfg.mount.target;
-          options = lib.mkDefault "noatime";
-          type = cfg.mount.type;
+            what = cfg.mount.source;
+            where = cfg.mount.target;
+            options = lib.mkDefault "noatime";
+            type = cfg.mount.type;
 
-          wantedBy = [ "multi-user.target" ];
-        }
-      ];
-    })
+            wantedBy = [ "multi-user.target" ];
+          }
+        ];
+      })
     # always execute this
     (mkIf cfg.enable {
       # package
