@@ -127,6 +127,34 @@
         format = "copytoram-iso";
       };
 
+      "ponkila-ephemeral-gamma" = nixos-generators.nixosGenerate {
+        system = "aarch64-linux";
+        specialArgs = { inherit inputs outputs; };
+        modules = [
+          ./home-manager/core.nix
+          ./hosts/ponkila-ephemeral-gamma
+          ./system/global.nix
+          ./system/netboot.nix
+          ./system/ramdisk-rpi4.nix
+          home-manager.nixosModules.home-manager
+          disko.nixosModules.disko
+          {
+            nixpkgs.overlays = [
+              ethereum-nix.overlays.default
+              outputs.overlays.additions
+              outputs.overlays.modifications
+            ];
+          }
+          {
+            home-manager.sharedModules = [
+              sops-nix.homeManagerModules.sops
+            ];
+          }
+        ];
+        customFormats = customFormats;
+        format = "kexecTree";
+      };
+
       darwinConfigurations."ponkila-persistent-epsilon" = darwin.lib.darwinSystem {
         specialArgs = { inherit inputs outputs; };
         system = "x86_64-darwin";
