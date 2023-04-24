@@ -13,7 +13,6 @@
   # Localization
   networking.hostName = "ponkila-ephemeral-beta";
   time.timeZone = "Europe/Helsinki";
-  console.keyMap = "fi";
 
   # SSH
   services.openssh = {
