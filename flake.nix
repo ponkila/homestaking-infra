@@ -71,6 +71,7 @@
         system = "x86_64-linux";
         specialArgs = { inherit inputs outputs; };
         modules = [
+          ./modules/networking/wireguard.nix
           ./hosts/ponkila-ephemeral-beta
           ./modules/eth/erigon.nix
           ./modules/eth/lighthouse-beacon.nix
@@ -101,6 +102,7 @@
         system = "x86_64-linux";
         specialArgs = { inherit inputs outputs; };
         modules = [
+          ./modules/networking/wireguard.nix
           ./hosts/dinar-ephemeral-alpha
           ./hosts/dinar-ephemeral-alpha/mounts.nix
           ./modules/eth/erigon.nix
