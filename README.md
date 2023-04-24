@@ -8,7 +8,7 @@ We are currently working on [HomeStakerOS](https://github.com/ponkila/Homestaker
 
 ## Keypoints
 - Multiple NixOS configurations for running Ethereum nodes
-- Supports declarative disk partitioning via [disko](https://github.com/nix-community/disko)
+- Uses declarative disk partitioning via [disko](https://github.com/nix-community/disko)
 - Runs on RAM disk, providing significant performance benefits by reducing I/O operations
 - Deployment secrets using [sops-nix](https://github.com/Mic92/sops-nix) for secure handling of sensitive information
 - Utilization of [ethereum.nix](https://github.com/nix-community/ethereum.nix) providing an up-to-date package management solution
@@ -26,13 +26,13 @@ We are currently working on [HomeStakerOS](https://github.com/ponkila/Homestaker
 - `modules`: Shared module configurations
 - `overlay`: Patches and version overrides for some packages. Accessible via `nix build`
 - `pkgs`: Our custom packages. Also accessible via `nix build`
-- `system`: Shared system configurations
+- `system`: Shared system configurations and custom formats
 
 ## Supported formats
 format        | output
 --- | ---
 kexecTree     | initrd, bzImage and a kexec-boot script
-copytoram-iso | ISO image, loaded into a tmpfs during stage-1
+copytoram-iso | ISO image, loaded into RAM during stage-1
 
 ## Secrets and keys
 loading..
