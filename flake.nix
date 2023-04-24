@@ -133,9 +133,15 @@
               sops-nix.homeManagerModules.sops
             ];
           }
+          {
+            # GRUB timeout
+            boot.loader.timeout = nixpkgs.lib.mkForce 1;
+
+            # Load into a tmpfs during stage-1
+            boot.kernelParams = [ "copytoram" ];
+          }
         ];
-        customFormats = customFormats;
-        format = "copytoram-iso";
+        format = "install-iso";
       };
 
       darwinConfigurations."ponkila-persistent-epsilon" = darwin.lib.darwinSystem {

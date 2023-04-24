@@ -25,11 +25,6 @@ in
   erigon = rec {
     endpoint = infra.ip;
     datadir = "/mnt/eth/erigon";
-    mount = {
-      source = "/dev/sda3";
-      target = datadir;
-      type = "ext4";
-    };
   };
 
   # Lighthouse options
@@ -42,11 +37,6 @@ in
       enable = false;
       history-length = 256;
       max-db-size = 16;
-    };
-    mount = {
-      source = "/dev/sda2";
-      target = datadir;
-      type = "ext4";
     };
   };
 
@@ -65,10 +55,10 @@ in
     {
       enable = true;
 
-      description = "secrets storage";
+      description = "storage";
 
       what = "/dev/sda1";
-      where = "/mnt/secrets";
+      where = "/mnt/eth";
       type = "ext4";
 
       before = [ "sops-nix.service" "sshd.service" ];
