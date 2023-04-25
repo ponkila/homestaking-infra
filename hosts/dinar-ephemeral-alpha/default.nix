@@ -3,7 +3,7 @@
 let
   # General
   infra.ip = "192.168.100.31";
-  sshKeysPath = "/mnt/secrets/ssh/id_ed25519"; # FIXME
+  sshKeysPath = "/mnt/secrets/ssh/id_ed25519";
 in
 {
   # User options
@@ -73,7 +73,7 @@ in
     settings.PasswordAuthentication = false;
     hostKeys = [{
       path = sshKeysPath;
-      type = "id_ed25519";
+      type = "ed25519";
     }];
   };
 
