@@ -42,7 +42,7 @@ Tested on Ubuntu 22.04.2 LTS aarch64, 5.15.0-69-generic
     ---
     ### Debug notes
     
-    This error occurs when if `programs.fish.enable` is set to `true`, maybe something to do with [this](https://github.com/NixOS/nixpkgs/blob/f5364316e314436f6b9c8fd50592b18920ab18f9/nixos/modules/programs/fish.nix#L153)
+    This error occurs when `programs.fish.enable` is set to `true`, maybe something to do with [this](https://github.com/NixOS/nixpkgs/blob/f5364316e314436f6b9c8fd50592b18920ab18f9/nixos/modules/programs/fish.nix#L153)
     ```
     ...
     building '/nix/store/dgy59sxqj2wq2418f82n14z9cljzjin4-man-cache.drv'...
