@@ -45,7 +45,7 @@
     systemctl kexec
   '';
 
-    # A tree containing initrd.gz, bzImage, ipxe and a kexec-boot script.
+  # A tree containing initrd.gz, bzImage, ipxe and a kexec-boot script.
   system.build.kexecTree = pkgs.linkFarm "kexec-tree" [
     {
       name = "initrd.gz";
