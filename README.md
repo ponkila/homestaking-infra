@@ -28,11 +28,8 @@ We are currently working on [HomeStakerOS](https://github.com/ponkila/Homestaker
 - `pkgs`: Our custom packages. Also accessible via `nix build`
 - `system`: Shared system configurations and custom formats
 
-## Supported formats
-format        | output
---- | ---
-kexecTree     | initrd, bzImage and a kexec-boot script
-copytoram-iso | ISO image, loaded into RAM during stage-1
+## Disk formatting with disko
+loading..
 
 ## Secrets and keys
 loading..
