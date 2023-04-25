@@ -3,6 +3,7 @@
 let
   # General
   infra.ip = "192.168.100.31";
+  sshKeysPath = "/mnt/secrets/ssh/id_ed25519"; # FIXME
 in
 {
   # User options
@@ -47,7 +48,7 @@ in
       secrets."wireguard/wg0" = {
         path = "%r/wireguard/wg0.conf";
       };
-      age.sshKeyPaths = [ "/mnt/secrets/ssh/id_ed25519" ];
+      age.sshKeyPaths = [ sshKeysPath ];
     };
   };
 
@@ -71,8 +72,8 @@ in
     enable = true;
     settings.PasswordAuthentication = false;
     hostKeys = [{
-      path = "/mnt/secrets/ssh/id_ed25519";
-      type = "ed25519";
+      path = sshKeysPath;
+      type = "id_ed25519";
     }];
   };
 
