@@ -21,8 +21,9 @@ We are currently working on [HomeStakerOS](https://github.com/ponkila/Homestaker
 - `home-manager`: Home-manager configuration
 - `hosts`: NixOS configurations, accessible via `nix build .#<hostname>`
   - `ponkila-ephemeral-beta`: x86_64-linux, kexecTree, lighthouse + erigon
-  - `ponkila-persistent-epsilon`: x86_64-darwin, persistent 
-  - `dinar-ephemeral-alpha`: x86_64-linux, copytoram-iso, lighthouse + erigon
+  - `ponkila-persistent-epsilon`: x86_64-darwin | persistent 
+  - `ponkila-ephemeral-gamma`: aarch64-linux, Raspberry Pi 4 | kexecTree
+  - `dinar-ephemeral-alpha`: x86_64-linux | install-iso, lighthouse + erigon
 - `modules`: Shared module configurations
 - `overlay`: Patches and version overrides for some packages. Accessible via `nix build`
 - `pkgs`: Our custom packages. Also accessible via `nix build`
