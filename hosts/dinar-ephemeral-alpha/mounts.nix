@@ -1,4 +1,4 @@
-# sudo nix run github:nix-community/disko -- --mode zap_create_mount ./dinar-disko-config.nix --arg disks '[ "/dev/sda" ]'
+# sudo nix run github:nix-community/disko -- --mode zap_create_mount ./mounts.nix --arg disks '[ "/dev/sda" ]'
 
 { disks ? [ "/dev/sda" ], ... }: {
   disko.devices = {
@@ -13,37 +13,15 @@
             {
               name = "sda1";
               start = "1MiB";
-              end = "10MiB";
-              bootable = false;
-              content = {
-                type = "filesystem";
-                format = "ext4";
-                # systemd should handle mount
-                #mountpoint = "/secrets";
-              };
-            }
-            {
-              name = "sda2";
-              start = "10MiB";
-              end = "50%";
-              bootable = false;
-              content = {
-                type = "filesystem";
-                format = "ext4";
-                # systemd should handle mount
-                #mountpoint = "/eth/lighthouse";
-              };
-            }
-            {
-              name = "sda3";
-              start = "50%";
               end = "100%";
+              part-type = "primary";
               bootable = false;
               content = {
                 type = "filesystem";
                 format = "ext4";
+                # mountpoint has invisible /mnt prefix 
                 # systemd should handle mount
-                #mountpoint = "/eth/erigon";
+                #mountpoint = "/eth";
               };
             }
           ];

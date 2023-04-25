@@ -129,12 +129,18 @@
             ];
           }
           {
+            # Bootloader
             boot.loader.systemd-boot.enable = true;
             boot.loader.efi.canTouchEfiVariables = true;
+
+            # GRUB timeout
+            boot.loader.timeout = nixpkgs.lib.mkForce 1;
+
+            # Load into a tmpfs during stage-1
+            boot.kernelParams = [ "copytoram" ];
           }
         ];
-        customFormats = customFormats;
-        format = "copytoram-iso";
+        format = "install-iso";
       };
 
       "ponkila-ephemeral-gamma" = nixos-generators.nixosGenerate {
