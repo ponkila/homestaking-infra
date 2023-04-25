@@ -93,6 +93,10 @@
               sops-nix.homeManagerModules.sops
             ];
           }
+          {
+            boot.loader.systemd-boot.enable = true;
+            boot.loader.efi.canTouchEfiVariables = true;
+          }
         ];
         customFormats = customFormats;
         format = "kexecTree";
@@ -124,6 +128,10 @@
               sops-nix.homeManagerModules.sops
             ];
           }
+          {
+            boot.loader.systemd-boot.enable = true;
+            boot.loader.efi.canTouchEfiVariables = true;
+          }
         ];
         customFormats = customFormats;
         format = "copytoram-iso";
@@ -137,7 +145,7 @@
           ./hosts/ponkila-ephemeral-gamma
           ./system/global.nix
           ./system/netboot.nix
-          ./system/ramdisk-rpi4.nix
+          ./system/ramdisk.nix
           home-manager.nixosModules.home-manager
           disko.nixosModules.disko
           {
@@ -151,6 +159,13 @@
             home-manager.sharedModules = [
               sops-nix.homeManagerModules.sops
             ];
+          }
+          {
+            boot.loader.raspberryPi = {
+              enable = true;
+              version = 4;
+            };
+            boot.loader.grub.enable = false;
           }
         ];
         customFormats = customFormats;
