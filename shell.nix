@@ -9,6 +9,7 @@
       git
       nix
       sops
+      rsync
     ];
   };
 }
