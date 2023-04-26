@@ -41,14 +41,28 @@ in
     };
   };
 
-  # Secrets
-  home-manager.users.core = { pkgs, ... }: {
-    sops = {
-      defaultSopsFile = ./secrets/default.yaml;
-      secrets."wireguard/wg0" = {
-        path = "%r/wireguard/wg0.conf";
+  home-manager.users = {
+    root = { pkgs, ... }: {
+      sops = {
+        defaultSopsFile = ./secrets/default.yaml;
+        secrets = {
+          "wireguard/wg0" = {
+            path = "%r/wireguard/wg0.conf";
+          };
+        };
+        age.sshKeyPaths = [ sshKeysPath ];
       };
-      age.sshKeyPaths = [ sshKeysPath ];
+    };
+    core = { pkgs, ... }: {
+      sops = {
+        defaultSopsFile = ./secrets/default.yaml;
+        secrets = {
+          "jwt.hex" = {
+            path = "%r/jwt.hex";
+          };
+        };
+        age.sshKeyPaths = [ sshKeysPath ];
+      };
     };
   };
 

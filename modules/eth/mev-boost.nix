@@ -7,7 +7,7 @@
   # TODO: extend this with flannel ontop of wireguard for cross-node comms
   virtualisation.podman.defaultNetwork.settings.dns_enabled = true;
 
-  systemd.services.mev-boost = {
+  systemd.user.services.mev-boost = {
     enable = true;
 
     description = "MEV-boost allows proof-of-stake Ethereum consensus clients to outsource block construction";
@@ -17,8 +17,6 @@
     serviceConfig = {
       Restart = "always";
       RestartSec = "5s";
-      User = "core";
-      Group = "core";
       Type = "simple";
     };
 

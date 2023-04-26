@@ -72,8 +72,7 @@ in
         lighthouse
       ];
 
-      # service
-      systemd.services.lighthouse = {
+      systemd.user.services.lighthouse = {
         enable = true;
 
         description = "beacon, mainnet";
@@ -83,8 +82,6 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "5s";
-          User = "core";
-          Group = "core";
           Type = "simple";
         };
 
@@ -93,7 +90,7 @@ in
           --network mainnet \
           --http --http-address ${cfg.endpoint} \
           --execution-endpoint ${cfg.exec.endpoint} \
-          --execution-jwt ${cfg.datadir}/jwt.hex \
+          --execution-jwt %r/jwt.hex \
           --builder ${cfg.mev-boost.endpoint} \
           --prune-payloads false \
           --metrics \
