@@ -8,7 +8,7 @@ We are currently working on [HomeStakerOS](https://github.com/ponkila/Homestaker
 
 ## Keypoints
 - Multiple NixOS configurations for running Ethereum nodes
-- Uses declarative disk partitioning via [disko](https://github.com/nix-community/disko)
+- Supports declarative disk partitioning via [disko](https://github.com/nix-community/disko)
 - Runs on RAM disk, providing significant performance benefits by reducing I/O operations
 - Deployment secrets using [sops-nix](https://github.com/Mic92/sops-nix) for secure handling of sensitive information
 - Utilization of [ethereum.nix](https://github.com/nix-community/ethereum.nix) providing an up-to-date package management solution
