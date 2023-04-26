@@ -80,14 +80,18 @@ Tested on Ubuntu 22.04.2 LTS aarch64, 5.15.0-69-generic
     . $HOME/.nix-profile/etc/profile.d/nix.sh
     ```
 
-    Install nix-command
+    Install nix-command and build
 
     ```
     nix-env -iA nixpkgs.nix
     ```
 
-    Build
-
     ```
     nix --extra-experimental-features "nix-command flakes" build .#<hostname>
     ```
+
+## Disk formatting with disko
+
+## Secrets and keys
+
+## Deployment
