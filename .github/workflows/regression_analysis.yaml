@@ -40,7 +40,7 @@ jobs:
           echo $drv
           exit 1
 
-        # Get the nix store path for the target. Build and get store path for main.
+        # Get the Nix store path for the target. Build and get store path for main.
 
       - name: Get current build store path 
         id: current-store-path
