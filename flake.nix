@@ -62,33 +62,18 @@
           filename = "*.iso";
         };
       };
-    in
-    {
 
-      formatter = forAllSystems (system:
-        nixpkgs.legacyPackages.${system}.nixpkgs-fmt
-      );
-
-      overlays = import ./overlays { inherit inputs; };
-
-      # Your custom packages
-      # Acessible through 'nix build', 'nix shell', etc
-      packages = forAllSystems (system:
-        let pkgs = nixpkgs.legacyPackages.${system};
-        in import ./pkgs { inherit pkgs; }
-      );
-
-      "ponkila-ephemeral-beta" = nixos-generators.nixosGenerate {
+      ponkila-ephemeral-beta = {
         system = "x86_64-linux";
         specialArgs = { inherit inputs outputs; };
         modules = [
+          ./home-manager/core.nix
           ./hosts/ponkila-ephemeral-beta
           ./modules/eth/erigon.nix
           ./modules/eth/lighthouse-beacon.nix
           ./modules/eth/mev-boost.nix
           ./system/global.nix
           ./system/ramdisk.nix
-          ./home-manager/core.nix
           home-manager.nixosModules.home-manager
           disko.nixosModules.disko
           {
@@ -108,17 +93,18 @@
         format = "kexecTree";
       };
 
-      "dinar-ephemeral-alpha" = nixos-generators.nixosGenerate {
+      dinar-ephemeral-alpha = {
+        format = "install-iso";
         system = "x86_64-linux";
         specialArgs = { inherit inputs outputs; };
         modules = [
+          ./home-manager/core.nix
           ./hosts/dinar-ephemeral-alpha
           ./hosts/dinar-ephemeral-alpha/mounts.nix
           ./modules/eth/erigon.nix
           ./modules/eth/lighthouse-beacon.nix
           ./modules/eth/mev-boost.nix
           ./system/global.nix
-          ./home-manager/core.nix
           home-manager.nixosModules.home-manager
           disko.nixosModules.disko
           {
@@ -141,7 +127,45 @@
             boot.kernelParams = [ "copytoram" ];
           }
         ];
-        format = "install-iso";
+      };
+    in
+    {
+
+      # To run:
+      # $ nix fmt
+      formatter = forAllSystems (system:
+        nixpkgs.legacyPackages.${system}.nixpkgs-fmt
+      );
+
+      overlays = import ./overlays { inherit inputs; };
+
+      # Your custom packages
+      # Acessible through 'nix build', 'nix shell', etc
+      #
+      # E.g., to build one image:
+      # nix build .#dinar-ephemeral-alpha
+      #
+      packages = forAllSystems (system: {
+        dinar-ephemeral-alpha = nixos-generators.nixosGenerate dinar-ephemeral-alpha;
+        ponkila-ephemeral-beta = nixos-generators.nixosGenerate ponkila-ephemeral-beta;
+      });
+
+      # Despite defining the hosts here, the rebuild command is not supposed to used:
+      # instead, these are defined here to make use of standard tools to read config
+      # declarations of each host, and to verify all images are bootable (nix flake check)
+      #
+      # E.g., to read lighthouse endpoint IP:
+      # $ nix eval .#nixosConfigurations.dinar-ephemeral-alpha.config.lighthouse.endpoint
+      #
+      # To hack and explore the configuration:
+      # NOTE: repl-flakes does *not* work: https://github.com/NixOS/nix/issues/8059
+      # $ nix repl
+      # nix-repl> :lf .#
+      # nix-repl> (press TAB for autocomplete)
+      #
+      nixosConfigurations = with nixpkgs.lib; {
+        "dinar-ephemeral-alpha" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] dinar-ephemeral-alpha);
+        "ponkila-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] ponkila-ephemeral-beta);
       };
 
       darwinConfigurations."ponkila-persistent-epsilon" = darwin.lib.darwinSystem {
