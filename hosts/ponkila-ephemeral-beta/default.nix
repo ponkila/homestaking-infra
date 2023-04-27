@@ -3,6 +3,8 @@
 let
   # General
   infra.ip = "192.168.100.10";
+  lighthouse.datadir = "/var/mnt/lighthouse";
+  erigon.datadir = "/var/mnt/erigon";
 in
 {
   # User options
@@ -22,29 +24,19 @@ in
   # Erigon options
   erigon = rec {
     endpoint = infra.ip;
-    datadir = "/var/mnt/erigon";
-    mount = {
-      source = "/dev/disk/by-label/erigon";
-      target = datadir;
-      type = "btrfs";
-    };
+    datadir = erigon.datadir;
   };
 
   # Lighthouse options
   lighthouse = rec {
     endpoint = infra.ip;
-    datadir = "/var/mnt/lighthouse";
+    datadir = lighthouse.datadir;
     exec.endpoint = "http://${infra.ip}:8551";
     mev-boost.endpoint = "http://${infra.ip}:18550";
     slasher = {
       enable = false;
       history-length = 256;
       max-db-size = 16;
-    };
-    mount = {
-      source = "/dev/disk/by-label/lighthouse";
-      target = datadir;
-      type = "btrfs";
     };
   };
 
@@ -60,6 +52,7 @@ in
   };
 
   systemd.mounts = [
+    # Secrets
     {
       enable = true;
 
@@ -70,6 +63,32 @@ in
       type = "btrfs";
 
       before = [ "sshd.service" ];
+      wantedBy = [ "multi-user.target" ];
+    }
+    # Erigon
+    {
+      enable = true;
+
+      description = "erigon storage";
+
+      what = "/dev/disk/by-label/erigon";
+      where = erigon.datadir;
+      options = lib.mkDefault "noatime";
+      type = "btrfs";
+
+      wantedBy = [ "multi-user.target" ];
+    }
+    # Lighthouse
+    {
+      enable = true;
+
+      description = "lighthouse storage";
+
+      what = "/dev/disk/by-label/lighthouse";
+      where = lighthouse.datadir;
+      options = lib.mkDefault "noatime";
+      type = "btrfs";
+
       wantedBy = [ "multi-user.target" ];
     }
   ];
