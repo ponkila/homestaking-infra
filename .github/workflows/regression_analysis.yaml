@@ -66,14 +66,10 @@ jobs:
       - name: Diff current and main branch builds
         id: diff
         run: |
-          diff <(nix-store --query --tree ${{ steps.current-store-path.outputs.store-path }}) <(nix-store --query --tree ${{ steps.main-store-path.outputs.store-path }})
-          echo "::set-output name=has-diff::$?"
-
-      - name: Output diff if exists
-        if: steps.diff.outputs.has-diff == '0'
-        run: |
-          echo "No differences found between current and main branch builds."
-        if: steps.diff.outputs.has-diff == '1'
-        run: |
-          echo "Differences found between current and main branch builds:"
-          diff <(nix-store --query --tree ${{ steps.current-store-path.outputs.store-path }}) <(nix-store --query --tree ${{ steps.main-store-path.outputs.store-path }})
+          if diff <(nix-store --query --tree ${{ steps.current-store-path.outputs.store-path }}) <(nix-store --query --tree ${{ steps.main-store-path.outputs.store-path }}); then
+            echo "No differences found between current and main branch builds."
+          else
+            echo "Differences found between current and main branch builds:"
+            diff <(nix-store --query --tree ${{ steps.current-store-path.outputs.store-path }}) <(nix-store --query --tree ${{ steps.main-store-path.outputs.store-path }})
+            exit 1
+          fi
