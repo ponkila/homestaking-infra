@@ -48,11 +48,13 @@ jobs:
           current_build_path=$(tail -n 2 /tmp/nix-build-err.log | awk -F"'" '{print $2}')
           echo "::set-output name=store-path::$current_build_path"
 
-      - name: Get main branch build store path
-        id: main-store-path
-        uses: actions/checkout@v2
+      - name: Checkout main branch
+        uses: actions/checkout@v3
         with:
           ref: main
+
+      - name: Get main branch build store path
+        id: main-store-path
         run: |
           set -o pipefail
           nix build .#${{ matrix.target }} --experimental-features "nix-command flakes" --fallback --show-trace -v --log-format raw > >(tee /tmp/nix-build-main-out.log) 2> >(tee /tmp/nix-build-main-err.log >&2)
