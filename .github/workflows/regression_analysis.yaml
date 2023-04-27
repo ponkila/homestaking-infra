@@ -45,7 +45,7 @@ jobs:
       - name: Get current build store path 
         id: current-store-path
         run: |
-          current_build_path=$(tail -n 2 /tmp/nix-build-err.log | awk -F"'" '{print $2}')
+          current_build_path=$(tail -n 2 /tmp/nix-build-err.log | head -n 1 | awk -F"'" '{print $2}')
           echo "::set-output name=store-path::$current_build_path"
 
       - name: Checkout main branch
