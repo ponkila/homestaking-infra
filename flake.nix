@@ -23,6 +23,7 @@
     ethereum-nix.url = "github:nix-community/ethereum.nix";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
+    nixobolus.url = "github:ponkila/nixobolus/juuso/options-extractions";
     nixos-generators.inputs.nixpkgs.follows = "nixpkgs";
     nixos-generators.url = "github:nix-community/nixos-generators";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -36,6 +37,7 @@
     , disko
     , ethereum-nix
     , home-manager
+    , nixobolus
     , nixos-generators
     , nixpkgs
     , sops-nix
@@ -69,13 +71,11 @@
         modules = [
           ./home-manager/core.nix
           ./hosts/ponkila-ephemeral-beta
-          ./modules/eth/erigon.nix
-          ./modules/eth/lighthouse-beacon.nix
-          ./modules/eth/mev-boost.nix
           ./system/global.nix
           ./system/ramdisk.nix
           home-manager.nixosModules.home-manager
           disko.nixosModules.disko
+          nixobolus.nixosModules.erigon
           {
             nixpkgs.overlays = [
               ethereum-nix.overlays.default
@@ -101,12 +101,10 @@
           ./home-manager/core.nix
           ./hosts/dinar-ephemeral-alpha
           ./hosts/dinar-ephemeral-alpha/mounts.nix
-          ./modules/eth/erigon.nix
-          ./modules/eth/lighthouse-beacon.nix
-          ./modules/eth/mev-boost.nix
           ./system/global.nix
           home-manager.nixosModules.home-manager
           disko.nixosModules.disko
+          nixobolus.nixosModules.erigon
           {
             nixpkgs.overlays = [
               ethereum-nix.overlays.default
