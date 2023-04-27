@@ -1,0 +1,75 @@
+name: "Nix build & regression analysis"
+
+on: 
+  pull_request:
+    branches: [ main ]
+  
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-20.04
+            target: dinar-ephemeral-alpha
+          - os: ubuntu-20.04
+            target: ponkila-ephemeral-beta
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install nix
+        uses: cachix/install-nix-action@v20
+
+        # Build target, output log files. Output nix log if build fails
+
+      - name: Build target
+        run: |
+          set -o pipefail
+          nix build .#${{ matrix.target }}  --experimental-features "nix-command flakes" --fallback --show-trace -v --log-format raw > >(tee /tmp/nix-build-out.log) 2> >(tee /tmp/nix-build-err.log >&2)
+
+      - name: Output build failure
+        if: failure()
+        run: |
+          drv=$(grep "For full logs, run" /tmp/nix-build-err.log | grep -oE "/nix/store/.*.drv")
+          nix log $drv
+          echo $drv
+          exit 1
+
+        # Get the nix store path for the target. Build and get store path for main.
+
+      - name: Get current build store path 
+        id: current-store-path
+        run: |
+          current_build_path=$(tail -n 2 /tmp/nix-build-err.log | awk -F"'" '{print $2}')
+          echo "::set-output name=store-path::$current_build_path"
+
+      - name: Get main branch build store path
+        id: main-store-path
+        uses: actions/checkout@v2
+        with:
+          ref: main
+        run: |
+          set -o pipefail
+          nix build .#${{ matrix.target }} --experimental-features "nix-command flakes" --fallback --show-trace -v --log-format raw > >(tee /tmp/nix-build-main-out.log) 2> >(tee /tmp/nix-build-main-err.log >&2)
+          main_build_path=$(tail -n 1 /tmp/nix-build-main-err.log | head -n 1 | awk -F"'" '{print $2}')
+          echo "::set-output name=store-path::$main_build_path"
+
+      # Show differences if there are any
+
+      - name: Diff current and main branch builds
+        id: diff
+        run: |
+          diff <(nix-store --query --tree ${{ steps.current-store-path.outputs.store-path }}) <(nix-store --query --tree ${{ steps.main-store-path.outputs.store-path }})
+          echo "::set-output name=has-diff::$?"
+
+      - name: Output diff if exists
+        if: steps.diff.outputs.has-diff == '0'
+        run: |
+          echo "No differences found between current and main branch builds."
+        if: steps.diff.outputs.has-diff == '1'
+        run: |
+          echo "Differences found between current and main branch builds:"
+          diff <(nix-store --query --tree ${{ steps.current-store-path.outputs.store-path }}) <(nix-store --query --tree ${{ steps.main-store-path.outputs.store-path }})
