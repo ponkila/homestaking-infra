@@ -23,7 +23,7 @@
     ethereum-nix.url = "github:nix-community/ethereum.nix";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
-    nixobolus.url = "github:ponkila/nixobolus/juuso/options-extractions";
+    nixobolus.url = "github:ponkila/nixobolus/jesse/options-extractions";
     nixos-generators.inputs.nixpkgs.follows = "nixpkgs";
     nixos-generators.url = "github:nix-community/nixos-generators";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
