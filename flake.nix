@@ -75,7 +75,7 @@
           ./system/ramdisk.nix
           home-manager.nixosModules.home-manager
           disko.nixosModules.disko
-          nixobolus.nixosModules.erigon
+          nixobolus.nixosModules.nixobolus
           {
             nixpkgs.overlays = [
               ethereum-nix.overlays.default
@@ -104,13 +104,7 @@
           ./system/global.nix
           home-manager.nixosModules.home-manager
           disko.nixosModules.disko
-          nixobolus.nixosModules.erigon
-          nixobolus.nixosModules.lighthouse
-          nixobolus.nixosModules.mev-boost
-          nixobolus.nixosModules.mounts
-          nixobolus.nixosModules.localization
-          nixobolus.nixosModules.user
-          nixobolus.nixosModules.ssh
+          nixobolus.nixosModules.nixobolus
           {
             nixpkgs.overlays = [
               ethereum-nix.overlays.default
@@ -124,6 +118,8 @@
             ];
           }
           {
+            boot.kernelPackages = nixpkgs.linuxPackagesFor (nixpkgs.linux);
+
             # GRUB timeout
             boot.loader.timeout = nixpkgs.lib.mkForce 1;
 
