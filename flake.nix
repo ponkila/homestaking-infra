@@ -105,6 +105,12 @@
           home-manager.nixosModules.home-manager
           disko.nixosModules.disko
           nixobolus.nixosModules.erigon
+          nixobolus.nixosModules.lighthouse
+          nixobolus.nixosModules.mev-boost
+          nixobolus.nixosModules.mounts
+          nixobolus.nixosModules.localization
+          nixobolus.nixosModules.user
+          nixobolus.nixosModules.ssh
           {
             nixpkgs.overlays = [
               ethereum-nix.overlays.default
