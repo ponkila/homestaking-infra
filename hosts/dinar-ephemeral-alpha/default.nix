@@ -3,6 +3,8 @@
 let
   # General
   infra.ip = "192.168.100.31";
+  lighthouse.datadir = "/mnt/eth/lighthouse";
+  erigon.datadir = "/mnt/eth/erigon";
 in
 {
   # User options
@@ -15,22 +17,23 @@ in
     ];
   };
 
-  # Localization
-  networking.hostName = "dinar-ephemeral-alpha";
-  time.timeZone = "Europe/Helsinki";
-
-  boot.kernelPackages = pkgs.linuxPackagesFor (pkgs.linux);
+  # Localization options
+  localization = {
+    hostname = "dinar-ephemeral-alpha";
+    timezone = "Europe/Helsinki";
+    keymap = "fi";
+  };
 
   # Erigon options
-  erigon = rec {
+  erigon = {
     endpoint = infra.ip;
-    datadir = "/mnt/eth/erigon";
+    datadir = erigon.datadir;
   };
 
   # Lighthouse options
-  lighthouse = rec {
+  lighthouse = {
     endpoint = infra.ip;
-    datadir = "/mnt/eth/lighthouse";
+    datadir = lighthouse.datadir;
     exec.endpoint = "http://${infra.ip}:8551";
     mev-boost.endpoint = "http://${infra.ip}:18550";
     slasher = {
@@ -39,22 +42,20 @@ in
       max-db-size = 16;
     };
   };
-
-  # Secrets
-  home-manager.users.core = { pkgs, ... }: {
-    sops = {
-      defaultSopsFile = ./secrets/default.yaml;
-      secrets."wireguard/wg0" = {
-        path = "%r/wireguard/wg0.conf";
-      };
-      age.sshKeyPaths = [ "/mnt/secrets/ssh/id_ed25519" ];
-    };
+  
+  # MEV-Boost options
+  mev-boost = {
+    enable = true;
   };
 
-  systemd.mounts = [
-    {
-      enable = true;
+  # SSH (system level) options
+  ssh = {
+    privateKeyPath = "/var/mnt/secrets/ssh/id_ed25519";
+  };
 
+  # Mounts
+  mounts = [
+    {
       description = "storage";
 
       what = "/dev/sda1";
@@ -65,51 +66,5 @@ in
       wantedBy = [ "multi-user.target" ];
     }
   ];
-
-  # SSH
-  services.openssh = {
-    enable = true;
-    settings.PasswordAuthentication = false;
-    hostKeys = [{
-      path = "/mnt/secrets/ssh/id_ed25519";
-      type = "ed25519";
-    }];
-  };
-
-  # Prometheus
-  services.prometheus = {
-    enable = false;
-    port = 9001;
-    exporters = {
-      node = {
-        enable = false;
-        enabledCollectors = [ "systemd" ];
-        port = 9002;
-      };
-    };
-    scrapeConfigs = [
-      {
-        job_name = config.networking.hostName;
-        static_configs = [{
-          targets = [ "127.0.0.1:${toString config.services.prometheus.exporters.node.port}" ];
-        }];
-      }
-      {
-        job_name = "erigon";
-        metrics_path = "/debug/metrics/prometheus";
-        scheme = "http";
-        static_configs = [{
-          targets = [ "127.0.0.1:6060" "127.0.0.1:6061" "127.0.0.1:6062" ];
-        }];
-      }
-      {
-        job_name = "lighthouse";
-        scrape_interval = "5s";
-        static_configs = [{
-          targets = [ "127.0.0.1:5054" "127.0.0.1:5064" ];
-        }];
-      }
-    ];
-  };
   system.stateVersion = "23.05";
 }
