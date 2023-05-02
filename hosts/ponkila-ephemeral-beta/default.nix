@@ -17,7 +17,7 @@ in
     ];
   };
 
-  # Localization
+  # Localization options
   localization = {
     hostname = "ponkila-ephemeral-beta";
     timezone = "Europe/Helsinki";
@@ -43,16 +43,17 @@ in
     };
   };
 
-  # Mev-boost
+  # Mev-boost options
   mev-boost = {
     enable = true;
   };
 
-  # SSH
+  # SSH (system level) options
   ssh = {
     privateKeyPath = "/var/mnt/secrets/ssh/id_ed25519";
   };
 
+  # Mount options
   mounts = [
     # Secrets
     {
@@ -70,7 +71,7 @@ in
       description = "erigon storage";
 
       what = "/dev/disk/by-label/erigon";
-      where = self.options.erigon.datadir;
+      where = erigon.datadir;
       options = "noatime";
       type = "btrfs";
 
@@ -81,7 +82,7 @@ in
       description = "lighthouse storage";
 
       what = "/dev/disk/by-label/lighthouse";
-      where = self.options.lighthouse.datadir;
+      where = lighthouse.datadir;
       options = "noatime";
       type = "btrfs";
 
