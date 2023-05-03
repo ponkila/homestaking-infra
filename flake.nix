@@ -23,7 +23,7 @@
     ethereum-nix.url = "github:nix-community/ethereum.nix";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
-    nixobolus.url = "github:ponkila/nixobolus/jesse/options-extractions";
+    nixobolus.url = "github:ponkila/nixobolus";
     nixos-generators.inputs.nixpkgs.follows = "nixpkgs";
     nixos-generators.url = "github:nix-community/nixos-generators";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -75,7 +75,7 @@
           ./system/ramdisk.nix
           home-manager.nixosModules.home-manager
           disko.nixosModules.disko
-          nixobolus.nixosModules.nixobolus
+          nixobolus.nixosModules.homestakeros
           {
             nixpkgs.overlays = [
               ethereum-nix.overlays.default
@@ -104,7 +104,7 @@
           ./system/global.nix
           home-manager.nixosModules.home-manager
           disko.nixosModules.disko
-          nixobolus.nixosModules.nixobolus
+          nixobolus.nixosModules.homestakeros
           {
             nixpkgs.overlays = [
               ethereum-nix.overlays.default
