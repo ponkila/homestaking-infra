@@ -26,12 +26,14 @@ in
 
   # Erigon options
   erigon = {
+    enable = true;
     endpoint = infra.ip;
     datadir = erigon.datadir;
   };
 
   # Lighthouse options
   lighthouse = {
+    enable = true;
     endpoint = infra.ip;
     datadir = lighthouse.datadir;
     exec.endpoint = "http://${infra.ip}:8551";
@@ -57,6 +59,7 @@ in
   mounts = [
     # Secrets
     {
+      enable = true;
       description = "secrets storage";
 
       what = "/dev/disk/by-label/secrets";
@@ -68,6 +71,7 @@ in
     }
     # Erigon
     {
+      enable = true;
       description = "erigon storage";
 
       what = "/dev/disk/by-label/erigon";
@@ -79,6 +83,7 @@ in
     }
     # Lighthouse
     {
+      enable = true;
       description = "lighthouse storage";
 
       what = "/dev/disk/by-label/lighthouse";
