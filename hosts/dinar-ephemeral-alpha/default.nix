@@ -26,12 +26,14 @@ in
 
   # Erigon options
   erigon = {
+    enable = true;
     endpoint = infra.ip;
     datadir = erigon.datadir;
   };
 
   # Lighthouse options
   lighthouse = {
+    enable = true;
     endpoint = infra.ip;
     datadir = lighthouse.datadir;
     exec.endpoint = "http://${infra.ip}:8551";
@@ -42,7 +44,7 @@ in
       max-db-size = 16;
     };
   };
-  
+
   # MEV-Boost options
   mev-boost = {
     enable = true;
@@ -56,6 +58,7 @@ in
   # Mounts
   mounts = [
     {
+      enable = true;
       description = "storage";
 
       what = "/dev/sda1";
