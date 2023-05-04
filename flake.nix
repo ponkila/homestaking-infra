@@ -108,6 +108,32 @@
         format = "kexecTree";
       };
 
+      "hetzner-ephemeral-alpha" = nixos-generators.nixosGenerate {
+        system = "x86_64-linux";
+        specialArgs = { inherit inputs outputs; };
+        modules = [
+          ./hosts/hetzner-ephemeral-alpha
+          ./system/global.nix
+          ./system/ramdisk.nix
+          ./home-manager/juuso.nix
+          ./home-manager/kari.nix
+          home-manager.nixosModules.home-manager
+          {
+            nixpkgs.overlays = [
+              outputs.overlays.additions
+              outputs.overlays.modifications
+            ];
+          }
+          {
+            home-manager.sharedModules = [
+              sops-nix.homeManagerModules.sops
+            ];
+          }
+        ];
+        customFormats = customFormats;
+        format = "kexecTree";
+      };
+
       "dinar-ephemeral-alpha" = nixos-generators.nixosGenerate {
         system = "x86_64-linux";
         specialArgs = { inherit inputs outputs; };
