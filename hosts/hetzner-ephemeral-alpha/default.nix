@@ -1,5 +1,17 @@
 { pkgs, config, inputs, lib, ... }:
 {
+
+  # Allows this server to be used as a remote builder
+  nix.settings.trusted-users = [
+    "root"
+    "@wheel"
+  ];
+
+  boot.binfmt.emulatedSystems = [
+    "aarch64-linux"
+    "armv7l-linux"
+  ];
+
   # User options
   users = {
     juuso.authorizedKeys = [ "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBNMKgTTpGSvPG4p8pRUWg1kqnP9zPKybTHQ0+Q/noY5+M6uOxkLy7FqUIEFUT9ZS/fflLlC/AlJsFBU212UzobA= ssh@secretive.sandbox.local" ];
