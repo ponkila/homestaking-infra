@@ -191,12 +191,10 @@
         );
 
       herculesCI = { ... }: {
-        onPush.default = {
-          outputs = { ... }: {
-            nixosConfigurations = nixosConfigurations;
-          };
+        onPush.default.outputs = { ... }: {
+          unit = self.outputs.nixosConfigurations;
         };
       };
-
     };
+
 }
