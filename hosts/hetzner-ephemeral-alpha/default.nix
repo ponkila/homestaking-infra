@@ -10,6 +10,26 @@
   networking.hostName = "hetzner-ephemeral-alpha";
   time.timeZone = "Europe/Helsinki";
 
+  services.hercules-ci-agent = {
+    enable = true;
+    settings.baseDirectory = "/var/mnt/nvme/hercules-ci-agent";
+  };
+
+  systemd.mounts = [
+    {
+      enable = true;
+
+      description = "persistent nvme storage";
+
+      what = "/dev/disk/by-label/nvme";
+      where = "/var/mnt/nvme";
+      type = "btrfs";
+      options = "noatime";
+
+      wantedBy = [ "multi-user.target" ];
+    }
+  ];
+
   # SSH
   services.openssh = {
     enable = true;
