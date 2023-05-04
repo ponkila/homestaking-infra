@@ -113,7 +113,6 @@
         specialArgs = { inherit inputs outputs; };
         modules = [
           ./hosts/dinar-ephemeral-alpha
-          ./hosts/dinar-ephemeral-alpha/mounts.nix
           ./modules/eth/erigon.nix
           ./modules/eth/lighthouse-beacon.nix
           ./modules/eth/mev-boost.nix
