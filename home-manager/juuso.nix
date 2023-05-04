@@ -15,7 +15,7 @@ in
     users.users.juuso = {
       isNormalUser = true;
       group = "juuso";
-      extraGroups = [ "wheel" ];
+      extraGroups = [ "wheel" "users" ];
       openssh.authorizedKeys.keys = cfg.authorizedKeys;
       shell = pkgs.fish;
     };
