@@ -60,23 +60,8 @@
           filename = "*.iso";
         };
       };
-    in
-    {
 
-      formatter = forAllSystems (system:
-        nixpkgs.legacyPackages.${system}.nixpkgs-fmt
-      );
-
-      overlays = import ./overlays { inherit inputs; };
-
-      # Your custom packages
-      # Acessible through 'nix build', 'nix shell', etc
-      packages = forAllSystems (system:
-        let pkgs = nixpkgs.legacyPackages.${system};
-        in import ./pkgs { inherit pkgs; }
-      );
-
-      "ponkila-ephemeral-beta" = nixos-generators.nixosGenerate {
+      ponkila-ephemeral-beta = {
         system = "x86_64-linux";
         specialArgs = { inherit inputs outputs; };
         modules = [
@@ -106,7 +91,7 @@
         format = "kexecTree";
       };
 
-      "hetzner-ephemeral-alpha" = nixos-generators.nixosGenerate {
+      hetzner-ephemeral-alpha = {
         system = "x86_64-linux";
         specialArgs = { inherit inputs outputs; };
         modules = [
@@ -132,7 +117,7 @@
         format = "kexecTree";
       };
 
-      "dinar-ephemeral-alpha" = nixos-generators.nixosGenerate {
+      dinar-ephemeral-alpha = {
         system = "x86_64-linux";
         specialArgs = { inherit inputs outputs; };
         modules = [
@@ -167,6 +152,28 @@
         format = "install-iso";
       };
 
+    in
+    rec {
+
+      formatter = forAllSystems (system:
+        nixpkgs.legacyPackages.${system}.nixpkgs-fmt
+      );
+
+      overlays = import ./overlays { inherit inputs; };
+
+      # Your custom packages
+      # Acessible through 'nix build', 'nix shell', etc
+      packages = forAllSystems (system:
+        let pkgs = nixpkgs.legacyPackages.${system};
+        in import ./pkgs { inherit pkgs; }
+      );
+
+      nixosConfigurations = with nixpkgs.lib; {
+        "dinar-ephemeral-alpha" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] dinar-ephemeral-alpha);
+        "hetzner-ephemeral-alpha" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] hetzner-ephemeral-alpha);
+        "ponkila-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] ponkila-ephemeral-beta);
+      };
+
       darwinConfigurations."ponkila-persistent-epsilon" = darwin.lib.darwinSystem {
         specialArgs = { inherit inputs outputs; };
         system = "x86_64-darwin";
@@ -182,6 +189,14 @@
           let pkgs = nixpkgs.legacyPackages.${system};
           in import ./shell.nix { inherit pkgs; }
         );
+
+      herculesCI = { ... }: {
+        onPush.default = {
+          outputs = { ... }: {
+            inherit nixosConfigurations;
+          };
+        };
+      };
 
     };
 }
