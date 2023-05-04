@@ -193,7 +193,7 @@
       herculesCI = { ... }: {
         onPush.default = {
           outputs = { ... }: {
-            inherit nixosConfigurations;
+            nixosConfigurations = nixosConfigurations;
           };
         };
       };
