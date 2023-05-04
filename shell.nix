@@ -9,6 +9,8 @@
       git
       nix
       sops
+
+      ssh-to-age
       rsync
     ];
   };

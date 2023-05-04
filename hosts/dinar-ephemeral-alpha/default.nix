@@ -3,6 +3,7 @@
 let
   # General
   infra.ip = "192.168.100.31";
+  sshKeysPath = "/mnt/eth/secrets/ssh/id_ed25519";
 in
 {
   # User options
@@ -40,14 +41,28 @@ in
     };
   };
 
-  # Secrets
-  home-manager.users.core = { pkgs, ... }: {
-    sops = {
-      defaultSopsFile = ./secrets/default.yaml;
-      secrets."wireguard/wg0" = {
-        path = "%r/wireguard/wg0.conf";
+  home-manager.users = {
+    root = { pkgs, ... }: {
+      sops = {
+        defaultSopsFile = ./secrets/default.yaml;
+        secrets = {
+          "wireguard/wg0" = {
+            path = "%r/wireguard/wg0.conf";
+          };
+        };
+        age.sshKeyPaths = [ sshKeysPath ];
       };
-      age.sshKeyPaths = [ "/mnt/secrets/ssh/id_ed25519" ];
+    };
+    core = { pkgs, ... }: {
+      sops = {
+        defaultSopsFile = ./secrets/default.yaml;
+        secrets = {
+          "jwt.hex" = {
+            path = "%r/jwt.hex";
+          };
+        };
+        age.sshKeyPaths = [ sshKeysPath ];
+      };
     };
   };
 
@@ -71,7 +86,7 @@ in
     enable = true;
     settings.PasswordAuthentication = false;
     hostKeys = [{
-      path = "/mnt/secrets/ssh/id_ed25519";
+      path = sshKeysPath;
       type = "ed25519";
     }];
   };

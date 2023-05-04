@@ -23,6 +23,7 @@ in
     environment.shells = [ pkgs.fish ];
     programs.fish.enable = true;
 
+    home-manager.users.root.home.stateVersion = config.home-manager.users.core.home.stateVersion;
     home-manager.users.core = { pkgs, ... }: {
 
       home.packages = with pkgs; [
@@ -56,9 +57,9 @@ in
         Type = "oneshot";
       };
 
-      preStart = "${pkgs.wireguard-tools}/bin/wg-quick down /run/user/1000/wireguard/wg0.conf || true";
+      preStart = "${pkgs.wireguard-tools}/bin/wg-quick down %r/wireguard/wg0.conf || true";
       script = ''${pkgs.wireguard-tools}/bin/wg-quick \
-        up /run/user/1000/wireguard/wg0.conf
+        up %r/wireguard/wg0.conf
       '';
 
       wantedBy = [ "multi-user.target" ];

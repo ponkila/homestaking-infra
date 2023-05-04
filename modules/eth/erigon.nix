@@ -24,7 +24,7 @@ in
     ];
 
     # service
-    systemd.services.erigon = {
+    systemd.user.services.erigon = {
       enable = true;
 
       description = "execution, mainnet";
@@ -34,8 +34,6 @@ in
       serviceConfig = {
         Restart = "always";
         RestartSec = "5s";
-        User = "core";
-        Group = "core";
         Type = "simple";
       };
 
@@ -44,7 +42,7 @@ in
         --chain mainnet \
         --authrpc.vhosts="*" \
         --authrpc.addr ${cfg.endpoint} \
-        --authrpc.jwtsecret=${cfg.datadir}/jwt.hex \
+        --authrpc.jwtsecret=%r/jwt.hex \
         --metrics \
         --externalcl
       '';
