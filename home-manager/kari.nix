@@ -15,7 +15,7 @@ in
     users.users.kari = {
       isNormalUser = true;
       group = "kari";
-      extraGroups = [ "wheel" ];
+      extraGroups = [ "wheel" "users" ];
       openssh.authorizedKeys.keys = cfg.authorizedKeys;
       shell = pkgs.fish;
     };
