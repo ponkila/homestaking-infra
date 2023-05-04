@@ -62,6 +62,7 @@ in
         --datadir ${cfg.datadir} \
         --network mainnet \
         --http --http-address ${cfg.endpoint} \
+        --http-allow-origin "*" \
         --execution-endpoint ${cfg.exec.endpoint} \
         --execution-jwt %r/jwt.hex \
         --builder ${cfg.mev-boost.endpoint} \
