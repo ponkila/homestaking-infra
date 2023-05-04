@@ -6,6 +6,9 @@
     kari.authorizedKeys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKEdpdbTOz0h9tVvkn13k1e8X7MnctH3zHRFmYWTbz9T kari@torque" ];
   };
 
+  # Users group
+  users.groups.users = {};
+
   # Localization
   networking.hostName = "hetzner-ephemeral-alpha";
   time.timeZone = "Europe/Helsinki";
