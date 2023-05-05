@@ -193,9 +193,9 @@
           in import ./shell.nix { inherit pkgs; }
         );
 
-      herculesCI = { ... }: {
+      herculesCI = {
         ciSystems = [ "x86_64-linux" "aarch64-linux" ];
-        onPush.default.outputs = { ... }: {
+        onPush.default.outputs = {
           unit = self.outputs.nixosConfigurations;
         };
       };
