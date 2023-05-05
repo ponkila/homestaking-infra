@@ -214,7 +214,7 @@
       herculesCI = {
         ciSystems = [ "x86_64-linux" "aarch64-linux" ];
         onPush.default.outputs = {
-          unit = self.outputs.apps.apps."x86_64-linux".hetzner-build;
+          unit = self.outputs.apps."x86_64-linux".hetzner-build;
         };
       };
     };
