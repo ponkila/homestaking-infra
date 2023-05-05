@@ -193,28 +193,7 @@
           in import ./shell.nix { inherit pkgs; }
         );
 
-      herculesCI = {
-        ciSystems = [ "x86_64-linux" "aarch64-linux" ];
-        onPush.default.outputs = {
-          unit = {
-            let
-              pkgs = import nixpkgs { system = "x86_64-linux"; };
-              my-name = "hetzner-build";
-              my-script = pkgs.writeShellScriptBin my-name ''
-                nix build .#ponkila-ephemeral-beta
-                nix build .#hetzner-ephemeral-alpha
-              '';
-              my-buildInputs = with pkgs; [ ];
-            in
-            pkgs.symlinkJoin {
-              name = my-name;
-              paths = [ my-script ] ++ my-buildInputs;
-              buildInputs = [ pkgs.makeWrapper ];
-              postBuild = "wrapProgram $out/bin/${my-name} --prefix PATH : $out/bin";
-            };
-          };
-        };
-      };
+      herculesCI.ciSystems = [ "x86_64-linux" "aarch64-linux" ];
     };
 
 }
