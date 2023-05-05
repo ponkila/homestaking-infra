@@ -46,8 +46,8 @@
       forAllSystems = nixpkgs.lib.genAttrs [
         "x86_64-linux"
         "aarch64-linux"
-        #"x86_64-darwin"
-        #"aarch64-darwin"
+        "x86_64-darwin"
+        "aarch64-darwin"
       ];
 
       # custom formats for nixos-generators
@@ -154,6 +154,24 @@
       #   format = "install-iso";
       # };
 
+      apps."x86_64-linux" = {
+        hetzner-build =
+          let
+            pkgs = import nixpkgs { system = "x86_64-linux"; };
+            my-name = "hetzner-build";
+            my-script = pkgs.writeShellScriptBin my-name ''
+              nix build .#ponkila-ephemeral-beta
+              nix build .#hetzner-ephemeral-alpha
+            '';
+            my-buildInputs = with pkgs; [ ];
+          in
+          pkgs.symlinkJoin {
+            name = my-name;
+            paths = [ my-script ] ++ my-buildInputs;
+            buildInputs = [ pkgs.makeWrapper ];
+            postBuild = "wrapProgram $out/bin/${my-name} --prefix PATH : $out/bin";
+          };
+
     in
     {
 
@@ -196,7 +214,7 @@
       herculesCI = {
         ciSystems = [ "x86_64-linux" "aarch64-linux" ];
         onPush.default.outputs = {
-          unit = self.outputs.nixosConfigurations;
+          unit = self.outputs.apps.apps."x86_64-linux".hetzner-build;
         };
       };
     };
