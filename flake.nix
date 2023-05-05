@@ -196,7 +196,7 @@
       herculesCI = { ... }: {
         ciSystems = [ "x86_64-linux" "aarch64-linux" ];
         onPush.default.outputs = { ... }: {
-          unit = self.outputs.packages;
+          unit = self.outputs.nixosConfigurations;
         };
       };
     };
