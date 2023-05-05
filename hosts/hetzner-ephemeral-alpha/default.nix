@@ -18,14 +18,6 @@
     settings.baseDirectory = "/var/mnt/nvme/hercules-ci-agent";
   };
 
-  boot.initrd.availableKernelModules = [ "btrfs" ];
-  fileSystems."/nix/.rw-store" = lib.mkImageMediaOverride {
-    fsType = "btrfs";
-    device = "/dev/disk/by-label/nvme";
-    options = [ "compress=zstd:2,noatime,subvolid=258" ];
-    neededForBoot = true;
-  };
-
   systemd.mounts = [
     {
       enable = true;
