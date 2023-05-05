@@ -193,7 +193,7 @@
 
       herculesCI = { ... }: {
         onPush.default.outputs = { ... }: {
-          unit = self.outputs.nixosConfigurations;
+          unit = self.outputs.packages;
         };
       };
     };
