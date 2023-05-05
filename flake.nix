@@ -44,8 +44,10 @@
     let
       inherit (self) outputs;
       forAllSystems = nixpkgs.lib.genAttrs [
-        "aarch64-linux"
         "x86_64-linux"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
       ];
 
       # custom formats for nixos-generators
@@ -192,6 +194,7 @@
         );
 
       herculesCI = { ... }: {
+        ciSystems = [ "x86_64-linux" "aarch64-linux" ];
         onPush.default.outputs = { ... }: {
           unit = self.outputs.packages;
         };
