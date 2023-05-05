@@ -24,11 +24,11 @@
     neededForBoot = true;
   };
 
-  fileSystems."/nix/.rw-store" = lib.mkImageMediaOverride {
+  fileSystems."/nix/.rw-store" = lib.mkDefault (lib.mkImageMediaOverride {
     fsType = "tmpfs";
     options = [ "mode=0755" ];
     neededForBoot = true;
-  };
+  });
 
   fileSystems."/nix/store" = lib.mkImageMediaOverride {
     fsType = "overlay";
