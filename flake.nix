@@ -163,10 +163,11 @@
 
       # Your custom packages
       # Acessible through 'nix build', 'nix shell', etc
-      packages = forAllSystems (system:
-        let pkgs = nixpkgs.legacyPackages.${system};
-        in import ./pkgs { inherit pkgs; }
-      );
+      packages = forAllSystems (system: {
+        dinar-ephemeral-alpha = nixos-generators.nixosGenerate dinar-ephemeral-alpha;
+        ponkila-ephemeral-beta = nixos-generators.nixosGenerate ponkila-ephemeral-beta;
+        hetzner-ephemeral-alpha = nixos-generators.nixosGenerate hetzner-ephemeral-alpha;
+      });
 
       nixosConfigurations = with nixpkgs.lib; {
         "dinar-ephemeral-alpha" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] dinar-ephemeral-alpha);
