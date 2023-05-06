@@ -7,7 +7,7 @@
   };
 
   # Users group
-  users.groups.users = {};
+  users.groups.users = { };
 
   # Localization
   networking.hostName = "hetzner-ephemeral-alpha";
@@ -15,23 +15,42 @@
 
   services.hercules-ci-agent = {
     enable = true;
-    settings.baseDirectory = "/var/mnt/nvme/hercules-ci-agent";
+    settings.baseDirectory = "/var/mnt/.config/hercules-ci-agent";
   };
 
   systemd.mounts = [
     {
       enable = true;
 
-      description = "persistent nvme storage";
-
-      what = "/dev/disk/by-label/nvme";
-      where = "/var/mnt/nvme";
+      what = "/dev/disk/by-label/nix";
+      where = "/var/mnt/.config";
       type = "btrfs";
-      options = "noatime";
+      options = "subvolid=257";
 
+      before = [ "hercules-ci-agent.service" ];
       wantedBy = [ "multi-user.target" ];
     }
   ];
+
+  systemd.services.linger.enable = lib.mkForce false;
+  systemd.services.nix-remount = {
+    path = [ "/run/wrappers" ];
+    enable = true;
+
+    serviceConfig = {
+      Type = "oneshot";
+    };
+
+    # if a new device, the new .rw-store has to be mounted
+    preStart = ''
+      /run/wrappers/bin/mount /dev/disk/by-label/nix -o subvolid=256 /nix/.rw-store
+    '';
+    script = ''
+      /run/wrappers/bin/mount -t overlay overlay -o lowerdir=/nix/.ro-store:/nix/store,upperdir=/nix/.rw-store/store,workdir=/nix/.rw-store/work /nix/store
+    '';
+
+    wantedBy = [ "multi-user.target" ];
+  };
 
   # SSH
   services.openssh = {
