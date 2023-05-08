@@ -13,6 +13,14 @@
   networking.hostName = "hetzner-ephemeral-alpha";
   time.timeZone = "Europe/Helsinki";
 
+  # Automatic carbage collection
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 30d";
+  };
+
+  # Hercules CI
   services.hercules-ci-agent = {
     enable = true;
     settings.baseDirectory = "/var/mnt/.config/hercules-ci-agent";
