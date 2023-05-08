@@ -143,6 +143,41 @@
         format = "install-iso";
       };
 
+      "dinar-ephemeral-beta" = nixos-generators.nixosGenerate {
+        system = "x86_64-linux";
+        specialArgs = { inherit inputs outputs; };
+        modules = [
+          ./hosts/dinar-ephemeral-beta
+          ./modules/eth/erigon.nix
+          ./modules/eth/lighthouse-beacon.nix
+          ./modules/eth/mev-boost.nix
+          ./system/global.nix
+          ./home-manager/core.nix
+          home-manager.nixosModules.home-manager
+          disko.nixosModules.disko
+          {
+            nixpkgs.overlays = [
+              ethereum-nix.overlays.default
+              outputs.overlays.additions
+              outputs.overlays.modifications
+            ];
+          }
+          {
+            home-manager.sharedModules = [
+              sops-nix.homeManagerModules.sops
+            ];
+          }
+          {
+            # GRUB timeout
+            boot.loader.timeout = nixpkgs.lib.mkForce 1;
+
+            # Load into a tmpfs during stage-1
+            boot.kernelParams = [ "copytoram" ];
+          }
+        ];
+        format = "install-iso";
+      };
+
       darwinConfigurations."ponkila-persistent-epsilon" = darwin.lib.darwinSystem {
         specialArgs = { inherit inputs outputs; };
         system = "x86_64-darwin";
