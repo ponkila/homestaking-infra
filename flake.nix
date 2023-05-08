@@ -119,40 +119,40 @@
         format = "kexecTree";
       };
 
-      # dinar-ephemeral-alpha = {
-      #   system = "x86_64-linux";
-      #   specialArgs = { inherit inputs outputs; };
-      #   modules = [
-      #     ./hosts/dinar-ephemeral-alpha
-      #     ./modules/eth/erigon.nix
-      #     ./modules/eth/lighthouse-beacon.nix
-      #     ./modules/eth/mev-boost.nix
-      #     ./system/global.nix
-      #     ./home-manager/core.nix
-      #     home-manager.nixosModules.home-manager
-      #     disko.nixosModules.disko
-      #     {
-      #       nixpkgs.overlays = [
-      #         ethereum-nix.overlays.default
-      #         outputs.overlays.additions
-      #         outputs.overlays.modifications
-      #       ];
-      #     }
-      #     {
-      #       home-manager.sharedModules = [
-      #         sops-nix.homeManagerModules.sops
-      #       ];
-      #     }
-      #     {
-      #       # GRUB timeout
-      #       boot.loader.timeout = nixpkgs.lib.mkForce 1;
+      dinar-ephemeral-alpha = {
+        system = "x86_64-linux";
+        specialArgs = { inherit inputs outputs; };
+        modules = [
+          ./hosts/dinar-ephemeral-alpha
+          ./modules/eth/erigon.nix
+          ./modules/eth/lighthouse-beacon.nix
+          ./modules/eth/mev-boost.nix
+          ./system/global.nix
+          ./home-manager/core.nix
+          home-manager.nixosModules.home-manager
+          disko.nixosModules.disko
+          {
+            nixpkgs.overlays = [
+              ethereum-nix.overlays.default
+              outputs.overlays.additions
+              outputs.overlays.modifications
+            ];
+          }
+          {
+            home-manager.sharedModules = [
+              sops-nix.homeManagerModules.sops
+            ];
+          }
+          {
+            # GRUB timeout
+            boot.loader.timeout = nixpkgs.lib.mkForce 1;
 
-      #       # Load into a tmpfs during stage-1
-      #       boot.kernelParams = [ "copytoram" ];
-      #     }
-      #   ];
-      #   format = "install-iso";
-      # };
+            # Load into a tmpfs during stage-1
+            boot.kernelParams = [ "copytoram" ];
+          }
+        ];
+        format = "install-iso";
+      };
 
     in
     {
@@ -166,13 +166,13 @@
       # Your custom packages
       # Acessible through 'nix build', 'nix shell', etc
       packages = forAllSystems (system: {
-        #dinar-ephemeral-alpha = nixos-generators.nixosGenerate dinar-ephemeral-alpha;
+        dinar-ephemeral-alpha = nixos-generators.nixosGenerate dinar-ephemeral-alpha;
         ponkila-ephemeral-beta = nixos-generators.nixosGenerate ponkila-ephemeral-beta;
         hetzner-ephemeral-alpha = nixos-generators.nixosGenerate hetzner-ephemeral-alpha;
       });
 
       nixosConfigurations = with nixpkgs.lib; {
-        #"dinar-ephemeral-alpha" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] dinar-ephemeral-alpha);
+        "dinar-ephemeral-alpha" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] dinar-ephemeral-alpha);
         "hetzner-ephemeral-alpha" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] hetzner-ephemeral-alpha);
         "ponkila-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] ponkila-ephemeral-beta);
       };
