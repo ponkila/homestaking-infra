@@ -40,14 +40,14 @@ Tested on Ubuntu 22.04.2 LTS aarch64, 5.15.0-69-generic
 
 - With Nix package manager (recommended)
     ```
-    nix --extra-experimental-features "nix-command flakes" build .#nixosConfigurations.<hostname>.config.system.build.<format>
+    nix build .#nixosConfigurations.<hostname>.config.system.build.<format>
     ```
     <details>
     <summary>Install Nix</summary>
 
       # Let root run the nix installer (optional)
-      $ mkdir -p /etc/nix
-      $ echo "build-users-group =" > /etc/nix/nix.conf
+      $ mkdir -p $HOME/.config/nix
+      $ echo "build-users-group =" > $HOME/.config/nix/nix.conf
 
       # Install Nix in single-user mode
       $ curl -L https://nixos.org/nix/install | sh
@@ -55,6 +55,12 @@ Tested on Ubuntu 22.04.2 LTS aarch64, 5.15.0-69-generic
 
       # Install nix-command
       $ nix-env -iA nixpkgs.nix
+
+      # Allow experimental features (optional)
+      $ echo "experimental-features = nix-command flakes" >> $HOME/.config/nix/nix.conf
+
+      # Accept nix configuration from a flake (optional)
+      $ echo "accept-flake-config = true" >> $HOME/.config/nix/nix.conf
     </details>
 
 - Within [Docker](https://docs.docker.com/desktop/install/linux-install/) / [Podman](https://podman.io/getting-started/installation)
