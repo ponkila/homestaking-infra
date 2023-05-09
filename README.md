@@ -91,7 +91,7 @@ Tested on Ubuntu 22.04.2 LTS aarch64, 5.15.0-69-generic
 
 We use declarative disk partitioning by [disko](https://github.com/nix-community/disko). For each host, there is a disko script that contains the desired disk layout. There are a lot of [examples](https://github.com/nix-community/disko/tree/master/example) available on how to configure the layout.
 
-To apply the disk layout to a target machine, you'll need to boot the machine using the built image and obtain the `mount.nix` file for that specific host. Once you have the file, execute the following command:
+To apply the disk layout to a target machine, you'll need to boot the machine using the built image and obtain the `mounts.nix` file for that specific host. Once you have the file, execute the following command:
 
 ```
 sudo nix run github:nix-community/disko -- --mode create ./mounts.nix
