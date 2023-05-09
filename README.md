@@ -13,7 +13,7 @@ We are currently working on [HomeStakerOS](https://github.com/ponkila/Homestaker
 - Deployment secrets using [sops-nix](https://github.com/Mic92/sops-nix) for secure handling of sensitive information
 - Utilization of [ethereum.nix](https://github.com/nix-community/ethereum.nix) providing an up-to-date package management solution
 - [Overlays](https://nixos.wiki/wiki/Overlays) offer a convenient and efficient way to manually update or modify packages, ideal for addressing issues with upstream sources
-- Outputs `isoImage` or `kexecTree` (bzImage, initrd, kexec-script, and ipxe-script), depending on the host configuration
+- Offers `isoImage` or `kexecTree` output formats depending on the host configuration in flake
 
 ## Structure
 - `flake.nix`: Entrypoint for host configurations
@@ -53,8 +53,13 @@ Tested on Ubuntu 22.04.2 LTS aarch64, 5.15.0-69-generic
     </details>
 
     ```
-    nix --extra-experimental-features "nix-command flakes" build .#nixosConfigurations.<hostname>.config.system.build.<format>
+    nix --extra-experimental-features "nix-command flakes" build .#nixosConfigurations.<hostname>.config.system.build.<format-attribute>
     ```
+
+    | Import  | Format attribute | Outputs
+    |-|-|-|
+    | netboot-kexec.nix | kexecTree| bzImage, initrd, kexec-script, and ipxe-script
+    | copytoram-iso.nix | isoImage | ISO image that loads into RAM on stage-1
 
 - Within [Docker](https://docs.docker.com/desktop/install/linux-install/) / [Podman](https://podman.io/getting-started/installation)
 
