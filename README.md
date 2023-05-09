@@ -34,6 +34,7 @@ hetzner-ephemeral-alpha | x86-64 | kexecTree | Dedicated build server
 hetzner-ephemeral-beta | aarch64 |  kexecTree | Cloud build server
 ponkila-ephemeral-beta | x86-64 | kexecTree | Lighthouse + Erigon
 ponkila-ephemeral-gamma | aarch64 | kexecTree | Raspberry Pi 4 
+ponkila-persistent-epsilon | x86-64 | | Darwin 
 
 ## Building (no cross-compile)
 Tested on Ubuntu 22.04.2 LTS aarch64, 5.15.0-69-generic
