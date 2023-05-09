@@ -48,7 +48,6 @@
       ];
 
       nixosConfigurations = {
-        # nix build .#nixosConfigurations.ponkila-ephemeral-beta.config.system.build.kexecTree
         ponkila-ephemeral-beta = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           specialArgs = { inherit inputs outputs; };
@@ -78,7 +77,6 @@
           ];
         };
 
-        # nix build .#nixosConfigurations.dinar-ephemeral-alpha.config.system.build.isoImage
         dinar-ephemeral-alpha = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           specialArgs = { inherit inputs outputs; };
