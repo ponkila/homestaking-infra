@@ -1,4 +1,4 @@
-# derived from https://github.com/nix-community/nixos-generators/blob/master/formats/iso-install.nix
+# derived from https://github.com/nix-community/nixos-generators/blob/master/formats/install-iso.nix
 { config, lib, modulesPath, ... }:
 {
   imports = [
