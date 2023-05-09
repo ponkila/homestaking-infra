@@ -63,7 +63,7 @@ Tested on Ubuntu 22.04.2 LTS aarch64, 5.15.0-69-generic
       $ echo "accept-flake-config = true" >> $HOME/.config/nix/nix.conf
     </details>
 
-- Within [Docker](https://docs.docker.com/desktop/install/linux-install/) / [Podman](https://podman.io/getting-started/installation)
+- Within [Docker](https://docs.docker.com/desktop/install/linux-install/) / [Podman](https://podman.io/docs/tutorials/installation#installing-on-linux)
     ```
     podman build . --tag nix-builder --build-arg hostname=<hostname>
     ```
