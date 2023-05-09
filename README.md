@@ -16,14 +16,14 @@ We are currently working on [HomeStakerOS](https://github.com/ponkila/Homestaker
 - Offers `isoImage` or `kexecTree` output formats depending on the host configuration
 
 ## Structure
-- `flake.nix`: Entrypoint for host configurations
-- `shell.nix`: Devshell for boostrapping. Accessible via `nix develop`
-- `home-manager`: Home-manager configurations
-- `hosts`: NixOS configurations. Accessible via `nix build`
-- `modules`: Shared module configurations
+- `flake.nix`: Entrypoint for host configurations.
+- `shell.nix`: Devshell for boostrapping. Accessible via `nix develop`.
+- `home-manager`: Home-manager configurations.
+- `hosts`: NixOS configurations. Accessible via `nix build`.
+- `modules`: Shared module configurations.
 - `overlay`: Patches and version overrides for some packages.
 - `pkgs`: Our custom packages.
-- `system`: Shared system configurations and formats
+- `system`: Shared system configurations and formats.
 
 ## Hosts
 | Hostname | System | Format | Info
@@ -87,7 +87,17 @@ Tested on Ubuntu 22.04.2 LTS aarch64, 5.15.0-69-generic
       error: 1 dependencies of derivation '/nix/store/0ys7pxf0l529gmjpayb9ny37kc68bawf-kexec-tree.drv' failed to build
     </details>
 
-## Disk formatting with disko
+## Disk formatting
+
+We use declarative disk partitioning by [disko](https://github.com/nix-community/disko). For each host, there is a disko script that contains the desired disk layout. There are a lot of [examples](https://github.com/nix-community/disko/tree/master/example) available on how to configure the layout.
+
+To apply the disk layout to a target machine, you'll need to boot the machine using the built image and obtain the `mount.nix` file for that specific host. Once you have the file, execute the following command:
+
+```
+sudo nix run github:nix-community/disko -- --mode create ./mounts.nix
+```
+
+This command will format the disks according to the script. Once formatting is complete, reboot the machine and the disks should be ready to use.
 
 ## Secrets and keys
 
