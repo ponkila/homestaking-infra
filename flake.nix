@@ -46,21 +46,6 @@
         "x86_64-darwin"
         "x86_64-linux"
       ];
-    in
-    {
-
-      formatter = forAllSystems (system:
-        nixpkgs.legacyPackages.${system}.nixpkgs-fmt
-      );
-
-      overlays = import ./overlays { inherit inputs; };
-
-      # Your custom packages
-      # Acessible through 'nix build', 'nix shell', etc
-      packages = forAllSystems (system:
-        let pkgs = nixpkgs.legacyPackages.${system};
-        in import ./pkgs { inherit pkgs; }
-      );
 
       nixosConfigurations = {
         # nix build .#nixosConfigurations.ponkila-ephemeral-beta.config.system.build.kexecTree
@@ -122,6 +107,25 @@
           ];
         };
       };
+    in
+    {
+
+      formatter = forAllSystems (system:
+        nixpkgs.legacyPackages.${system}.nixpkgs-fmt
+      );
+
+      overlays = import ./overlays { inherit inputs; };
+
+      # Your custom packages
+      # Acessible through 'nix build', 'nix shell', etc
+      packages = forAllSystems (system:
+        let pkgs = nixpkgs.legacyPackages.${system};
+        in import ./pkgs { inherit pkgs; }
+      );
+
+      # Nix build aliases
+      dinar-ephemeral-alpha = nixosConfigurations.dinar-ephemeral-alpha.config.system.build.isoImage;
+      ponkila-ephemeral-beta = nixosConfigurations.ponkila-ephemeral-beta.config.system.build.kexecTree;
 
       darwinConfigurations."ponkila-persistent-epsilon" = darwin.lib.darwinSystem {
         specialArgs = { inherit inputs outputs; };
