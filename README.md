@@ -13,30 +13,35 @@ We are currently working on [HomeStakerOS](https://github.com/ponkila/Homestaker
 - Deployment secrets using [sops-nix](https://github.com/Mic92/sops-nix) for secure handling of sensitive information
 - Utilization of [ethereum.nix](https://github.com/nix-community/ethereum.nix) providing an up-to-date package management solution
 - [Overlays](https://nixos.wiki/wiki/Overlays) offer a convenient and efficient way to manually update or modify packages, ideal for addressing issues with upstream sources
-- Offers `isoImage` or `kexecTree` output formats depending on the host configuration in flake
+- Offers `isoImage` or `kexecTree` output formats depending on the host configuration
 
 ## Structure
 - `flake.nix`: Entrypoint for host configurations
-- `shell.nix`: Devshell for boostrapping (`nix develop` or `nix-shell`)
-- `home-manager`: Home-manager configuration
-- `hosts`: NixOS configurations, accessible via `nix build .#<hostname>`
-  - `dinar-ephemeral-alpha`: x86_64-linux | isoImage, lighthouse + erigon
-  - `dinar-ephemeral-beta`: x86_64-linux | isoImage, lighthouse + erigon
-  - `hetzner-ephemeral-alpha`: x86_64-linux | kexecTree, build server
-  - `hetzner-ephemeral-beta`: aarch64-linux | kexecTree, build server
-  - `ponkila-ephemeral-beta`: x86_64-linux | kexecTree, lighthouse + erigon
-  - `ponkila-ephemeral-gamma`: aarch64-linux, Raspberry Pi 4 | kexecTree
-  - `ponkila-persistent-epsilon`: x86_64-darwin | persistent 
+- `shell.nix`: Devshell for boostrapping. Accessible via `nix develop`
+- `home-manager`: Home-manager configurations
+- `hosts`: NixOS configurations. Accessible via `nix build`
 - `modules`: Shared module configurations
-- `overlay`: Patches and version overrides for some packages. Accessible via `nix build`
-- `pkgs`: Our custom packages. Also accessible via `nix build`
-- `system`: Shared system configurations and custom formats
+- `overlay`: Patches and version overrides for some packages.
+- `pkgs`: Our custom packages.
+- `system`: Shared system configurations and formats
+
+## Hosts
+| Hostname | System | Format | Info
+|-|-|-|-|
+dinar-ephemeral-alpha | x86-64 | isoImage | Lighthouse + Erigon
+dinar-ephemeral-beta | x86-64 | isoImage | Lighthouse + Erigon
+hetzner-ephemeral-alpha | x86-64 | kexecTree | Dedicated build server
+hetzner-ephemeral-beta | aarch64 |  kexecTree | Cloud build server
+ponkila-ephemeral-beta | x86-64 | kexecTree | Lighthouse + Erigon
+ponkila-ephemeral-gamma | aarch64 | kexecTree | Raspberry Pi 4 
 
 ## Building (no cross-compile)
 Tested on Ubuntu 22.04.2 LTS aarch64, 5.15.0-69-generic
 
 - With Nix package manager (recommended)
-
+    ```
+    nix --extra-experimental-features "nix-command flakes" build .#nixosConfigurations.<hostname>.config.system.build.<format>
+    ```
     <details>
     <summary>Install Nix</summary>
 
@@ -52,17 +57,7 @@ Tested on Ubuntu 22.04.2 LTS aarch64, 5.15.0-69-generic
       $ nix-env -iA nixpkgs.nix
     </details>
 
-    ```
-    nix --extra-experimental-features "nix-command flakes" build .#nixosConfigurations.<hostname>.config.system.build.<format-attribute>
-    ```
-
-    | Import  | Format attribute | Outputs
-    |-|-|-|
-    | netboot-kexec.nix | kexecTree| bzImage, initrd, kexec-script, and ipxe-script
-    | copytoram-iso.nix | isoImage | ISO image that loads into RAM on stage-1
-
 - Within [Docker](https://docs.docker.com/desktop/install/linux-install/) / [Podman](https://podman.io/getting-started/installation)
-
     ```
     podman build . --tag nix-builder --build-arg hostname=<hostname> --build-arg format=<format> 
     ```
@@ -70,7 +65,6 @@ Tested on Ubuntu 22.04.2 LTS aarch64, 5.15.0-69-generic
     ```
     podman run -v "$PWD:$PWD":z -w "$PWD" nix-builder
     ```
-
     <details>
     <summary>Debug notes</summary>
 
