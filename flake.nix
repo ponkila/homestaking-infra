@@ -140,6 +140,7 @@
           let pkgs = nixpkgs.legacyPackages.${system};
           in import ./shell.nix { inherit pkgs; }
         );
-
+      
+      herculesCI.ciSystems = [ "x86_64-linux" ];
     };
 }
