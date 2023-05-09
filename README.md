@@ -40,7 +40,7 @@ Tested on Ubuntu 22.04.2 LTS aarch64, 5.15.0-69-generic
 
 - With Nix package manager (recommended)
     ```
-    nix build .#nixosConfigurations.<hostname>.config.system.build.<format>
+    nix build .#<hostname>
     ```
     <details>
     <summary>Install Nix</summary>
@@ -65,7 +65,7 @@ Tested on Ubuntu 22.04.2 LTS aarch64, 5.15.0-69-generic
 
 - Within [Docker](https://docs.docker.com/desktop/install/linux-install/) / [Podman](https://podman.io/getting-started/installation)
     ```
-    podman build . --tag nix-builder --build-arg hostname=<hostname> --build-arg format=<format> 
+    podman build . --tag nix-builder --build-arg hostname=<hostname>
     ```
 
     ```
