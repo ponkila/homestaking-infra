@@ -40,7 +40,6 @@
     }
   ];
 
-  systemd.services.linger.enable = lib.mkForce false;
   systemd.services.nix-remount = {
     path = [ "/run/wrappers" ];
     enable = true;
