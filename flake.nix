@@ -23,8 +23,6 @@
     ethereum-nix.url = "github:nix-community/ethereum.nix";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
-    nixos-generators.inputs.nixpkgs.follows = "nixpkgs";
-    nixos-generators.url = "github:nix-community/nixos-generators";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     sops-nix.url = "github:Mic92/sops-nix";
   };
@@ -36,7 +34,6 @@
     , disko
     , ethereum-nix
     , home-manager
-    , nixos-generators
     , nixpkgs
     , sops-nix
     }@inputs:
@@ -50,35 +47,7 @@
         "x86_64-linux"
       ];
 
-      # custom formats for nixos-generators
-      customFormats = {
-        "kexecTree" = {
-          formatAttr = "kexecTree";
-          imports = [ ./system/netboot.nix ];
-        };
-        "copytoram-iso" = {
-          formatAttr = "isoImage";
-          imports = [ ./system/copytoram-iso.nix ];
-          filename = "*.iso";
-        };
-      };
-    in
-    {
-
-      formatter = forAllSystems (system:
-        nixpkgs.legacyPackages.${system}.nixpkgs-fmt
-      );
-
-      overlays = import ./overlays { inherit inputs; };
-
-      # Your custom packages
-      # Acessible through 'nix build', 'nix shell', etc
-      packages = forAllSystems (system:
-        let pkgs = nixpkgs.legacyPackages.${system};
-        in import ./pkgs { inherit pkgs; }
-      );
-
-      "ponkila-ephemeral-beta" = nixos-generators.nixosGenerate {
+      ponkila-ephemeral-beta = {
         system = "x86_64-linux";
         specialArgs = { inherit inputs outputs; };
         modules = [
@@ -86,6 +55,7 @@
           ./modules/eth/erigon.nix
           ./modules/eth/lighthouse-beacon.nix
           ./modules/eth/mev-boost.nix
+          ./system/formats/netboot-kexec.nix
           ./system/global.nix
           ./system/ramdisk.nix
           ./home-manager/core.nix
@@ -104,11 +74,9 @@
             ];
           }
         ];
-        customFormats = customFormats;
-        format = "kexecTree";
       };
 
-      "dinar-ephemeral-alpha" = nixos-generators.nixosGenerate {
+      dinar-ephemeral-alpha = {
         system = "x86_64-linux";
         specialArgs = { inherit inputs outputs; };
         modules = [
@@ -116,6 +84,7 @@
           ./modules/eth/erigon.nix
           ./modules/eth/lighthouse-beacon.nix
           ./modules/eth/mev-boost.nix
+          ./system/formats/copytoram-iso.nix
           ./system/global.nix
           ./home-manager/core.nix
           home-manager.nixosModules.home-manager
@@ -132,15 +101,25 @@
               sops-nix.homeManagerModules.sops
             ];
           }
-          {
-            # GRUB timeout
-            boot.loader.timeout = nixpkgs.lib.mkForce 1;
-
-            # Load into a tmpfs during stage-1
-            boot.kernelParams = [ "copytoram" ];
-          }
         ];
-        format = "install-iso";
+      };
+    in
+    rec {
+
+      formatter = forAllSystems (system:
+        nixpkgs.legacyPackages.${system}.nixpkgs-fmt
+      );
+
+      overlays = import ./overlays { inherit inputs; };
+
+      packages = forAllSystems (system: {
+        dinar-ephemeral-alpha = nixosConfigurations.dinar-ephemeral-alpha.config.system.build.isoImage;
+        ponkila-ephemeral-beta = nixosConfigurations.ponkila-ephemeral-beta.config.system.build.kexecTree;
+      });
+
+      nixosConfigurations = with nixpkgs.lib; {
+        "dinar-ephemeral-alpha" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] dinar-ephemeral-alpha);
+        "ponkila-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] ponkila-ephemeral-beta);
       };
 
       "dinar-ephemeral-beta" = nixos-generators.nixosGenerate {
@@ -194,5 +173,6 @@
           in import ./shell.nix { inherit pkgs; }
         );
 
+      herculesCI.ciSystems = [ "x86_64-linux" ];
     };
 }
