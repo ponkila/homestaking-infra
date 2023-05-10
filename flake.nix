@@ -81,6 +81,7 @@
         specialArgs = { inherit inputs outputs; };
         modules = [
           ./hosts/hetzner-ephemeral-alpha
+          ./system/formats/netboot-kexec.nix
           ./system/global.nix
           ./system/ramdisk.nix
           ./home-manager/juuso.nix
@@ -98,8 +99,6 @@
             ];
           }
         ];
-        customFormats = customFormats;
-        format = "kexecTree";
       };
 
       dinar-ephemeral-alpha = {
@@ -140,11 +139,13 @@
 
       packages = forAllSystems (system: {
         dinar-ephemeral-alpha = nixosConfigurations.dinar-ephemeral-alpha.config.system.build.isoImage;
+        hetzner-ephemeral-alpha = nixosConfigurations.hetzner-ephemeral-alpha.config.system.build.kexecTree;
         ponkila-ephemeral-beta = nixosConfigurations.ponkila-ephemeral-beta.config.system.build.kexecTree;
       });
 
       nixosConfigurations = with nixpkgs.lib; {
         "dinar-ephemeral-alpha" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] dinar-ephemeral-alpha);
+        "hetzner-ephemeral-alpha" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] hetzner-ephemeral-alpha);
         "ponkila-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] ponkila-ephemeral-beta);
       };
 
