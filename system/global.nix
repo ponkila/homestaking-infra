@@ -23,22 +23,6 @@
     package = pkgs.nix;
   };
 
-  systemd.services.linger = {
-    enable = true;
-
-    requires = [ "local-fs.target" ];
-    after = [ "local-fs.target" ];
-
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = ''
-        /run/current-system/sw/bin/loginctl enable-linger core
-      '';
-    };
-
-    wantedBy = [ "multi-user.target" ];
-  };
-
   boot.kernelParams = [
     "boot.shell_on_fail"
 
@@ -61,10 +45,6 @@
     btrfs-progs
     kexec-tools
     fuse-overlayfs
-  ];
-
-  boot.binfmt.emulatedSystems = [
-    "aarch64-linux"
   ];
 
   services.timesyncd.enable = false;
