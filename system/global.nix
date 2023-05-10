@@ -47,11 +47,6 @@
     fuse-overlayfs
   ];
 
-  boot.binfmt.emulatedSystems = [
-    "aarch64-linux"
-    "armv7l-linux"
-  ];
-
   services.timesyncd.enable = false;
   services.chrony = {
     enable = true;
