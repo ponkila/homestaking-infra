@@ -103,26 +103,8 @@
           }
         ];
       };
-    in
-    rec {
 
-      formatter = forAllSystems (system:
-        nixpkgs.legacyPackages.${system}.nixpkgs-fmt
-      );
-
-      overlays = import ./overlays { inherit inputs; };
-
-      packages = forAllSystems (system: {
-        dinar-ephemeral-alpha = nixosConfigurations.dinar-ephemeral-alpha.config.system.build.isoImage;
-        ponkila-ephemeral-beta = nixosConfigurations.ponkila-ephemeral-beta.config.system.build.kexecTree;
-      });
-
-      nixosConfigurations = with nixpkgs.lib; {
-        "dinar-ephemeral-alpha" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] dinar-ephemeral-alpha);
-        "ponkila-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] ponkila-ephemeral-beta);
-      };
-
-      "dinar-ephemeral-beta" = nixos-generators.nixosGenerate {
+      dinar-ephemeral-beta = {
         system = "x86_64-linux";
         specialArgs = { inherit inputs outputs; };
         modules = [
@@ -130,6 +112,7 @@
           ./modules/eth/erigon.nix
           ./modules/eth/lighthouse-beacon.nix
           ./modules/eth/mev-boost.nix
+          ./system/formats/copytoram-iso.nix
           ./system/global.nix
           ./home-manager/core.nix
           home-manager.nixosModules.home-manager
@@ -146,15 +129,27 @@
               sops-nix.homeManagerModules.sops
             ];
           }
-          {
-            # GRUB timeout
-            boot.loader.timeout = nixpkgs.lib.mkForce 1;
-
-            # Load into a tmpfs during stage-1
-            boot.kernelParams = [ "copytoram" ];
-          }
         ];
-        format = "install-iso";
+      };
+    in
+    rec {
+
+      formatter = forAllSystems (system:
+        nixpkgs.legacyPackages.${system}.nixpkgs-fmt
+      );
+
+      overlays = import ./overlays { inherit inputs; };
+
+      packages = forAllSystems (system: {
+        dinar-ephemeral-alpha = nixosConfigurations.dinar-ephemeral-alpha.config.system.build.isoImage;
+        dinar-ephemeral-beta = nixosConfigurations.dinar-ephemeral-beta.config.system.build.isoImage;
+        ponkila-ephemeral-beta = nixosConfigurations.ponkila-ephemeral-beta.config.system.build.kexecTree;
+      });
+
+      nixosConfigurations = with nixpkgs.lib; {
+        "dinar-ephemeral-alpha" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] dinar-ephemeral-alpha);
+        "dinar-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] dinar-ephemeral-beta);
+        "ponkila-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] ponkila-ephemeral-beta);
       };
 
       darwinConfigurations."ponkila-persistent-epsilon" = darwin.lib.darwinSystem {
