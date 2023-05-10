@@ -128,6 +128,34 @@
           }
         ];
       };
+
+      dinar-ephemeral-beta = {
+        system = "x86_64-linux";
+        specialArgs = { inherit inputs outputs; };
+        modules = [
+          ./hosts/dinar-ephemeral-beta
+          ./modules/eth/erigon.nix
+          ./modules/eth/lighthouse-beacon.nix
+          ./modules/eth/mev-boost.nix
+          ./system/formats/copytoram-iso.nix
+          ./system/global.nix
+          ./home-manager/core.nix
+          home-manager.nixosModules.home-manager
+          disko.nixosModules.disko
+          {
+            nixpkgs.overlays = [
+              ethereum-nix.overlays.default
+              outputs.overlays.additions
+              outputs.overlays.modifications
+            ];
+          }
+          {
+            home-manager.sharedModules = [
+              sops-nix.homeManagerModules.sops
+            ];
+          }
+        ];
+      };
     in
     rec {
 
@@ -140,12 +168,14 @@
       packages = forAllSystems (system: {
         dinar-ephemeral-alpha = nixosConfigurations.dinar-ephemeral-alpha.config.system.build.isoImage;
         hetzner-ephemeral-alpha = nixosConfigurations.hetzner-ephemeral-alpha.config.system.build.kexecTree;
+        dinar-ephemeral-beta = nixosConfigurations.dinar-ephemeral-beta.config.system.build.isoImage;
         ponkila-ephemeral-beta = nixosConfigurations.ponkila-ephemeral-beta.config.system.build.kexecTree;
       });
 
       nixosConfigurations = with nixpkgs.lib; {
         "dinar-ephemeral-alpha" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] dinar-ephemeral-alpha);
         "hetzner-ephemeral-alpha" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] hetzner-ephemeral-alpha);
+        "dinar-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] dinar-ephemeral-beta);
         "ponkila-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] ponkila-ephemeral-beta);
       };
 
