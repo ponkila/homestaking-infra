@@ -34,7 +34,9 @@ hetzner-ephemeral-alpha | x86-64 | kexecTree | Dedicated build server
 hetzner-ephemeral-beta | aarch64 |  kexecTree | Cloud build server
 ponkila-ephemeral-beta | x86-64 | kexecTree | Lighthouse + Erigon
 ponkila-ephemeral-gamma | aarch64 | kexecTree | Raspberry Pi 4 
-ponkila-persistent-epsilon | x86-64 | | Darwin 
+ponkila-persistent-epsilon | x86-64 | | Darwin
+
+Note: Some of these hosts are currently being set up and will be added to hosts directory soon.
 
 ## Building (no cross-compile)
 Tested on Ubuntu 22.04.2 LTS aarch64, 5.15.0-69-generic
@@ -99,7 +101,3 @@ sudo nix run github:nix-community/disko -- --mode create ./mounts.nix
 ```
 
 This command will format the disks according to the script. Once formatting is complete, reboot the machine and the disks should be ready to use.
-
-## Secrets and keys
-
-## Deployment
