@@ -5,6 +5,7 @@ let
   infra.ip = "192.168.100.10";
   lighthouse.datadir = "/var/mnt/lighthouse";
   erigon.datadir = "/var/mnt/erigon";
+  sshKeysPath = "/var/mnt/secrets/ssh/id_ed25519";
 in
 {
   # User options
@@ -47,7 +48,7 @@ in
       secrets."wireguard/wg0" = {
         path = "%r/wireguard/wg0.conf";
       };
-      age.sshKeyPaths = [ "/var/mnt/secrets/ssh/id_ed25519" ];
+      age.sshKeyPaths = [ sshKeysPath ];
     };
   };
 
@@ -96,11 +97,20 @@ in
   # SSH
   services.openssh = {
     enable = true;
-    settings.PasswordAuthentication = false;
     hostKeys = [{
-      path = "/var/mnt/secrets/ssh/id_ed25519";
+      path = sshKeysPath;
       type = "ed25519";
     }];
+    allowSFTP = false;
+    extraConfig = ''
+      AllowTcpForwarding yes
+      X11Forwarding no
+      AllowAgentForwarding no
+      AllowStreamLocalForwarding no
+      AuthenticationMethods publickey
+    '';
+    settings.PasswordAuthentication = false;
+    settings.challengeResponseAuthentication = false;
   };
 
   # Prometheus

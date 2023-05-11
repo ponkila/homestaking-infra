@@ -84,11 +84,20 @@ in
   # SSH
   services.openssh = {
     enable = true;
-    settings.PasswordAuthentication = false;
     hostKeys = [{
       path = sshKeysPath;
       type = "ed25519";
     }];
+    allowSFTP = false;
+    extraConfig = ''
+      AllowTcpForwarding yes
+      X11Forwarding no
+      AllowAgentForwarding no
+      AllowStreamLocalForwarding no
+      AuthenticationMethods publickey
+    '';
+    settings.PasswordAuthentication = false;
+    settings.challengeResponseAuthentication = false;
   };
 
   # Prometheus
