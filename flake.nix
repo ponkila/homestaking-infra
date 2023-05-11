@@ -101,6 +101,31 @@
         ];
       };
 
+      hetzner-ephemeral-beta = {
+        system = "aarch64-linux";
+        specialArgs = { inherit inputs outputs; };
+        modules = [
+          ./hosts/hetzner-ephemeral-beta
+          ./system/formats/netboot-kexec.nix
+          ./system/global.nix
+          ./system/ramdisk.nix
+          ./home-manager/juuso.nix
+          ./home-manager/kari.nix
+          home-manager.nixosModules.home-manager
+          {
+            nixpkgs.overlays = [
+              outputs.overlays.additions
+              outputs.overlays.modifications
+            ];
+          }
+          {
+            home-manager.sharedModules = [
+              sops-nix.homeManagerModules.sops
+            ];
+          }
+        ];
+      };
+
       dinar-ephemeral-alpha = {
         system = "x86_64-linux";
         specialArgs = { inherit inputs outputs; };
@@ -168,6 +193,7 @@
       packages = forAllSystems (system: {
         dinar-ephemeral-alpha = nixosConfigurations.dinar-ephemeral-alpha.config.system.build.isoImage;
         hetzner-ephemeral-alpha = nixosConfigurations.hetzner-ephemeral-alpha.config.system.build.kexecTree;
+        hetzner-ephemeral-beta = nixosConfigurations.hetzner-ephemeral-beta.config.system.build.kexecTree;
         dinar-ephemeral-beta = nixosConfigurations.dinar-ephemeral-beta.config.system.build.isoImage;
         ponkila-ephemeral-beta = nixosConfigurations.ponkila-ephemeral-beta.config.system.build.kexecTree;
       });
@@ -175,6 +201,7 @@
       nixosConfigurations = with nixpkgs.lib; {
         "dinar-ephemeral-alpha" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] dinar-ephemeral-alpha);
         "hetzner-ephemeral-alpha" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] hetzner-ephemeral-alpha);
+        "hetzner-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] hetzner-ephemeral-beta);
         "dinar-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] dinar-ephemeral-beta);
         "ponkila-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] ponkila-ephemeral-beta);
       };
