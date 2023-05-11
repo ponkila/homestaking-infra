@@ -36,7 +36,7 @@ ponkila-ephemeral-beta | x86-64 | kexecTree | Lighthouse + Erigon
 ponkila-ephemeral-gamma | aarch64 | kexecTree | Raspberry Pi 4 
 ponkila-persistent-epsilon | x86-64 | | Darwin
 
-Note: Some of these hosts are currently being set up and will be added to hosts directory soon.
+Note: Some of these hosts might be currently being set up and will be added to hosts directory soon.
 
 ## Building (no cross-compile)
 Tested on Ubuntu 22.04.2 LTS aarch64, 5.15.0-69-generic
@@ -92,7 +92,7 @@ Tested on Ubuntu 22.04.2 LTS aarch64, 5.15.0-69-generic
 
 ## Disk formatting
 
-We use declarative disk partitioning by [disko](https://github.com/nix-community/disko). For each host, there is a disko script that contains the desired disk layout. There are a lot of [examples](https://github.com/nix-community/disko/tree/master/example) available on how to configure the layout.
+We use declarative disk partitioning by [disko](https://github.com/nix-community/disko). For each host, there should be disko script that contains the desired disk layout. There are a lot of [examples](https://github.com/nix-community/disko/tree/master/example) available on how to configure the layout.
 
 To apply the disk layout to a target machine, you'll need to boot the machine using the built image and obtain the `mounts.nix` file for that specific host. Once you have the file, execute the following command:
 
@@ -101,3 +101,20 @@ sudo nix run github:nix-community/disko -- --mode create ./mounts.nix
 ```
 
 This command will format the disks according to the script. Once formatting is complete, reboot the machine and the disks should be ready to use.
+
+## Formats & Deployment
+
+- kexecTree
+  Outputs: bzImage, initrd, kexec-boot script, and netboot IPXE-script.
+  ```
+  # Run a bash shell that provides the dependencies
+  $ nix develop
+
+  # Run kexec-boot script
+  $ ./result/kexec-boot
+  ```
+  TODO: Prief info and links for netbooting Rasberry Pi 4
+
+- isoImage
+  Outputs: ISO image which is loaded into RAM in stage-1
+  Deploy: Bootable USB drive via balena etcher or ventoy
