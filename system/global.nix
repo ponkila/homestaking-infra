@@ -60,9 +60,20 @@
   systemd.watchdog.device = "/dev/watchdog";
   systemd.watchdog.runtimeTime = "30s";
 
-  ## Allow passwordless sudo from wheel group
+  # Audit Tracing
+  security.auditd.enable = true;
+  security.audit.enable = true;
+  security.audit.rules = [
+    "-a exit,always -F arch=b64 -S execve"
+  ];
+
+  # Rip Out Default Packages
+  environment.defaultPackages = lib.mkForce [ ];
+
+  # Allow passwordless sudo from wheel group
   security.sudo = {
     enable = lib.mkDefault true;
     wheelNeedsPassword = lib.mkForce false;
+    execWheelOnly = true;
   };
 }
