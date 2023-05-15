@@ -18,6 +18,12 @@
     "armv7l-linux"
   ];
 
+  # Hercules CI
+  services.hercules-ci-agent = {
+    enable = true;
+    settings.baseDirectory = "/var/mnt/.config/hercules-ci-agent";
+  };
+
   systemd.mounts = [
     {
       enable = true;
@@ -27,6 +33,7 @@
       type = "btrfs";
       options = "subvolid=257";
 
+      before = [ "hercules-ci-agent.service" ];
       wantedBy = [ "multi-user.target" ];
     }
   ];
