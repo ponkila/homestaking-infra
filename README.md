@@ -97,7 +97,7 @@ We use declarative disk partitioning by [disko](https://github.com/nix-community
 To apply the disk layout to a target machine, you'll need to boot the machine using the built image and obtain the `mounts.nix` file for that specific host. Once you have the file, execute the following command:
 
 ```
-sudo nix run github:nix-community/disko -- --mode create ./mounts.nix
+sudo nix run github:nix-community/disko -- --mode zap_create_mount ./mounts.nix
 ```
 
 This command will format the disks according to the script. Once formatting is complete, reboot the machine and the disks should be ready to use.
@@ -114,6 +114,31 @@ This command will format the disks according to the script. Once formatting is c
   $ ./result/kexec-boot
   ```
   TODO: Prief info and links for netbooting Rasberry Pi 4
+
+  <details>
+  <summary>Bootstrap from hetzner rescue</summary>
+      # The installer needs sudo
+      $ apt install -y sudo
+
+      # Let root run the nix installer
+      $ mkdir -p /etc/nix
+      $ echo "build-users-group =" > /etc/nix/nix.conf
+
+      # Install Nix in single-user mode
+      $ curl -L https://nixos.org/nix/install | sh
+      $ . $HOME/.nix-profile/etc/profile.d/nix.sh
+
+      # Install nix-command
+      $ nix-env -iA nixpkgs.nix
+
+      # Build
+      $ git clone https://github.com/ponkila/homestaking-infra.git
+      $ nix build --extra-experimental-features "nix-command flakes" .#<hostname>
+
+      # Kexec
+      $ apt-get install kexec-tools
+      $ ./result/kexec-tree
+   </details>
 
 - isoImage
   Outputs: ISO image which is loaded into RAM in stage-1
