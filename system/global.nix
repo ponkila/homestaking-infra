@@ -1,4 +1,7 @@
 { pkgs, config, lib, inputs, ... }:
+let
+  asGB = size: toString (size * 1024 * 1024);
+in
 {
   nix = {
     # This will add each flake input as a registry
@@ -14,6 +17,9 @@
       experimental-features = "nix-command flakes";
       # Deduplicate and optimize nix store
       auto-optimise-store = true;
+      # Free up to 200GiB whenever there is less than 10GiB left
+      min-free = asGB 10;
+      max-free = asGB 200;
       # Allows this server to be used as a remote builder
       trusted-users = [
         "root"
