@@ -83,6 +83,7 @@
           ./hosts/hetzner-ephemeral-alpha
           ./system/formats/netboot-kexec.nix
           ./system/global.nix
+          ./system/hercules-ci
           ./system/ramdisk.nix
           ./home-manager/juuso.nix
           ./home-manager/kari.nix
@@ -109,6 +110,7 @@
           ./hosts/hetzner-ephemeral-beta
           ./system/formats/netboot-kexec.nix
           ./system/global.nix
+          ./system/hercules-ci
           ./system/ramdisk.nix
           ./home-manager/juuso.nix
           ./home-manager/kari.nix
