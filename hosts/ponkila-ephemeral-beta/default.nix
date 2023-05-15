@@ -148,5 +148,10 @@ in
       }
     ];
   };
+  
+  # enable rpcbind, redistributable firmware 
+  services.rpcbind.enable = true;
+  hardware.enableRedistributableFirmware = true;
+
   system.stateVersion = "23.05";
 }
