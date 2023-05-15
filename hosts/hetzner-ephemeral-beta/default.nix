@@ -15,7 +15,6 @@
 
   # Support for cross compilation
   boot.binfmt.emulatedSystems = [
-    "aarch64-linux"
     "armv7l-linux"
   ];
 
