@@ -1,6 +1,4 @@
 keys:
-  - &hetzner-ephemeral-alpha age17ne44avq55ch559c5859q3wwv2j09d3yar505kegdwnrwa3ga9ss9kc0zn
-  - &hetzner-ephemeral-beta age17ne44avq55ch559c5859q3wwv2j09d3yar505kegdwnrwa3ga9ss9kc0zn
   - &dinar-ephemeral-beta age1fuxy7v9jfgzz3p4f0k5gna8rhmgp792cmnyrzuum3zkssqn0rqmqq34p98
   - &dinar-ephemeral-alpha age10256ff6jm2fqjekg4ta3y6ym6s63ppgxrnfrjlsnknd8jduksvasrgqnsy
   - &juuso 8F84B8738E67A3453F05D29BC2DC6A67CB7F891F
@@ -24,8 +22,3 @@ creation_rules:
         - *juuso
         age:
         - *dinar-ephemeral-beta
-  - path_regex: system/hercules-ci/.+\.yaml$
-    key_groups:
-      - age:
-          - *hetzner-ephemeral-alpha
-          - *hetzner-ephemeral-beta

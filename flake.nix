@@ -87,7 +87,6 @@
           ./system/ramdisk.nix
           ./home-manager/juuso.nix
           ./home-manager/kari.nix
-          inputs.sops-nix.nixosModules.sops
           home-manager.nixosModules.home-manager
           {
             nixpkgs.overlays = [
@@ -114,7 +113,6 @@
           ./system/ramdisk.nix
           ./home-manager/juuso.nix
           ./home-manager/kari.nix
-          inputs.sops-nix.nixosModules.sops
           home-manager.nixosModules.home-manager
           {
             nixpkgs.overlays = [
