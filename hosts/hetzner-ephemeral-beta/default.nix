@@ -13,6 +13,9 @@
   networking.hostName = "hetzner-ephemeral-beta";
   time.timeZone = "Europe/Helsinki";
 
+  # Use stable kernel
+  boot.kernelPackages = pkgs.linuxPackagesFor (pkgs.linux);
+
   # Apply kernel personality patch from Ubuntu and configure armv7l support
   boot.kernelPatches = [
     rec {
