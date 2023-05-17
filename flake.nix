@@ -25,12 +25,13 @@
     home-manager.url = "github:nix-community/home-manager";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     sops-nix.url = "github:Mic92/sops-nix";
-    aarch64-hosts.url = "path:./hosts"
+    aarch64-hosts.url = "path:./hosts";
   };
 
   # add the inputs declared above to the argument attribute set
   outputs =
     { self
+    , aarch64-hosts
     , darwin
     , disko
     , ethereum-nix
@@ -194,7 +195,7 @@
           in import ./shell.nix { inherit pkgs; }
         );
 
-      herculesCI.ciSystems = [ "x86_64-linux" "aarch64-linux" ];
+      herculesCI.ciSystems = [ "x86_64-linux" ];
     };
 
 }
