@@ -45,7 +45,7 @@
       what = "/dev/disk/by-label/nix";
       where = "/var/mnt/.config";
       type = "btrfs";
-      options = "subvolid=257";
+      options = "subvolid=256";
 
       before = [ "hercules-ci-agent.service" ];
       wantedBy = [ "multi-user.target" ];
@@ -62,7 +62,7 @@
 
     # if a new device, the new .rw-store has to be mounted
     preStart = ''
-      /run/wrappers/bin/mount /dev/disk/by-label/nix -o subvolid=256 /nix/.rw-store
+      /run/wrappers/bin/mount /dev/disk/by-label/nix -o subvolid=257 /nix/.rw-store
     '';
     script = ''
       /run/wrappers/bin/mount -t overlay overlay -o lowerdir=/nix/.ro-store:/nix/store,upperdir=/nix/.rw-store/store,workdir=/nix/.rw-store/work /nix/store
