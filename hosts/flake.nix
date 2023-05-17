@@ -2,12 +2,12 @@
   description = "Flake for aarch64 hosts";
 
   inputs = {
-    darwin.inputs.nixpkgs.follows = "nixpkgs";
-    darwin.url = "github:lnl7/nix-darwin";
-    disko.inputs.nixpkgs.follows = "nixpkgs";
-    disko.url = "github:nix-community/disko";
-    ethereum-nix.inputs.nixpkgs.follows = "nixpkgs";
-    ethereum-nix.url = "github:nix-community/ethereum.nix";
+    #darwin.inputs.nixpkgs.follows = "nixpkgs";
+    #darwin.url = "github:lnl7/nix-darwin";
+    #disko.inputs.nixpkgs.follows = "nixpkgs";
+    #disko.url = "github:nix-community/disko";
+    #ethereum-nix.inputs.nixpkgs.follows = "nixpkgs";
+    #ethereum-nix.url = "github:nix-community/ethereum.nix";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-22.11";
@@ -17,9 +17,9 @@
   # add the inputs declared above to the argument attribute set
   outputs =
     { self
-    , darwin
-    , disko
-    , ethereum-nix
+    #, darwin
+    #, disko
+    #, ethereum-nix
     , home-manager
     , nixpkgs
     , sops-nix
@@ -35,7 +35,7 @@
         system = "aarch64-linux";
         specialArgs = { inherit inputs outputs; };
         modules = [
-          ./hosts/hetzner-ephemeral-beta
+          ./hetzner-ephemeral-beta
           ../system/formats/netboot-kexec.nix
           ../system/global.nix
           ../system/ramdisk.nix
@@ -57,6 +57,8 @@
       };
     in
     rec {
+      overlays = import ../overlays { inherit inputs; };
+
       packages = forAllSystems (system: {
         hetzner-ephemeral-beta = nixosConfigurations.hetzner-ephemeral-beta.config.system.build.kexecTree;
       });

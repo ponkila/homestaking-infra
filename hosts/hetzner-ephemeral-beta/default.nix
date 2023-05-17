@@ -84,8 +84,8 @@
       AllowStreamLocalForwarding no
       AuthenticationMethods publickey
     '';
-    settings.PasswordAuthentication = false;
-    settings.challengeResponseAuthentication = false;
+    passwordAuthentication = false;
+    #challengeResponseAuthentication = false;
   };
 
   system.stateVersion = "23.05";
