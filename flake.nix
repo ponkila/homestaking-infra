@@ -24,7 +24,6 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-22.11";
     sops-nix.url = "github:Mic92/sops-nix";
   };
 
@@ -36,7 +35,6 @@
     , ethereum-nix
     , home-manager
     , nixpkgs
-    , nixpkgs-stable
     , sops-nix
     }@inputs:
 
@@ -103,45 +101,30 @@
         ];
       };
 
-      hetzner-ephemeral-beta =
-        # let
-        #   nixpkgs = import inputs.nixpkgs-stable {
-        #     system = nixpkgs.system;
-        #     # Uncomment this if you need an unfree package from unstable.
-        #     #config.allowUnfree = true;
-        #   };
-        # in 
-        rec {
-          system = "aarch64-linux";
-          specialArgs = { inherit inputs outputs; };
-          modules = [
-            ./hosts/hetzner-ephemeral-beta
-            ./system/formats/netboot-kexec.nix
-            ./system/global.nix
-            ./system/ramdisk.nix
-            ./home-manager/juuso.nix
-            ./home-manager/kari.nix
-            home-manager.nixosModules.home-manager
-            {
-              nixpkgs = import inputs.nixpkgs-stable {
-                inherit system;
-                # Uncomment this if you need an unfree package from unstable.
-                #config.allowUnfree = true;
-              };
-            }
-            {
-              nixpkgs.overlays = [
-                outputs.overlays.additions
-                outputs.overlays.modifications
-              ];
-            }
-            {
-              home-manager.sharedModules = [
-                sops-nix.homeManagerModules.sops
-              ];
-            }
-          ];
-        };
+      hetzner-ephemeral-beta = {
+        system = "aarch64-linux";
+        specialArgs = { inherit inputs outputs; };
+        modules = [
+          ./hosts/hetzner-ephemeral-beta
+          ./system/formats/netboot-kexec.nix
+          ./system/global.nix
+          ./system/ramdisk.nix
+          ./home-manager/juuso.nix
+          ./home-manager/kari.nix
+          home-manager.nixosModules.home-manager
+          {
+            nixpkgs.overlays = [
+              outputs.overlays.additions
+              outputs.overlays.modifications
+            ];
+          }
+          {
+            home-manager.sharedModules = [
+              sops-nix.homeManagerModules.sops
+            ];
+          }
+        ];
+      };
 
       dinar-ephemeral-alpha = {
         system = "x86_64-linux";
