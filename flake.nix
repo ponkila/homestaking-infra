@@ -24,6 +24,7 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-22.11";
     sops-nix.url = "github:Mic92/sops-nix";
   };
 
@@ -35,6 +36,7 @@
     , ethereum-nix
     , home-manager
     , nixpkgs
+    , nixpkgs-stable
     , sops-nix
     }@inputs:
 
@@ -81,6 +83,31 @@
         specialArgs = { inherit inputs outputs; };
         modules = [
           ./hosts/hetzner-ephemeral-alpha
+          ./system/formats/netboot-kexec.nix
+          ./system/global.nix
+          ./system/ramdisk.nix
+          ./home-manager/juuso.nix
+          ./home-manager/kari.nix
+          home-manager.nixosModules.home-manager
+          {
+            nixpkgs.overlays = [
+              outputs.overlays.additions
+              outputs.overlays.modifications
+            ];
+          }
+          {
+            home-manager.sharedModules = [
+              sops-nix.homeManagerModules.sops
+            ];
+          }
+        ];
+      };
+
+      hetzner-ephemeral-beta = {
+        system = "aarch64-linux";
+        specialArgs = { inherit inputs outputs; };
+        modules = [
+          ./hosts/hetzner-ephemeral-beta
           ./system/formats/netboot-kexec.nix
           ./system/global.nix
           ./system/ramdisk.nix
@@ -168,6 +195,7 @@
       packages = forAllSystems (system: {
         dinar-ephemeral-alpha = nixosConfigurations.dinar-ephemeral-alpha.config.system.build.isoImage;
         hetzner-ephemeral-alpha = nixosConfigurations.hetzner-ephemeral-alpha.config.system.build.kexecTree;
+        hetzner-ephemeral-beta = nixosConfigurations.hetzner-ephemeral-beta.config.system.build.kexecTree;
         dinar-ephemeral-beta = nixosConfigurations.dinar-ephemeral-beta.config.system.build.isoImage;
         ponkila-ephemeral-beta = nixosConfigurations.ponkila-ephemeral-beta.config.system.build.kexecTree;
       });
@@ -177,7 +205,9 @@
         "hetzner-ephemeral-alpha" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] hetzner-ephemeral-alpha);
         "dinar-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] dinar-ephemeral-beta);
         "ponkila-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] ponkila-ephemeral-beta);
-      };
+      } // (with nixpkgs-stable.lib; {
+        "hetzner-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] hetzner-ephemeral-beta);
+      });
 
       darwinConfigurations."ponkila-persistent-epsilon" = darwin.lib.darwinSystem {
         specialArgs = { inherit inputs outputs; };
@@ -195,7 +225,7 @@
           in import ./shell.nix { inherit pkgs; }
         );
 
-      herculesCI.ciSystems = [ "x86_64-linux" ];
+      herculesCI.ciSystems = [ "x86_64-linux" "aarch64-linux" ];
     };
 
 }
