@@ -24,6 +24,7 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-22.11";
     sops-nix.url = "github:Mic92/sops-nix";
   };
 
@@ -35,6 +36,7 @@
     , ethereum-nix
     , home-manager
     , nixpkgs
+    , nixpkgs-stable
     , sops-nix
     }@inputs:
 
@@ -201,10 +203,11 @@
       nixosConfigurations = with nixpkgs.lib; {
         "dinar-ephemeral-alpha" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] dinar-ephemeral-alpha);
         "hetzner-ephemeral-alpha" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] hetzner-ephemeral-alpha);
-        "hetzner-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] hetzner-ephemeral-beta);
         "dinar-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] dinar-ephemeral-beta);
         "ponkila-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] ponkila-ephemeral-beta);
-      };
+      } // (with nixpkgs-stable.lib; {
+        "hetzner-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] hetzner-ephemeral-beta);
+      });
 
       darwinConfigurations."ponkila-persistent-epsilon" = darwin.lib.darwinSystem {
         specialArgs = { inherit inputs outputs; };
