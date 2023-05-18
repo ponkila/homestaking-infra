@@ -110,7 +110,7 @@ in
       AuthenticationMethods publickey
     '';
     settings.PasswordAuthentication = false;
-    settings.challengeResponseAuthentication = false;
+    settings.KbdInteractiveAuthentication = false;
   };
 
   # Prometheus
