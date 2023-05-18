@@ -17,6 +17,7 @@
   boot.kernelPackages = pkgs.linuxPackagesFor (pkgs.linux);
 
   # Apply kernel personality patch from Ubuntu and configure armv7l support
+  # https://github.com/nix-community/aarch64-build-box/pull/133
   boot.kernelPatches = [
     rec {
       name = "compat_uts_machine";
