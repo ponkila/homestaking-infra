@@ -31,40 +31,38 @@
         "aarch64-linux"
       ];
 
-      hetzner-ephemeral-beta = {
-        system = "aarch64-linux";
-        specialArgs = { inherit inputs outputs; };
-        modules = [
-          ./hosts/hetzner-ephemeral-beta
-          ../system/formats/netboot-kexec.nix
-          ../system/global.nix
-          ../system/ramdisk.nix
-          ../home-manager/juuso.nix
-          ../home-manager/kari.nix
-          home-manager.nixosModules.home-manager
-          {
-            nixpkgs.overlays = [
-              outputs.overlays.additions
-              outputs.overlays.modifications
-            ];
-          }
-          {
-            home-manager.sharedModules = [
-              sops-nix.homeManagerModules.sops
-            ];
-          }
-        ];
-      };
-    in
-    rec {
-      packages = forAllSystems (system: {
-        hetzner-ephemeral-beta = nixosConfigurations.hetzner-ephemeral-beta.config.system.build.kexecTree;
-      });
-
-      nixosConfigurations = with nixpkgs.lib; {
-        "hetzner-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] hetzner-ephemeral-beta);
-      };
-
-      herculesCI.ciSystems = [ "aarch64-linux" ];
+    hetzner-ephemeral-beta = {
+      system = "aarch64-linux";
+      specialArgs = { inherit inputs outputs; };
+      modules = [
+        ./hosts/hetzner-ephemeral-beta
+        ../system/formats/netboot-kexec.nix
+        ../system/global.nix
+        ../system/ramdisk.nix
+        ../home-manager/juuso.nix
+        ../home-manager/kari.nix
+        home-manager.nixosModules.home-manager
+        {
+          nixpkgs.overlays = [
+            outputs.overlays.additions
+            outputs.overlays.modifications
+          ];
+        }
+        {
+          home-manager.sharedModules = [
+            sops-nix.homeManagerModules.sops
+          ];
+        }
+      ];
     };
+      in
+    rec {
+    packages = forAllSystems (system: {
+      hetzner-ephemeral-beta = nixosConfigurations.hetzner-ephemeral-beta.config.system.build.kexecTree;
+    });
+
+    nixosConfigurations = with nixpkgs.lib; {
+      "hetzner-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] hetzner-ephemeral-beta);
+    };
+  };
 }
