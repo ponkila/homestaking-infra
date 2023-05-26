@@ -30,7 +30,7 @@ in
 
   # Lighthouse options
   lighthouse = rec {
-    endpoint = infra.ip;
+    endpoint = "http://${infra.ip}:5052";
     datadir = "/mnt/eth/lighthouse";
     exec.endpoint = "http://${infra.ip}:8551";
     mev-boost.endpoint = "http://${infra.ip}:18550";

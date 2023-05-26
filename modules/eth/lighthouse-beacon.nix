@@ -2,6 +2,13 @@
 with lib;
 let
   cfg = config.lighthouse;
+  # split endpoint to address and port
+  endpointRegex = "(https?://)?([^:/]+):([0-9]+)?";
+  endpointMatch = builtins.match endpointRegex cfg.endpoint;
+  endpoint = {
+    addr = builtins.elemAt endpointMatch 1;
+    port = builtins.elemAt endpointMatch 2;
+  };
 in
 {
   options.lighthouse = {
@@ -61,7 +68,8 @@ in
       script = ''${pkgs.lighthouse}/bin/lighthouse bn \
         --datadir ${cfg.datadir} \
         --network mainnet \
-        --http --http-address ${cfg.endpoint} \
+        --http --http-address ${endpoint.addr} \
+        --http-port ${endpoint.port} \
         --http-allow-origin "*" \
         --execution-endpoint ${cfg.exec.endpoint} \
         --execution-jwt %r/jwt.hex \
@@ -82,7 +90,7 @@ in
       allowedTCPPorts = [ 9000 ];
       allowedUDPPorts = [ 9000 ];
       interfaces."wg0".allowedTCPPorts = [
-        5052 # lighthouse
+        5052 # TODO: use 'endpoint.port' here by converting it to u16
       ];
     };
   };
