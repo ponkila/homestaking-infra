@@ -4,6 +4,9 @@
 # usage: sh ./scripts/nix-diff.sh <hostname>
 
 set -o pipefail
+trap cleanup EXIT
+trap cleanup SIGINT
+
 log_path=/tmp
 hostname=$1
 nix_flags=(
@@ -12,6 +15,10 @@ nix_flags=(
 )
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+cleanup() {
+  rm -rf "$temp_dir"
+}
 
 buidl() {
     local hostname=$1
