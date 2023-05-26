@@ -10,8 +10,8 @@ trap cleanup SIGINT
 log_path=/tmp
 hostname=$1
 nix_flags=(
-    --accept-flake-config
-    --extra-experimental-features 'nix-command flakes'
+  --accept-flake-config
+  --extra-experimental-features 'nix-command flakes'
 )
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -21,38 +21,38 @@ cleanup() {
 }
 
 buidl() {
-    local hostname=$1
-    local log_prefix=$2
+  local hostname=$1
+  local log_prefix=$2
 
-    # Build
-    echo "Building '$hostname' from '$current_branch'.."
-    nix build .#"${hostname}" "${nix_flags[@]}" \
-        --fallback --show-trace -v --log-format raw > "$log_path/${log_prefix}.out.log" 2> "$log_path/${log_prefix}.err.log"
-    
-    # Output nix log and exit if build fails
-    if [ $? -ne 0 ]; then
-        drv=$(grep "For full logs, run" "$log_path/${log_prefix}.err.log" | grep -oE "/nix/store/.*.drv")
-        nix log "$drv"
-        echo "$drv"
-        exit 1
-    fi
+  # Build
+  echo "Building '$hostname' from '$current_branch'.."
+  nix build .#"${hostname}" "${nix_flags[@]}" \
+    --fallback --show-trace -v --log-format raw > "$log_path/${log_prefix}.out.log" 2> "$log_path/${log_prefix}.err.log"
+  
+  # Output nix log and exit if build fails
+  if [ $? -ne 0 ]; then
+    drv=$(grep "For full logs, run" "$log_path/${log_prefix}.err.log" | grep -oE "/nix/store/.*.drv")
+    nix log "$drv"
+    echo "$drv"
+    exit 1
+  fi
 
-    # Get sorted build tree
-    build_path=$(nix path-info --derivation .#"${hostname}" "${nix_flags[@]}" | tail -n 1)
-    echo "Hash: $build_path"
-    nix-store --query --graph "$build_path" \
-        | awk -F'-' '{ print $2, $0 }' | sort -k1 \
-        | cut -d' ' -f2- > "$log_path/${log_prefix}.tree.log"
+  # Get sorted build tree
+  build_path=$(nix path-info --derivation .#"${hostname}" "${nix_flags[@]}" | tail -n 1)
+  echo "Hash: $build_path"
+  nix-store --query --graph "$build_path" \
+    | awk -F'-' '{ print $2, $0 }' | sort -k1 \
+    | cut -d' ' -f2- > "$log_path/${log_prefix}.tree.log"
 
-    # Sep
-    printf '%.s-' {1..69} && echo
+  # Sep
+  printf '%.s-' {1..69} && echo
 }
 
 # Check if hostname is provided
 if [ -z "$hostname" ]; then
-    echo "Error: Please provide the hostname hostname as an argument."
-    echo "Usage: $0 <hostname>"
-    exit 1
+  echo "Error: Please provide the hostname hostname as an argument."
+  echo "Usage: $0 <hostname>"
+  exit 1
 fi
 
 # Create log directory
