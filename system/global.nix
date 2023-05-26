@@ -66,6 +66,11 @@ in
   systemd.watchdog.device = "/dev/watchdog";
   systemd.watchdog.runtimeTime = "30s";
 
+  # Zram swap
+  zramSwap.enable = true;
+  zramSwap.algorithm = "zstd";
+  zramSwap.memoryPercent = 100;
+
   # Audit Tracing
   security.auditd.enable = true;
   security.audit.enable = true;
