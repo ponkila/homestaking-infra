@@ -11,6 +11,7 @@ nix_flags=(
     --extra-experimental-features 'nix-command flakes'
 )
 current_branch=$(git rev-parse --abbrev-ref HEAD)
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 buidl() {
     local hostname=$1
@@ -53,8 +54,13 @@ mkdir -p "$log_path"
 # Build from current branch
 buidl "$hostname" "$hostname"
 
+# Clone main to temp dir
+temp_dir=$(mktemp -d -p "$DIR")
+remote_url=$(git remote show origin | awk '/Push  URL/ {print $3}')
+git clone "$remote_url" --branch main --single-branch "$temp_dir"
+
 # Build from main branch
-git checkout main > /dev/null
+cd "$temp_dir" || exit 1
 buidl "$hostname" "$hostname-main"
 
 # Show diffs
@@ -66,6 +72,3 @@ if [ -n "$diff_out" ]; then
 else
   echo "No differences found."
 fi
-
-# Checkout
-git checkout "$current_branch" > /dev/null 2>&1
