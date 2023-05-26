@@ -58,8 +58,12 @@
           systemctl --failed --quiet
         '';
       };
-      uptime.prefix = "Up";
-      last_login.root = 2;
+      last_login = builtins.listToAttrs (map
+        (user: {
+          name = user;
+          value = 2;
+        })
+        builtins.attrNames config.home-manager.users);
     };
   };
 
