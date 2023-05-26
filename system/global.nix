@@ -52,18 +52,29 @@
     enableMotdInSSHD = true;
     settings = {
       banner = {
-        color = "red";
+        color = "yellow";
         command = ''
-          ${pkgs.nettools}/bin/hostname | ${pkgs.figlet}/bin/figlet -f slant
+          echo ""
+          echo " +--------------+"
+          echo " | 10110 010    |"
+          echo " | 101 101 10   |"
+          echo " | 0   _____    |"
+          echo " |    / ___ \   |"
+          echo " |   / /__/ /   |"
+          echo " +--/ _____/----+"
+          echo "   / /"
+          echo "  /_/"
+          echo ""
           systemctl --failed --quiet
         '';
       };
+      uptime.prefix = "Uptime:";
       last_login = builtins.listToAttrs (map
         (user: {
           name = user;
           value = 2;
         })
-        builtins.attrNames config.home-manager.users);
+        (builtins.attrNames config.home-manager.users));
     };
   };
 
