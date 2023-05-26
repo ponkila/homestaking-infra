@@ -47,6 +47,22 @@
     fuse-overlayfs
   ];
 
+  programs.rust-motd = {
+    enable = true;
+    enableMotdInSSHD = true;
+    settings = {
+      banner = {
+        color = "red";
+        command = ''
+          ${pkgs.nettools}/bin/hostname | ${pkgs.figlet}/bin/figlet -f slant
+          systemctl --failed --quiet
+        '';
+      };
+      uptime.prefix = "Up";
+      last_login.root = 2;
+    };
+  };
+
   services.timesyncd.enable = false;
   services.chrony = {
     enable = true;
