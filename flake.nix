@@ -125,6 +125,10 @@
                   sops-nix.homeManagerModules.sops
                 ];
               }
+              {
+                boot.loader.systemd-boot.enable = true;
+                boot.loader.efi.canTouchEfiVariables = true;
+              }
             ];
           };
 
@@ -183,6 +187,10 @@
                   sops-nix.homeManagerModules.sops
                 ];
               }
+              {
+                boot.loader.systemd-boot.enable = true;
+                boot.loader.efi.canTouchEfiVariables = true;
+              }
             ];
           };
 
@@ -207,6 +215,10 @@
                 home-manager.sharedModules = [
                   sops-nix.homeManagerModules.sops
                 ];
+              }
+              {
+                boot.loader.systemd-boot.enable = true;
+                boot.loader.efi.canTouchEfiVariables = true;
               }
             ];
           };
