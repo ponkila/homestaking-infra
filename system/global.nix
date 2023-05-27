@@ -1,7 +1,4 @@
 { pkgs, config, lib, inputs, ... }:
-let
-  asGB = size: toString (size * 1024 * 1024);
-in
 {
   nix = {
     # This will add each flake input as a registry
