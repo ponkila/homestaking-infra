@@ -11,16 +11,27 @@
   };
 
   # Localization
-  networking.hostName = "ponkila-ephemeral-beta";
+  networking.hostName = "ponkila-ephemeral-gamma";
   time.timeZone = "Europe/Helsinki";
 
   # SSH
   services.openssh = {
     enable = true;
-    settings = {
-      permitRootLogin = true;
-      PasswordAuthentication = false;
-    };
+    hostKeys = [{
+      path = sshKeysPath;
+      type = "ed25519";
+    }];
+    allowSFTP = false;
+    extraConfig = ''
+      AllowTcpForwarding yes
+      X11Forwarding no
+      AllowAgentForwarding no
+      AllowStreamLocalForwarding no
+      AuthenticationMethods publickey
+    '';
+    settings.PasswordAuthentication = false;
+    settings.KbdInteractiveAuthentication = false;
   };
+
   system.stateVersion = "23.05";
 }

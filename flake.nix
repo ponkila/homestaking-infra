@@ -92,6 +92,7 @@
           "hetzner-ephemeral-beta" = hetzner-ephemeral-beta.config.system.build.kexecTree;
           "dinar-ephemeral-beta" = dinar-ephemeral-beta.config.system.build.isoImage;
           "ponkila-ephemeral-beta" = ponkila-ephemeral-beta.config.system.build.kexecTree;
+          "ponkila-ephemeral-gamma" = ponkila-ephemeral-gamma.config.system.build.kexecTree;
         };
       };
       flake =
@@ -127,15 +128,15 @@
             ];
           };
 
-          "ponkila-ephemeral-gamma" = nixos-generators.nixosGenerate {
+          ponkila-ephemeral-gamma = {
             system = "aarch64-linux";
             specialArgs = { inherit inputs outputs; };
             modules = [
-              ./home-manager/core.nix
               ./hosts/ponkila-ephemeral-gamma
+              ./system/formats/netboot-kexec.nix
               ./system/global.nix
-              ./system/netboot.nix
               ./system/ramdisk.nix
+              ./home-manager/core.nix
               home-manager.nixosModules.home-manager
               disko.nixosModules.disko
               {
@@ -158,8 +159,6 @@
                 boot.loader.grub.enable = false;
               }
             ];
-            customFormats = customFormats;
-            format = "kexecTree";
           };
 
           hetzner-ephemeral-alpha = {
@@ -280,6 +279,7 @@
             "ponkila-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] ponkila-ephemeral-beta);
           } // (with nixpkgs-stable.lib; {
             "hetzner-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] hetzner-ephemeral-beta);
+            "ponkila-ephemeral-gamma" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] ponkila-ephemeral-gamma);
           });
 
           darwinConfigurations."ponkila-persistent-epsilon" = darwin.lib.darwinSystem {
