@@ -17,20 +17,16 @@
   # SSH
   services.openssh = {
     enable = true;
-    hostKeys = [{
-      path = sshKeysPath;
-      type = "ed25519";
-    }];
     allowSFTP = false;
     extraConfig = ''
       AllowTcpForwarding yes
       X11Forwarding no
-      AllowAgentForwarding no
+      #AllowAgentForwarding no
       AllowStreamLocalForwarding no
       AuthenticationMethods publickey
     '';
-    settings.PasswordAuthentication = false;
-    settings.KbdInteractiveAuthentication = false;
+    passwordAuthentication = false;
+    kbdInteractiveAuthentication = false;
   };
 
   system.stateVersion = "23.05";
