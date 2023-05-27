@@ -105,9 +105,6 @@
             specialArgs = { inherit inputs outputs; };
             modules = [
               ./hosts/ponkila-ephemeral-beta
-              ./modules/eth/erigon.nix
-              ./modules/eth/lighthouse-beacon.nix
-              ./modules/eth/mev-boost.nix
               ./system/formats/netboot-kexec.nix
               ./system/global.nix
               ./system/ramdisk.nix
@@ -185,9 +182,6 @@
             specialArgs = { inherit inputs outputs; };
             modules = [
               ./hosts/dinar-ephemeral-alpha
-              ./modules/eth/erigon.nix
-              ./modules/eth/lighthouse-beacon.nix
-              ./modules/eth/mev-boost.nix
               ./system/formats/copytoram-iso.nix
               ./system/global.nix
               ./home-manager/core.nix
@@ -214,9 +208,6 @@
             specialArgs = { inherit inputs outputs; };
             modules = [
               ./hosts/dinar-ephemeral-beta
-              ./modules/eth/erigon.nix
-              ./modules/eth/lighthouse-beacon.nix
-              ./modules/eth/mev-boost.nix
               ./system/formats/copytoram-iso.nix
               ./system/global.nix
               ./home-manager/core.nix
