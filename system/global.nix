@@ -23,22 +23,6 @@
     package = pkgs.nix;
   };
 
-  systemd.services.linger = {
-    enable = true;
-
-    requires = [ "local-fs.target" ];
-    after = [ "local-fs.target" ];
-
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = ''
-        /run/current-system/sw/bin/loginctl enable-linger core
-      '';
-    };
-
-    wantedBy = [ "multi-user.target" ];
-  };
-
   boot.kernelParams = [
     "boot.shell_on_fail"
 
@@ -63,9 +47,36 @@
     fuse-overlayfs
   ];
 
-  boot.binfmt.emulatedSystems = [
-    "aarch64-linux"
-  ];
+  programs.rust-motd = {
+    enable = true;
+    enableMotdInSSHD = true;
+    settings = {
+      banner = {
+        color = "yellow";
+        command = ''
+          echo ""
+          echo " +--------------+"
+          echo " | 10110 010    |"
+          echo " | 101 101 10   |"
+          echo " | 0   _____    |"
+          echo " |    / ___ \   |"
+          echo " |   / /__/ /   |"
+          echo " +--/ _____/----+"
+          echo "   / /"
+          echo "  /_/"
+          echo ""
+          systemctl --failed --quiet
+        '';
+      };
+      uptime.prefix = "Uptime:";
+      last_login = builtins.listToAttrs (map
+        (user: {
+          name = user;
+          value = 2;
+        })
+        (builtins.attrNames config.home-manager.users));
+    };
+  };
 
   services.timesyncd.enable = false;
   services.chrony = {
@@ -80,9 +91,20 @@
   systemd.watchdog.device = "/dev/watchdog";
   systemd.watchdog.runtimeTime = "30s";
 
-  ## Allow passwordless sudo from wheel group
+  # Audit Tracing
+  security.auditd.enable = true;
+  security.audit.enable = true;
+  security.audit.rules = [
+    "-a exit,always -F arch=b64 -S execve"
+  ];
+
+  # Rip Out Default Packages
+  environment.defaultPackages = lib.mkForce [ ];
+
+  # Allow passwordless sudo from wheel group
   security.sudo = {
     enable = lib.mkDefault true;
     wheelNeedsPassword = lib.mkForce false;
+    execWheelOnly = true;
   };
 }

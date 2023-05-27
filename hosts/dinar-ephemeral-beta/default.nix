@@ -2,7 +2,7 @@
 
 let
   # General
-  infra.ip = "192.168.100.31";
+  infra.ip = "192.168.100.30";
   sshKeysPath = "/mnt/eth/secrets/ssh/id_ed25519";
 in
 {
@@ -16,25 +16,22 @@ in
     ];
   };
 
-  # Localization options
-  localization = {
-    hostname = "dinar-ephemeral-alpha";
-    timezone = "Europe/Helsinki";
-    keymap = "fi";
-  };
+  # Localization
+  networking.hostName = "dinar-ephemeral-beta";
+  time.timeZone = "Europe/Helsinki";
+
+  boot.kernelPackages = pkgs.linuxPackagesFor (pkgs.linux);
 
   # Erigon options
-  erigon = {
-    enable = true;
+  erigon = rec {
     endpoint = infra.ip;
-    datadir = erigon.datadir;
+    datadir = "/mnt/eth/erigon";
   };
 
   # Lighthouse options
-  lighthouse = {
-    enable = true;
+  lighthouse = rec {
     endpoint = infra.ip;
-    datadir = lighthouse.datadir;
+    datadir = "/mnt/eth/lighthouse";
     exec.endpoint = "http://${infra.ip}:8551";
     mev-boost.endpoint = "http://${infra.ip}:18550";
     slasher = {
@@ -69,15 +66,10 @@ in
     };
   };
 
-  # SSH (system level) options
-  ssh = {
-    privateKeyPath = "/var/mnt/secrets/ssh/id_ed25519";
-  };
-
-  # Mounts
-  mounts = [
+  systemd.mounts = [
     {
       enable = true;
+
       description = "storage";
 
       what = "/dev/sda1";
