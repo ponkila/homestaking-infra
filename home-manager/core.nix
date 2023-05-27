@@ -23,6 +23,7 @@ in
     #environment.shells = [ pkgs.fish ];
     #programs.fish.enable = true;
 
+    home-manager.users.root.home.stateVersion = config.home-manager.users.core.home.stateVersion;
     home-manager.users.core = { pkgs, ... }: {
 
       home.packages = with pkgs; [
@@ -43,6 +44,41 @@ in
       };
 
       home.stateVersion = "23.05";
+    };
+
+    systemd.services.wg0 = {
+      enable = true;
+
+      description = "wireguard interface for cross-node communication";
+      requires = [ "network-online.target" ];
+      after = [ "network-online.target" ];
+
+      serviceConfig = {
+        Type = "oneshot";
+      };
+
+      preStart = "${pkgs.wireguard-tools}/bin/wg-quick down %r/wireguard/wg0.conf || true";
+      script = ''${pkgs.wireguard-tools}/bin/wg-quick \
+        up %r/wireguard/wg0.conf
+      '';
+
+      wantedBy = [ "multi-user.target" ];
+    };
+
+    systemd.services.linger = {
+      enable = true;
+
+      requires = [ "local-fs.target" ];
+      after = [ "local-fs.target" ];
+
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = ''
+          /run/current-system/sw/bin/loginctl enable-linger core
+        '';
+      };
+
+      wantedBy = [ "multi-user.target" ];
     };
   };
 }

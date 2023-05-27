@@ -21,11 +21,13 @@
     disko.url = "github:nix-community/disko";
     ethereum-nix.inputs.nixpkgs.follows = "nixpkgs";
     ethereum-nix.url = "github:nix-community/ethereum.nix";
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    flake-root.url = "github:srid/flake-root";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
-    nixos-generators.inputs.nixpkgs.follows = "nixpkgs";
-    nixos-generators.url = "github:nix-community/nixos-generators";
+    mission-control.url = "github:Platonic-Systems/mission-control";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-22.11";
     sops-nix.url = "github:Mic92/sops-nix";
   };
 
@@ -35,175 +37,258 @@
     , darwin
     , disko
     , ethereum-nix
+    , flake-parts
     , home-manager
-    , nixos-generators
     , nixpkgs
+    , nixpkgs-stable
     , sops-nix
+    , ...
     }@inputs:
 
-    let
-      inherit (self) outputs;
-      forAllSystems = nixpkgs.lib.genAttrs [
+    flake-parts.lib.mkFlake { inherit inputs; } rec {
+
+      imports = [
+        inputs.flake-root.flakeModule
+        inputs.mission-control.flakeModule
+      ];
+      systems = [
         "aarch64-darwin"
         "aarch64-linux"
         "x86_64-darwin"
         "x86_64-linux"
       ];
-
-      # custom formats for nixos-generators
-      customFormats = {
-        "kexecTree" = {
-          formatAttr = "kexecTree";
-          imports = [ ./system/netboot.nix ];
+      perSystem = { pkgs, lib, config, system, ... }: {
+        formatter = nixpkgs.legacyPackages.${system}.nixpkgs-fmt;
+        mission-control.scripts = {
+          nix-diff = {
+            description = "Diff current and main branch builds.";
+            exec = ''
+              sh ./scripts/nix-diff.sh "$@"
+            '';
+            category = "Tools";
+          };
         };
-        "copytoram-iso" = {
-          formatAttr = "isoImage";
-          imports = [ ./system/copytoram-iso.nix ];
-          filename = "*.iso";
+        devShells = {
+          default = pkgs.mkShell {
+            nativeBuildInputs = with pkgs; [
+              git
+              nix
+              jq
+              sops
+              ssh-to-age
+              rsync
+              zstd
+              cpio
+            ];
+            inputsFrom = [
+              config.flake-root.devShell
+              config.mission-control.devShell
+            ];
+          };
+        };
+        packages = with flake.nixosConfigurations; {
+          "dinar-ephemeral-alpha" = dinar-ephemeral-alpha.config.system.build.isoImage;
+          "hetzner-ephemeral-alpha" = hetzner-ephemeral-alpha.config.system.build.kexecTree;
+          "hetzner-ephemeral-beta" = hetzner-ephemeral-beta.config.system.build.kexecTree;
+          "dinar-ephemeral-beta" = dinar-ephemeral-beta.config.system.build.isoImage;
+          "ponkila-ephemeral-beta" = ponkila-ephemeral-beta.config.system.build.kexecTree;
         };
       };
-    in
-    {
+      flake =
+        let
+          inherit (self) outputs;
 
-      formatter = forAllSystems (system:
-        nixpkgs.legacyPackages.${system}.nixpkgs-fmt
-      );
-
-      overlays = import ./overlays { inherit inputs; };
-
-      # Your custom packages
-      # Acessible through 'nix build', 'nix shell', etc
-      packages = forAllSystems (system:
-        let pkgs = nixpkgs.legacyPackages.${system};
-        in import ./pkgs { inherit pkgs; }
-      );
-
-      "ponkila-ephemeral-beta" = nixos-generators.nixosGenerate {
-        system = "x86_64-linux";
-        specialArgs = { inherit inputs outputs; };
-        modules = [
-          ./modules/networking/wireguard.nix
-          ./hosts/ponkila-ephemeral-beta
-          ./modules/eth/erigon.nix
-          ./modules/eth/lighthouse-beacon.nix
-          ./modules/eth/mev-boost.nix
-          ./system/global.nix
-          ./system/ramdisk.nix
-          ./home-manager/core.nix
-          home-manager.nixosModules.home-manager
-          disko.nixosModules.disko
-          {
-            nixpkgs.overlays = [
-              ethereum-nix.overlays.default
-              outputs.overlays.additions
-              outputs.overlays.modifications
+          ponkila-ephemeral-beta = {
+            system = "x86_64-linux";
+            specialArgs = { inherit inputs outputs; };
+            modules = [
+              ./hosts/ponkila-ephemeral-beta
+              ./modules/eth/erigon.nix
+              ./modules/eth/lighthouse-beacon.nix
+              ./modules/eth/mev-boost.nix
+              ./system/formats/netboot-kexec.nix
+              ./system/global.nix
+              ./system/ramdisk.nix
+              ./home-manager/core.nix
+              home-manager.nixosModules.home-manager
+              disko.nixosModules.disko
+              {
+                nixpkgs.overlays = [
+                  ethereum-nix.overlays.default
+                  outputs.overlays.additions
+                  outputs.overlays.modifications
+                ];
+              }
+              {
+                home-manager.sharedModules = [
+                  sops-nix.homeManagerModules.sops
+                ];
+              }
             ];
-          }
-          {
-            home-manager.sharedModules = [
-              sops-nix.homeManagerModules.sops
+          };
+
+          "ponkila-ephemeral-gamma" = nixos-generators.nixosGenerate {
+            system = "aarch64-linux";
+            specialArgs = { inherit inputs outputs; };
+            modules = [
+              ./home-manager/core.nix
+              ./hosts/ponkila-ephemeral-gamma
+              ./system/global.nix
+              ./system/netboot.nix
+              ./system/ramdisk.nix
+              home-manager.nixosModules.home-manager
+              disko.nixosModules.disko
+              {
+                nixpkgs.overlays = [
+                  ethereum-nix.overlays.default
+                  outputs.overlays.additions
+                  outputs.overlays.modifications
+                ];
+              }
+              {
+                home-manager.sharedModules = [
+                  sops-nix.homeManagerModules.sops
+                ];
+              }
+              {
+                boot.loader.raspberryPi = {
+                  enable = true;
+                  version = 4;
+                };
+                boot.loader.grub.enable = false;
+              }
             ];
-          }
-          {
-            boot.loader.systemd-boot.enable = true;
-            boot.loader.efi.canTouchEfiVariables = true;
-          }
-        ];
-        customFormats = customFormats;
-        format = "kexecTree";
-      };
+            customFormats = customFormats;
+            format = "kexecTree";
+          };
 
-      "dinar-ephemeral-alpha" = nixos-generators.nixosGenerate {
-        system = "x86_64-linux";
-        specialArgs = { inherit inputs outputs; };
-        modules = [
-          ./modules/networking/wireguard.nix
-          ./hosts/dinar-ephemeral-alpha
-          ./hosts/dinar-ephemeral-alpha/mounts.nix
-          ./modules/eth/erigon.nix
-          ./modules/eth/lighthouse-beacon.nix
-          ./modules/eth/mev-boost.nix
-          ./system/global.nix
-          ./home-manager/core.nix
-          home-manager.nixosModules.home-manager
-          disko.nixosModules.disko
-          {
-            nixpkgs.overlays = [
-              ethereum-nix.overlays.default
-              outputs.overlays.additions
-              outputs.overlays.modifications
+          hetzner-ephemeral-alpha = {
+            system = "x86_64-linux";
+            specialArgs = { inherit inputs outputs; };
+            modules = [
+              ./hosts/hetzner-ephemeral-alpha
+              ./system/formats/netboot-kexec.nix
+              ./system/global.nix
+              ./system/ramdisk.nix
+              ./home-manager/juuso.nix
+              ./home-manager/kari.nix
+              home-manager.nixosModules.home-manager
+              {
+                nixpkgs.overlays = [
+                  outputs.overlays.additions
+                  outputs.overlays.modifications
+                ];
+              }
+              {
+                home-manager.sharedModules = [
+                  sops-nix.homeManagerModules.sops
+                ];
+              }
             ];
-          }
-          {
-            home-manager.sharedModules = [
-              sops-nix.homeManagerModules.sops
+          };
+
+          hetzner-ephemeral-beta = {
+            system = "aarch64-linux";
+            specialArgs = { inherit inputs outputs; };
+            modules = [
+              ./hosts/hetzner-ephemeral-beta
+              ./system/formats/netboot-kexec.nix
+              ./system/global.nix
+              ./system/ramdisk.nix
+              ./home-manager/juuso.nix
+              ./home-manager/kari.nix
+              home-manager.nixosModules.home-manager
+              {
+                nixpkgs.overlays = [
+                  outputs.overlays.additions
+                  outputs.overlays.modifications
+                ];
+              }
+              {
+                home-manager.sharedModules = [
+                  sops-nix.homeManagerModules.sops
+                ];
+              }
             ];
-          }
-          {
-            # Bootloader
-            boot.loader.systemd-boot.enable = true;
-            boot.loader.efi.canTouchEfiVariables = true;
+          };
 
-            # GRUB timeout
-            boot.loader.timeout = nixpkgs.lib.mkForce 1;
-
-            # Load into a tmpfs during stage-1
-            boot.kernelParams = [ "copytoram" ];
-          }
-        ];
-        format = "install-iso";
-      };
-
-      "ponkila-ephemeral-gamma" = nixos-generators.nixosGenerate {
-        system = "aarch64-linux";
-        specialArgs = { inherit inputs outputs; };
-        modules = [
-          ./home-manager/core.nix
-          ./hosts/ponkila-ephemeral-gamma
-          ./system/global.nix
-          ./system/netboot.nix
-          ./system/ramdisk.nix
-          home-manager.nixosModules.home-manager
-          disko.nixosModules.disko
-          {
-            nixpkgs.overlays = [
-              ethereum-nix.overlays.default
-              outputs.overlays.additions
-              outputs.overlays.modifications
+          dinar-ephemeral-alpha = {
+            system = "x86_64-linux";
+            specialArgs = { inherit inputs outputs; };
+            modules = [
+              ./hosts/dinar-ephemeral-alpha
+              ./modules/eth/erigon.nix
+              ./modules/eth/lighthouse-beacon.nix
+              ./modules/eth/mev-boost.nix
+              ./system/formats/copytoram-iso.nix
+              ./system/global.nix
+              ./home-manager/core.nix
+              home-manager.nixosModules.home-manager
+              disko.nixosModules.disko
+              {
+                nixpkgs.overlays = [
+                  ethereum-nix.overlays.default
+                  outputs.overlays.additions
+                  outputs.overlays.modifications
+                ];
+              }
+              {
+                home-manager.sharedModules = [
+                  sops-nix.homeManagerModules.sops
+                ];
+              }
             ];
-          }
-          {
-            home-manager.sharedModules = [
-              sops-nix.homeManagerModules.sops
+          };
+
+          dinar-ephemeral-beta = {
+            system = "x86_64-linux";
+            specialArgs = { inherit inputs outputs; };
+            modules = [
+              ./hosts/dinar-ephemeral-beta
+              ./modules/eth/erigon.nix
+              ./modules/eth/lighthouse-beacon.nix
+              ./modules/eth/mev-boost.nix
+              ./system/formats/copytoram-iso.nix
+              ./system/global.nix
+              ./home-manager/core.nix
+              home-manager.nixosModules.home-manager
+              disko.nixosModules.disko
+              {
+                nixpkgs.overlays = [
+                  ethereum-nix.overlays.default
+                  outputs.overlays.additions
+                  outputs.overlays.modifications
+                ];
+              }
+              {
+                home-manager.sharedModules = [
+                  sops-nix.homeManagerModules.sops
+                ];
+              }
             ];
-          }
-          {
-            boot.loader.raspberryPi = {
-              enable = true;
-              version = 4;
-            };
-            boot.loader.grub.enable = false;
-          }
-        ];
-        customFormats = customFormats;
-        format = "kexecTree";
-      };
+          };
 
-      darwinConfigurations."ponkila-persistent-epsilon" = darwin.lib.darwinSystem {
-        specialArgs = { inherit inputs outputs; };
-        system = "x86_64-darwin";
-        modules = [
-          ./hosts/ponkila-persistent-epsilon/default.nix
-        ];
-      };
+        in
+        {
 
-      # Devshell for bootstrapping
-      # Acessible through 'nix develop' or 'nix-shell' (legacy)
-      devShells = forAllSystems
-        (system:
-          let pkgs = nixpkgs.legacyPackages.${system};
-          in import ./shell.nix { inherit pkgs; }
-        );
+          overlays = import ./overlays { inherit inputs; };
 
+          nixosConfigurations = with nixpkgs.lib; {
+            "dinar-ephemeral-alpha" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] dinar-ephemeral-alpha);
+            "hetzner-ephemeral-alpha" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] hetzner-ephemeral-alpha);
+            "dinar-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] dinar-ephemeral-beta);
+            "ponkila-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] ponkila-ephemeral-beta);
+          } // (with nixpkgs-stable.lib; {
+            "hetzner-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] hetzner-ephemeral-beta);
+          });
+
+          darwinConfigurations."ponkila-persistent-epsilon" = darwin.lib.darwinSystem {
+            specialArgs = { inherit inputs outputs; };
+            system = "x86_64-darwin";
+            modules = [
+              ./hosts/ponkila-persistent-epsilon/default.nix
+            ];
+          };
+        };
     };
 }
