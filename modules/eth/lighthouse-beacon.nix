@@ -3,7 +3,7 @@ with lib;
 let
   cfg = config.lighthouse;
   # split endpoint to address and port
-  endpointRegex = "(https?://)?([^:/]+):([0-9]+)?";
+  endpointRegex = "(https?://)?([^:/]+):([0-9]+)(/.*)?$";
   endpointMatch = builtins.match endpointRegex cfg.endpoint;
   endpoint = {
     addr = builtins.elemAt endpointMatch 1;
