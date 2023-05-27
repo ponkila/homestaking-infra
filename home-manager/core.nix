@@ -17,11 +17,11 @@ in
       group = "core";
       extraGroups = [ "wheel" ];
       openssh.authorizedKeys.keys = cfg.authorizedKeys;
-      #shell = pkgs.fish;
+      shell = pkgs.fish;
     };
     users.groups.core = { };
-    #environment.shells = [ pkgs.fish ];
-    #programs.fish.enable = true;
+    environment.shells = [ pkgs.fish ];
+    programs.fish.enable = true;
 
     home-manager.users.root.home.stateVersion = config.home-manager.users.core.home.stateVersion;
     home-manager.users.core = { pkgs, ... }: {
@@ -37,8 +37,8 @@ in
         htop.enable = true;
         vim.enable = true;
         git.enable = true;
-        #fish.enable = true;
-        #fish.loginShellInit = "fish_add_path --move --prepend --path $HOME/.nix-profile/bin /run/wrappers/bin /etc/profiles/per-user/$USER/bin /run/current-system/sw/bin /nix/var/nix/profiles/default/bin";
+        fish.enable = true;
+        fish.loginShellInit = "fish_add_path --move --prepend --path $HOME/.nix-profile/bin /run/wrappers/bin /etc/profiles/per-user/$USER/bin /run/current-system/sw/bin /nix/var/nix/profiles/default/bin";
 
         home-manager.enable = true;
       };
