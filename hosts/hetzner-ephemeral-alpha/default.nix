@@ -19,6 +19,9 @@
     "armv7l-linux"
   ];
 
+  # Saiko's automatic gc
+  sys2x.gc.useDiskAware = true;
+
   # Hercules CI
   services.hercules-ci-agent = {
     enable = true;

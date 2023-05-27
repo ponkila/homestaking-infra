@@ -81,6 +81,7 @@
         specialArgs = { inherit inputs outputs; };
         modules = [
           ./hosts/hetzner-ephemeral-alpha
+          ./modules/sys2x/gc.nix
           ./system/formats/netboot-kexec.nix
           ./system/global.nix
           ./system/ramdisk.nix
