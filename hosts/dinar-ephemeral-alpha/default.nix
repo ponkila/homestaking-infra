@@ -20,6 +20,7 @@ in
   networking.hostName = "dinar-ephemeral-alpha";
   time.timeZone = "Europe/Helsinki";
 
+  # Use stable kernel
   boot.kernelPackages = pkgs.linuxPackagesFor (pkgs.linux);
 
   # Erigon options
