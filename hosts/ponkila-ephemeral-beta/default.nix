@@ -24,7 +24,7 @@ in
 
   # Erigon options
   erigon = rec {
-    endpoint = infra.ip;
+    endpoint = "http://${infra.ip}:8551";
     datadir = erigon.datadir;
   };
 

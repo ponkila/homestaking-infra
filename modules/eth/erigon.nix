@@ -2,6 +2,13 @@
 with lib;
 let
   cfg = config.erigon;
+  # split endpoint to address and port
+  endpointRegex = "(https?://)?([^:/]+):([0-9]+)(/.*)?$";
+  endpointMatch = builtins.match endpointRegex cfg.endpoint;
+  endpoint = {
+    addr = builtins.elemAt endpointMatch 1;
+    port = builtins.elemAt endpointMatch 2;
+  };
 in
 {
   options.erigon = {
@@ -41,7 +48,8 @@ in
         --datadir=${cfg.datadir} \
         --chain mainnet \
         --authrpc.vhosts="*" \
-        --authrpc.addr ${cfg.endpoint} \
+        --authrpc.port ${endpoint.port}
+        --authrpc.addr ${endpoint.addr} \
         --authrpc.jwtsecret=%r/jwt.hex \
         --metrics \
         --externalcl
