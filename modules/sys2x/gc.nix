@@ -1,11 +1,11 @@
 # https://www.reddit.com/r/NixOS/comments/13si0vs/check_out_my_nixos_module_to_set_disk_space/
 # https://git.dblsaiko.net/systems/plain/common/modules/sys2x/gc.nix
-{
-  pkgs,
-  lib,
-  config,
-  ...
-}: let
+{ pkgs
+, lib
+, config
+, ...
+}:
+let
   inherit (lib) mkDefault mkEnableOption mkIf mkOption;
   inherit (lib.types) int;
 
@@ -53,11 +53,12 @@
 
   hourly =
     if pkgs.stdenv.isLinux
-    then {dates = mkDefault "hourly";}
+    then { dates = mkDefault "hourly"; }
     else if pkgs.stdenv.isDarwin
-    then {interval = mkDefault {Minute = 0;};}
+    then { interval = mkDefault { Minute = 0; }; }
     else throw "unsupported system";
-in {
+in
+{
   options = {
     sys2x.gc = {
       useDiskAware = mkEnableOption "disk-aware garbage collector";
