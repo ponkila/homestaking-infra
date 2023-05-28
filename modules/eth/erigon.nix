@@ -48,7 +48,7 @@ in
         --datadir=${cfg.datadir} \
         --chain mainnet \
         --authrpc.vhosts="*" \
-        --authrpc.port ${endpoint.port}
+        --authrpc.port ${endpoint.port} \
         --authrpc.addr ${endpoint.addr} \
         --authrpc.jwtsecret=%r/jwt.hex \
         --metrics \
