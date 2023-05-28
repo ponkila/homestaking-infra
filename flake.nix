@@ -73,6 +73,7 @@
             nativeBuildInputs = with pkgs; [
               git
               nix
+              nix-tree
               jq
               sops
               ssh-to-age
