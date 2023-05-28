@@ -75,7 +75,6 @@ in
         --execution-jwt %r/jwt.hex \
         --builder ${cfg.mev-boost.endpoint} \
         --prune-payloads false \
-        --genesis-backfill \
         --metrics \
         ${if cfg.slasher.enable then
           "--slasher "
