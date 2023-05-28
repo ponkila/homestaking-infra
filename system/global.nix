@@ -64,13 +64,13 @@
         color = "yellow";
         command = ''
           echo ""
-          echo " +--------------+"
-          echo " | 10110 010    |"
-          echo " | 101 101 10   |"
-          echo " | 0   _____    |"
-          echo " |    / ___ \   |"
-          echo " |   / /__/ /   |"
-          echo " +--/ _____/----+"
+          echo " +-------------+"
+          echo " | 10110 010   |"
+          echo " | 101 101 10  |"
+          echo " | 0   _____   |"
+          echo " |    / ___ \  |"
+          echo " |   / /__/ /  |"
+          echo " +--/ _____/---+"
           echo "   / /"
           echo "  /_/"
           echo ""
@@ -87,6 +87,7 @@
     };
   };
 
+  # Better clock sync via chrony
   services.timesyncd.enable = false;
   services.chrony = {
     enable = true;
@@ -97,6 +98,7 @@
     ];
   };
 
+  # Enable podman with DNS
   virtualisation.podman = {
     enable = true;
   } // (
@@ -111,6 +113,7 @@
     }
   );
 
+  # Reboots hanged system
   systemd.watchdog.device = "/dev/watchdog";
   systemd.watchdog.runtimeTime = "30s";
 
@@ -119,7 +122,7 @@
   zramSwap.algorithm = "zstd";
   zramSwap.memoryPercent = 100;
 
-  # Audit Tracing
+  # Audit tracing
   security.auditd.enable = true;
   security.audit.enable = true;
   security.audit.rules = [
