@@ -126,8 +126,15 @@
     "-a exit,always -F arch=b64 -S execve"
   ];
 
-  # Rip Out Default Packages
+  # Rip out packages
   environment.defaultPackages = lib.mkForce [ ];
+  environment.noXlibs = true;
+  documentation.doc.enable = false;
+  xdg.mime.enable = false;
+  xdg.menus.enable = false;
+  xdg.icons.enable = false;
+  xdg.sounds.enable = false;
+  xdg.autostart.enable = false;
 
   # Allow passwordless sudo from wheel group
   security.sudo = {
