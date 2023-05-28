@@ -16,9 +16,11 @@ in
     ];
   };
 
-  # Localization
-  networking.hostName = "dinar-ephemeral-beta";
-  time.timeZone = "Europe/Helsinki";
+  # Localization options
+  localization = {
+    hostname = "dinar-ephemeral-beta";
+    timezone = "Europe/Helsinki";
+  };
 
   boot.kernelPackages = pkgs.linuxPackagesFor (pkgs.linux);
 
@@ -71,7 +73,6 @@ in
   systemd.mounts = [
     {
       enable = true;
-
       description = "storage";
 
       what = "/dev/sda1";

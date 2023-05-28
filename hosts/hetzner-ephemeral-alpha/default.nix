@@ -9,9 +9,11 @@
   # Users group
   users.groups.users = { };
 
-  # Localization
-  networking.hostName = "hetzner-ephemeral-alpha";
-  time.timeZone = "Europe/Helsinki";
+  # Localization options
+  localization = {
+    hostname = "hetzner-ephemeral-alpha";
+    timezone = "Europe/Helsinki";
+  };
 
   # Support for cross compilation
   boot.binfmt.emulatedSystems = [
