@@ -149,7 +149,7 @@ in
     ];
   };
 
-  # Rpcbind
+  # Enable an ONC RPC directory service used by NFS
   services.rpcbind.enable = true;
 
   system.stateVersion = "23.05";
