@@ -47,7 +47,7 @@ let
     maxCollect=$((used - freeLimit))
 
     echo "collecting up to $maxCollect MiB" >&2
-    echo $maxCollect
+    echo $((maxCollect * 1048576))
     exit 0
   '';
 
