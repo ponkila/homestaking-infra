@@ -23,13 +23,15 @@ in
   boot.kernelPackages = pkgs.linuxPackagesFor (pkgs.linux);
 
   # Erigon options
-  erigon = rec {
+  erigon = {
+    enable = true;
     endpoint = infra.ip;
     datadir = "/mnt/eth/erigon";
   };
 
   # Lighthouse options
-  lighthouse = rec {
+  lighthouse = {
+    enable = true;
     endpoint = infra.ip;
     datadir = "/mnt/eth/lighthouse";
     exec.endpoint = "http://${infra.ip}:8551";
