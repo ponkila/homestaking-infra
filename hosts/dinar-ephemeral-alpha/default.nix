@@ -20,7 +20,6 @@ in
   localization = {
     hostname = "dinar-ephemeral-alpha";
     timezone = "Europe/Helsinki";
-    keymap = "fi";
   };
 
   # Erigon options

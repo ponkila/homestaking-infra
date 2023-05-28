@@ -22,7 +22,6 @@ in
   localization = {
     hostname = "ponkila-ephemeral-beta";
     timezone = "Europe/Helsinki";
-    keymap = "us";
   };
 
   # Erigon options
