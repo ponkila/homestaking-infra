@@ -1,12 +1,5 @@
 { pkgs, lib, ... }:
 {
-  virtualisation.podman.enable = true;
-  # dnsname allows containers to use ${name}.dns.podman to reach each other
-  # on the same host instead of using hard-coded IPs.
-  # NOTE: --net must be the same on the containers, and not eq "host"
-  # TODO: extend this with flannel ontop of wireguard for cross-node comms
-  virtualisation.podman.defaultNetwork.settings.dns_enabled = true;
-
   systemd.user.services.mev-boost = {
     enable = true;
 

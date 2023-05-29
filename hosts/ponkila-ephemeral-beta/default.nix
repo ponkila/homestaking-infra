@@ -24,13 +24,13 @@ in
 
   # Erigon options
   erigon = rec {
-    endpoint = infra.ip;
+    endpoint = "http://${infra.ip}:8551";
     datadir = erigon.datadir;
   };
 
   # Lighthouse options
   lighthouse = rec {
-    endpoint = infra.ip;
+    endpoint = "http://${infra.ip}:5052";
     datadir = lighthouse.datadir;
     exec.endpoint = "http://${infra.ip}:8551";
     mev-boost.endpoint = "http://${infra.ip}:18550";
@@ -110,7 +110,7 @@ in
       AuthenticationMethods publickey
     '';
     settings.PasswordAuthentication = false;
-    settings.challengeResponseAuthentication = false;
+    settings.KbdInteractiveAuthentication = false;
   };
 
   # Prometheus
@@ -148,5 +148,9 @@ in
       }
     ];
   };
+
+  # Enable an ONC RPC directory service used by NFS
+  services.rpcbind.enable = true;
+
   system.stateVersion = "23.05";
 }

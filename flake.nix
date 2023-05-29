@@ -73,6 +73,7 @@
             nativeBuildInputs = with pkgs; [
               git
               nix
+              nix-tree
               jq
               sops
               ssh-to-age
@@ -132,6 +133,7 @@
             specialArgs = { inherit inputs outputs; };
             modules = [
               ./hosts/hetzner-ephemeral-alpha
+              ./modules/sys2x/gc.nix
               ./system/formats/netboot-kexec.nix
               ./system/global.nix
               ./system/ramdisk.nix
@@ -157,6 +159,7 @@
             specialArgs = { inherit inputs outputs; };
             modules = [
               ./hosts/hetzner-ephemeral-beta
+              ./modules/sys2x/gc.nix
               ./system/formats/netboot-kexec.nix
               ./system/global.nix
               ./system/ramdisk.nix

@@ -9,6 +9,7 @@
     # Closures to be copied to the Nix store, namely the init
     # script and the top-level system configuration directory.
     storeContents = [ config.system.build.toplevel ];
+    comp = "zstd -Xcompression-level 2";
   };
 
   # Create the initrd
