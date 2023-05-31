@@ -2,9 +2,9 @@
 Ethereum home-staking infrastructure powered by Nix
 
 ## About
-Transparency is crucial for spreading knowledge among Ethereum infrastructures, benefiting new home-stakers and maintainers to improve their existing setup. With Nix, the entire configuration of the real, working infrastructure can be seen at glance. This is extremely useful for those involved in the maintenance of these machines, as it provides a clear understanding of what's under the hood and makes it easy to see the setup as a whole.
+Transparency is crucial for spreading knowledge among Ethereum infrastructures, benefiting new home-stakers and maintainers to improve their existing setup. With Nix, the entire configuration of the real, working infrastructure can be seen at glance. This is extremely useful for those involved in the maintenance of these machines, as it provides a clear understanding of what's under the hood.
 
-We are currently working on [HomeStakerOS](https://github.com/ponkila/HomestakerOS) and [Nixobolus](https://github.com/ponkila/nixobolus), which are designed to provide users with an easy way to configure, build and deploy this kind of infrastructure via WebUI.
+We are currently working on [HomestakerOS](https://github.com/ponkila/HomestakerOS) and [Nixobolus](https://github.com/ponkila/nixobolus), which are designed to provide users with an easy way to configure, build and deploy this kind of infrastructure via WebUI.
 
 ## Keypoints
 - Multiple NixOS configurations for running Ethereum nodes
@@ -17,7 +17,6 @@ We are currently working on [HomeStakerOS](https://github.com/ponkila/Homestaker
 
 ## Structure
 - `flake.nix`: Entrypoint for host configurations.
-- `shell.nix`: Devshell for boostrapping. Accessible via `nix develop`.
 - `home-manager`: Home-manager configurations.
 - `hosts`: NixOS configurations. Accessible via `nix build`.
 - `modules`: Shared module configurations.
@@ -105,7 +104,11 @@ This command will format the disks according to the script. Once formatting is c
 ## Formats & Deployment
 
 - kexecTree
+  
   Outputs: bzImage, initrd, kexec-boot script, and netboot IPXE-script.
+  
+  Deploy:
+  
   ```
   # Run a bash shell that provides the dependencies
   $ nix develop
@@ -117,6 +120,7 @@ This command will format the disks according to the script. Once formatting is c
 
   <details>
   <summary>Bootstrap from hetzner rescue</summary>
+
       # The installer needs sudo
       $ apt install -y sudo
 
@@ -138,8 +142,11 @@ This command will format the disks according to the script. Once formatting is c
       # Kexec
       $ apt-get install kexec-tools
       $ ./result/kexec-tree
+
    </details>
 
 - isoImage
+  
   Outputs: ISO image which is loaded into RAM in stage-1
-  Deploy: Bootable USB drive via balena etcher or ventoy
+  
+  Deploy: Bootable USB drive via [balenaEtcher](https://etcher.balena.io/) or [Ventoy](https://www.ventoy.net/en/index.html)
