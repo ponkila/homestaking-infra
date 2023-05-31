@@ -12,7 +12,6 @@ in
   };
 
   config = {
-    services.getty.autologinUser = "core";
     users.users.core = {
       isNormalUser = true;
       group = "core";
