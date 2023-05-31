@@ -3,9 +3,6 @@
 , ...
 }:
 {
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-
   # These kmodules are implicit requirements of netboot
   boot.initrd.availableKernelModules = [ "squashfs" "overlay" ];
   boot.initrd.kernelModules = [ "loop" "overlay" ];
