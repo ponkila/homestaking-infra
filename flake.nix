@@ -150,6 +150,7 @@
                   outputs.overlays.additions
                   outputs.overlays.modifications
                   # Workaround for https://github.com/NixOS/nixpkgs/issues/154163
+                  # This issue only happens with the isoImage format
                   (final: super: {
                     makeModulesClosure = x:
                       super.makeModulesClosure (x // { allowMissing = true; });
