@@ -14,6 +14,9 @@
   networking.hostName = "ponkila-ephemeral-gamma";
   time.timeZone = "Europe/Helsinki";
 
+  # Use RPi4 kernel
+  boot.kernelPackages = pkgs.linuxPackages_rpi4;
+
   # SSH
   services.openssh = {
     enable = true;
