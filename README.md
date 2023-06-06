@@ -14,6 +14,7 @@ We are currently working on [HomestakerOS](https://github.com/ponkila/Homestaker
 - Utilization of [ethereum.nix](https://github.com/nix-community/ethereum.nix) providing an up-to-date package management solution
 - [Overlays](https://nixos.wiki/wiki/Overlays) offer a convenient and efficient way to manually update or modify packages, ideal for addressing issues with upstream sources
 - Offers `isoImage` or `kexecTree` output formats depending on the host configuration
+- Offers `isoImage` or `kexecTree` output formats depending on the host configuration
 
 ## Structure
 - `flake.nix`: Entrypoint for host configurations.
@@ -64,7 +65,32 @@ Tested on Ubuntu 22.04.2 LTS aarch64, 5.15.0-69-generic
       # Accept nix configuration from a flake (optional)
       $ echo "accept-flake-config = true" >> $HOME/.config/nix/nix.conf
     </details>
+- With Nix package manager (recommended)
+    ```
+    nix build .#<hostname>
+    ```
+    <details>
+    <summary>Install Nix</summary>
 
+      # Let root run the nix installer (optional)
+      $ mkdir -p $HOME/.config/nix
+      $ echo "build-users-group =" > $HOME/.config/nix/nix.conf
+
+      # Install Nix in single-user mode
+      $ curl -L https://nixos.org/nix/install | sh
+      $ . $HOME/.nix-profile/etc/profile.d/nix.sh
+
+      # Install nix-command
+      $ nix-env -iA nixpkgs.nix
+
+      # Allow experimental features (optional)
+      $ echo "experimental-features = nix-command flakes" >> $HOME/.config/nix/nix.conf
+
+      # Accept nix configuration from a flake (optional)
+      $ echo "accept-flake-config = true" >> $HOME/.config/nix/nix.conf
+    </details>
+
+- Within [Docker](https://docs.docker.com/desktop/install/linux-install/) / [Podman](https://podman.io/docs/tutorials/installation#installing-on-linux)
 - Within [Docker](https://docs.docker.com/desktop/install/linux-install/) / [Podman](https://podman.io/docs/tutorials/installation#installing-on-linux)
     ```
     podman build . --tag nix-builder --build-arg hostname=<hostname>

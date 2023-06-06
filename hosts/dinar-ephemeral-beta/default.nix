@@ -2,10 +2,8 @@
 
 let
   # General
-  infra.ip = "192.168.100.10";
-  lighthouse.datadir = "/var/mnt/lighthouse";
-  erigon.datadir = "/var/mnt/erigon";
-  sshKeysPath = "/var/mnt/secrets/ssh/id_ed25519";
+  infra.ip = "192.168.100.30";
+  sshKeysPath = "/mnt/eth/secrets/ssh/id_ed25519";
 in
 {
   # User options
@@ -19,19 +17,22 @@ in
   };
 
   # Localization
-  networking.hostName = "ponkila-ephemeral-beta";
+  networking.hostName = "dinar-ephemeral-beta";
   time.timeZone = "Europe/Helsinki";
+
+  # Use stable kernel
+  boot.kernelPackages = pkgs.linuxPackagesFor (pkgs.linux);
 
   # Erigon options
   erigon = rec {
     endpoint = "http://${infra.ip}:8551";
-    datadir = erigon.datadir;
+    datadir = "/mnt/eth/erigon";
   };
 
   # Lighthouse options
   lighthouse = rec {
     endpoint = "http://${infra.ip}:5052";
-    datadir = lighthouse.datadir;
+    datadir = "/mnt/eth/lighthouse";
     exec.endpoint = "http://${infra.ip}:8551";
     mev-boost.endpoint = "http://${infra.ip}:18550";
     slasher = {
@@ -41,55 +42,42 @@ in
     };
   };
 
-  # Secrets
-  home-manager.users.core = { pkgs, ... }: {
-    sops = {
-      defaultSopsFile = ./secrets/default.yaml;
-      secrets."wireguard/wg0" = {
-        path = "%r/wireguard/wg0.conf";
+  home-manager.users = {
+    root = { pkgs, ... }: {
+      sops = {
+        defaultSopsFile = ./secrets/default.yaml;
+        secrets = {
+          "wireguard/wg0" = {
+            path = "%r/wireguard/wg0.conf";
+          };
+        };
+        age.sshKeyPaths = [ sshKeysPath ];
       };
-      age.sshKeyPaths = [ sshKeysPath ];
+    };
+    core = { pkgs, ... }: {
+      sops = {
+        defaultSopsFile = ./secrets/default.yaml;
+        secrets = {
+          "jwt.hex" = {
+            path = "%r/jwt.hex";
+          };
+        };
+        age.sshKeyPaths = [ sshKeysPath ];
+      };
     };
   };
 
   systemd.mounts = [
-    # Secrets
     {
       enable = true;
 
-      description = "secrets storage";
+      description = "storage";
 
-      what = "/dev/disk/by-label/secrets";
-      where = "/var/mnt/secrets";
-      type = "btrfs";
+      what = "/dev/sda1";
+      where = "/mnt/eth";
+      type = "ext4";
 
-      before = [ "sshd.service" ];
-      wantedBy = [ "multi-user.target" ];
-    }
-    # Erigon
-    {
-      enable = true;
-
-      description = "erigon storage";
-
-      what = "/dev/disk/by-label/erigon";
-      where = erigon.datadir;
-      options = lib.mkDefault "noatime";
-      type = "btrfs";
-
-      wantedBy = [ "multi-user.target" ];
-    }
-    # Lighthouse
-    {
-      enable = true;
-
-      description = "lighthouse storage";
-
-      what = "/dev/disk/by-label/lighthouse";
-      where = lighthouse.datadir;
-      options = lib.mkDefault "noatime";
-      type = "btrfs";
-
+      before = [ "sops-nix.service" "sshd.service" ];
       wantedBy = [ "multi-user.target" ];
     }
   ];
@@ -148,9 +136,5 @@ in
       }
     ];
   };
-
-  # Enable an ONC RPC directory service used by NFS
-  services.rpcbind.enable = true;
-
   system.stateVersion = "23.05";
 }

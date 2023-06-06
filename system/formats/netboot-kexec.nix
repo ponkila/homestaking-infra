@@ -9,6 +9,7 @@
     # Closures to be copied to the Nix store, namely the init
     # script and the top-level system configuration directory.
     storeContents = [ config.system.build.toplevel ];
+    comp = "zstd -Xcompression-level 2";
   };
 
   # Create the initrd
@@ -21,16 +22,16 @@
     }];
   };
 
-  system.build.netbootIpxeScript = pkgs.writeTextDir "netboot.ipxe" ''
+  system.build.netbootIpxeScript = pkgs.writeText "netboot.ipxe" ''
     #!ipxe
     # Use the cmdline variable to allow the user to specify custom kernel params
     # when chainloading this script from other iPXE scripts like netboot.xyz
-    kernel ${pkgs.stdenv.hostPlatform.linux-kernel.target} init=${config.system.build.toplevel}/init initrd=initrd ${toString config.boot.kernelParams} ''${cmdline}
-    initrd initrd
+    kernel bzImage init=${config.system.build.toplevel}/init initrd=initrd.zst ${toString config.boot.kernelParams} ''${cmdline}
+    initrd initrd.zst
     boot
   '';
 
-  # A script invoking kexec on ./bzImage and ./initrd.gz.
+  # A script invoking kexec on ./bzImage and ./initrd.zst.
   # Usually used through system.build.kexecTree, but exposed here for composability.
   system.build.kexecScript = pkgs.writeScript "kexec-boot" ''
     #!/usr/bin/env bash
@@ -40,15 +41,15 @@
     fi
     SCRIPT_DIR=$( cd -- "$( dirname -- "''${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
     kexec --load ''${SCRIPT_DIR}/bzImage \
-      --initrd=''${SCRIPT_DIR}/initrd.gz \
+      --initrd=''${SCRIPT_DIR}/initrd.zst \
       --command-line "init=${config.system.build.toplevel}/init ${toString config.boot.kernelParams}"
     systemctl kexec
   '';
 
-  # A tree containing initrd.gz, bzImage and a kexec-boot script.
+  # A tree containing initrd.zst, bzImage and a kexec-boot script.
   system.build.kexecTree = pkgs.linkFarm "kexec-tree" [
     {
-      name = "initrd.gz";
+      name = "initrd.zst";
       path = "${config.system.build.netbootRamdisk}/initrd";
     }
     {
@@ -58,6 +59,10 @@
     {
       name = "kexec-boot";
       path = config.system.build.kexecScript;
+    }
+    {
+      name = "netboot.ipxe";
+      path = config.system.build.netbootIpxeScript;
     }
   ];
 }

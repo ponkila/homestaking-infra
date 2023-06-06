@@ -20,17 +20,18 @@ in
   networking.hostName = "dinar-ephemeral-alpha";
   time.timeZone = "Europe/Helsinki";
 
+  # Use stable kernel
   boot.kernelPackages = pkgs.linuxPackagesFor (pkgs.linux);
 
   # Erigon options
   erigon = rec {
-    endpoint = infra.ip;
+    endpoint = "http://${infra.ip}:8551";
     datadir = "/mnt/eth/erigon";
   };
 
   # Lighthouse options
   lighthouse = rec {
-    endpoint = infra.ip;
+    endpoint = "http://${infra.ip}:5052";
     datadir = "/mnt/eth/lighthouse";
     exec.endpoint = "http://${infra.ip}:8551";
     mev-boost.endpoint = "http://${infra.ip}:18550";
@@ -84,11 +85,20 @@ in
   # SSH
   services.openssh = {
     enable = true;
-    settings.PasswordAuthentication = false;
     hostKeys = [{
       path = sshKeysPath;
       type = "ed25519";
     }];
+    allowSFTP = false;
+    extraConfig = ''
+      AllowTcpForwarding yes
+      X11Forwarding no
+      AllowAgentForwarding no
+      AllowStreamLocalForwarding no
+      AuthenticationMethods publickey
+    '';
+    settings.PasswordAuthentication = false;
+    settings.KbdInteractiveAuthentication = false;
   };
 
   # Prometheus
