@@ -23,23 +23,32 @@
     package = pkgs.nix;
   };
 
-  boot.kernelParams = [
-    "boot.shell_on_fail"
+  boot = {
+    kernelParams = [
+      "boot.shell_on_fail"
 
-    "mitigations=off"
-    "l1tf=off"
-    "mds=off"
-    "no_stf_barrier"
-    "noibpb"
-    "noibrs"
-    "nopti"
-    "nospec_store_bypass_disable"
-    "nospectre_v1"
-    "nospectre_v2"
-    "tsx=on"
-    "tsx_async_abort=off"
-  ];
-  boot.kernelPackages = lib.mkDefault (pkgs.linuxPackagesFor (pkgs.linux_latest));
+      "mitigations=off"
+      "l1tf=off"
+      "mds=off"
+      "no_stf_barrier"
+      "noibpb"
+      "noibrs"
+      "nopti"
+      "nospec_store_bypass_disable"
+      "nospectre_v1"
+      "nospectre_v2"
+      "tsx=on"
+      "tsx_async_abort=off"
+    ];
+    kernelPackages = lib.mkDefault (pkgs.linuxPackagesFor (pkgs.linux_latest));
+  } // (
+    # Increase tmpfs (default: "50%")
+    if (lib.trivial.release == "22.11") then {
+      tmpOnTmpfsSize = "80%";
+    } else {
+      tmp.tmpfsSize = "80%";
+    }
+  );
 
   environment.systemPackages = with pkgs; [
     btrfs-progs
@@ -55,13 +64,13 @@
         color = "yellow";
         command = ''
           echo ""
-          echo " +--------------+"
-          echo " | 10110 010    |"
-          echo " | 101 101 10   |"
-          echo " | 0   _____    |"
-          echo " |    / ___ \   |"
-          echo " |   / /__/ /   |"
-          echo " +--/ _____/----+"
+          echo " +-------------+"
+          echo " | 10110 010   |"
+          echo " | 101 101 10  |"
+          echo " | 0   _____   |"
+          echo " |    / ___ \  |"
+          echo " |   / /__/ /  |"
+          echo " +--/ _____/---+"
           echo "   / /"
           echo "  /_/"
           echo ""
@@ -78,6 +87,7 @@
     };
   };
 
+  # Better clock sync via chrony
   services.timesyncd.enable = false;
   services.chrony = {
     enable = true;
@@ -88,18 +98,46 @@
     ];
   };
 
+  # Enable podman with DNS
+  virtualisation.podman = {
+    enable = true;
+  } // (
+    # dnsname allows containers to use ${name}.dns.podman to reach each other
+    # on the same host instead of using hard-coded IPs.
+    # NOTE: --net must be the same on the containers, and not eq "host"
+    # TODO: extend this with flannel ontop of wireguard for cross-node comms
+    if (lib.trivial.release == "22.11") then {
+      defaultNetwork.dnsname.enable = true;
+    } else {
+      defaultNetwork.settings = { dns_enabled = true; };
+    }
+  );
+
+  # Reboots hanged system
   systemd.watchdog.device = "/dev/watchdog";
   systemd.watchdog.runtimeTime = "30s";
 
-  # Audit Tracing
+  # Zram swap
+  zramSwap.enable = true;
+  zramSwap.algorithm = "zstd";
+  zramSwap.memoryPercent = 100;
+
+  # Audit tracing
   security.auditd.enable = true;
   security.audit.enable = true;
   security.audit.rules = [
     "-a exit,always -F arch=b64 -S execve"
   ];
 
-  # Rip Out Default Packages
+  # Rip out packages
   environment.defaultPackages = lib.mkForce [ ];
+  environment.noXlibs = true;
+  documentation.doc.enable = false;
+  xdg.mime.enable = false;
+  xdg.menus.enable = false;
+  xdg.icons.enable = false;
+  xdg.sounds.enable = false;
+  xdg.autostart.enable = false;
 
   # Allow passwordless sudo from wheel group
   security.sudo = {

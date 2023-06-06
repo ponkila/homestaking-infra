@@ -22,17 +22,20 @@ in
     timezone = "Europe/Helsinki";
   };
 
+  # Use stable kernel
+  boot.kernelPackages = pkgs.linuxPackagesFor (pkgs.linux);
+
   # Erigon options
   erigon = {
     enable = true;
-    endpoint = infra.ip;
+    endpoint = "http://${infra.ip}:8551";
     datadir = "/mnt/eth/erigon";
   };
 
   # Lighthouse options
   lighthouse = {
     enable = true;
-    endpoint = infra.ip;
+    endpoint = "http://${infra.ip}:5052";
     datadir = "/mnt/eth/lighthouse";
     exec.endpoint = "http://${infra.ip}:8551";
     mev-boost.endpoint = "http://${infra.ip}:18550";
@@ -104,7 +107,7 @@ in
       AuthenticationMethods publickey
     '';
     settings.PasswordAuthentication = false;
-    settings.challengeResponseAuthentication = false;
+    settings.KbdInteractiveAuthentication = false;
   };
 
   # Prometheus

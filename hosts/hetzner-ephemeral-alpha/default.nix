@@ -20,6 +20,9 @@
     "aarch64-linux"
   ];
 
+  # Saiko's automatic gc
+  sys2x.gc.useDiskAware = true;
+
   systemd.mounts = [
     {
       enable = true;
@@ -66,7 +69,7 @@
       AuthenticationMethods publickey
     '';
     settings.PasswordAuthentication = false;
-    settings.challengeResponseAuthentication = false;
+    settings.KbdInteractiveAuthentication = false;
   };
 
   system.stateVersion = "23.05";
