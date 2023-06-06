@@ -26,14 +26,14 @@ in
   erigon = {
     enable = true;
     endpoint = infra.ip;
-    datadir = erigon.datadir;
+    datadir = "/mnt/eth/erigon";
   };
 
   # Lighthouse options
   lighthouse = {
     enable = true;
     endpoint = infra.ip;
-    datadir = lighthouse.datadir;
+    datadir = "/mnt/eth/lighthouse";
     exec.endpoint = "http://${infra.ip}:8551";
     mev-boost.endpoint = "http://${infra.ip}:18550";
     slasher = {
