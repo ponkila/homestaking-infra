@@ -120,26 +120,29 @@ This command will format the disks according to the script. Once formatting is c
   <details>
   <summary>Netbooting Raspberry Pi 4 with UEFI Firmware</summary>
 
-    We'll be gathering the boot media (/tftpboot folder for PXE booting) in the /result directory. Make sure you have the following dependencies installed: docker, unzip.
+    We'll be gathering the boot media (/tftpboot folder for PXE booting) in the `/result` directory. Make sure you have the following dependencies installed: docker, unzip.
 
-    Clone the project repository, build the EDK2 Raspberry Pi 4 UEFI firmware, and copy the necessary files to the result directory.
+    Clone the project repository and build the EDK2 Raspberry Pi 4 UEFI firmware. 
     ```
     git clone https://github.com/valtzu/pipxe.git
     cd pixpe
     sudo docker-compose up
-
+    ```
+    
+    Create a result directory and copy the UEFI firmware files there.
+    ```
     mkdir -p result
     cp pxe/RPI_EFI.fd result
     cp -r pxe/efi result
     ```
 
-    Download the "standard" [RPi4 UEFI releases from Github](https://github.com/pftf/RPi4/releases) (excluding RPI_EFI.fd) and copy the files to the result directory.
+    Download the "standard" [RPi4 UEFI releases from Github](https://github.com/pftf/RPi4/releases) and copy the files (excluding RPI_EFI.fd) to the `result` directory.
     ```
     wget https://github.com/pftf/RPi4/releases/download/v1.34/RPi4_UEFI_Firmware_v1.34.zip
     unzip RPi4_UEFI_Firmware_v1.34.zip -d result -x RPI_EFI.fd
     ```
 
-    Obtain all firmware overlays from the [Raspberry Pi Github repository](https://github.com/raspberrypi/firmware/tree/master/boot/overlays) and add them to the overlays folder in the result directory. When prompted to override files, keep the `miniuart-bt.dtbo` and `upstream-pi4.dtbo` from the UEFI project.
+    Obtain all firmware overlays from the [Raspberry Pi Github repository](https://github.com/raspberrypi/firmware/tree/master/boot/overlays) and add them to the overlays folder in the `result` directory. When prompted to override files, keep the `miniuart-bt.dtbo` and `upstream-pi4.dtbo` from the UEFI project.
     ```
     cp -n overlays/* result/tftpboot/overlays/
     ```
