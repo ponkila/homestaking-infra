@@ -110,7 +110,6 @@
               ./system/formats/netboot-kexec.nix
               ./system/global.nix
               ./system/ramdisk.nix
-              ./home-manager/core.nix
               nixobolus.nixosModules.homestakeros
               home-manager.nixosModules.home-manager
               disko.nixosModules.disko
@@ -141,7 +140,6 @@
               ./system/formats/netboot-kexec.nix
               ./system/global.nix
               ./system/ramdisk.nix
-              ./home-manager/core.nix
               home-manager.nixosModules.home-manager
               disko.nixosModules.disko
               {
@@ -239,7 +237,6 @@
               ./hosts/dinar-ephemeral-alpha
               ./system/formats/copytoram-iso.nix
               ./system/global.nix
-              ./home-manager/core.nix
               nixobolus.nixosModules.homestakeros
               home-manager.nixosModules.home-manager
               disko.nixosModules.disko
@@ -265,7 +262,6 @@
               ./hosts/dinar-ephemeral-beta
               ./system/formats/copytoram-iso.nix
               ./system/global.nix
-              ./home-manager/core.nix
               nixobolus.nixosModules.homestakeros
               home-manager.nixosModules.home-manager
               disko.nixosModules.disko
