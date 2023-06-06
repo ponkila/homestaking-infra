@@ -25,7 +25,7 @@
     flake-root.url = "github:srid/flake-root";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
-    nixobolus.url = "github:ponkila/nixobolus";
+    nixobolus.url = "github:ponkila/nixobolus/jesse/wip";
     mission-control.url = "github:Platonic-Systems/mission-control";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-22.11";
