@@ -116,32 +116,87 @@ This command will format the disks according to the script. Once formatting is c
   # Run kexec-boot script
   $ ./result/kexec-boot
   ```
-  TODO: Prief info and links for netbooting Rasberry Pi 4
+
+  <details>
+  <summary>Netbooting Raspberry Pi 4 with UEFI Firmware</summary>
+
+    We'll be gathering the boot media (/tftpboot folder for PXE booting) in the /result directory. Make sure you have the following dependencies installed: docker, unzip.
+
+    Clone the project repository, build the EDK2 Raspberry Pi 4 UEFI firmware, and copy the necessary files to the result directory.
+    ```
+    git clone https://github.com/valtzu/pipxe.git
+    cd pixpe
+    sudo docker-compose up
+
+    mkdir -p result
+    cp pxe/RPI_EFI.fd result
+    cp -r pxe/efi result
+    ```
+
+    Download the "standard" [RPi4 UEFI releases from Github](https://github.com/pftf/RPi4/releases) (excluding RPI_EFI.fd) and copy the files to the result directory.
+    ```
+    wget https://github.com/pftf/RPi4/releases/download/v1.34/RPi4_UEFI_Firmware_v1.34.zip
+    unzip RPi4_UEFI_Firmware_v1.34.zip -d result -x RPI_EFI.fd
+    ```
+
+    Obtain all firmware overlays from the [Raspberry Pi Github repository](https://github.com/raspberrypi/firmware/tree/master/boot/overlays) and add them to the overlays folder in the result directory. When prompted to override files, keep the `miniuart-bt.dtbo` and `upstream-pi4.dtbo` from the UEFI project.
+    ```
+    cp -n overlays/* result/tftpboot/overlays/
+    ```
+
+    Replace the autoexec.ipxe file in the projects folder with your own custom ipxe script.
+    ```
+    cat > result/efi/boot/autoexec.ipxe << EOF
+    #!ipxe
+    dhcp
+    chain --autofree http://192.168.1.128:8080/netboot.ipxe || shell
+    EOF
+    ```
+
+    Use rpi-imager to flash "Raspberry Pi OS Lite (32-bit)" to an SD card, boot from it, update the system, and change the boot order using `raspi-config` (Advanced Settings > Boot Order > Network Boot). Finally, remove the SD card and reboot.
+    ```
+    sudo apt-get update && sudo apt-get full-upgrade
+    raspi-config
+    ```
+
+  </details>
 
   <details>
   <summary>Bootstrap from hetzner rescue</summary>
 
-      # The installer needs sudo
-      $ apt install -y sudo
+    The installer needs sudo
+    ```
+    apt install -y sudo
+    ```
 
-      # Let root run the nix installer
-      $ mkdir -p /etc/nix
-      $ echo "build-users-group =" > /etc/nix/nix.conf
+    Let root run the nix installer
+    ```
+    mkdir -p /etc/nix
+    echo "build-users-group =" > /etc/nix/nix.conf
+    ```
 
-      # Install Nix in single-user mode
-      $ curl -L https://nixos.org/nix/install | sh
-      $ . $HOME/.nix-profile/etc/profile.d/nix.sh
+    Install Nix in single-user mode
+    ```
+    curl -L https://nixos.org/nix/install | sh
+    . $HOME/.nix-profile/etc/profile.d/nix.sh
+    ```
 
-      # Install nix-command
-      $ nix-env -iA nixpkgs.nix
+    Install nix-command
+    ```
+    nix-env -iA nixpkgs.nix
+    ```
 
-      # Build
-      $ git clone https://github.com/ponkila/homestaking-infra.git
-      $ nix build --extra-experimental-features "nix-command flakes" .#<hostname>
+    Build
+    ```
+    git clone https://github.com/ponkila/homestaking-infra.git
+    nix build --extra-experimental-features "nix-command flakes" .#<hostname>
+    ```
 
-      # Kexec
-      $ apt-get install kexec-tools
-      $ ./result/kexec-tree
+    Kexec
+    ```
+    apt-get install kexec-tools
+    ./result/kexec-tree
+    ```
 
    </details>
 
