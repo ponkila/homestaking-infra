@@ -19,8 +19,6 @@
     darwin.url = "github:lnl7/nix-darwin";
     disko.inputs.nixpkgs.follows = "nixpkgs";
     disko.url = "github:nix-community/disko";
-    ethereum-nix.inputs.nixpkgs.follows = "nixpkgs";
-    ethereum-nix.url = "github:nix-community/ethereum.nix";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-root.url = "github:srid/flake-root";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
@@ -37,7 +35,6 @@
     { self
     , darwin
     , disko
-    , ethereum-nix
     , flake-parts
     , home-manager
     , nixobolus
@@ -115,7 +112,6 @@
               disko.nixosModules.disko
               {
                 nixpkgs.overlays = [
-                  ethereum-nix.overlays.default
                   outputs.overlays.additions
                   outputs.overlays.modifications
                 ];
@@ -144,7 +140,6 @@
               disko.nixosModules.disko
               {
                 nixpkgs.overlays = [
-                  ethereum-nix.overlays.default
                   outputs.overlays.additions
                   outputs.overlays.modifications
                   # Workaround for https://github.com/NixOS/nixpkgs/issues/154163
@@ -242,7 +237,6 @@
               disko.nixosModules.disko
               {
                 nixpkgs.overlays = [
-                  ethereum-nix.overlays.default
                   outputs.overlays.additions
                   outputs.overlays.modifications
                 ];
@@ -267,7 +261,6 @@
               disko.nixosModules.disko
               {
                 nixpkgs.overlays = [
-                  ethereum-nix.overlays.default
                   outputs.overlays.additions
                   outputs.overlays.modifications
                 ];
