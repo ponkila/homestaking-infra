@@ -8,12 +8,11 @@ We are currently working on [HomestakerOS](https://github.com/ponkila/Homestaker
 
 ## Keypoints
 - Multiple NixOS configurations for running Ethereum nodes
-- Supports declarative disk partitioning via [disko](https://github.com/nix-community/disko)
 - Runs on RAM disk, providing significant performance benefits by reducing I/O operations
-- Deployment secrets using [sops-nix](https://github.com/Mic92/sops-nix) for secure handling of sensitive information
 - Utilization of [ethereum.nix](https://github.com/nix-community/ethereum.nix) providing an up-to-date package management solution
-- [Overlays](https://nixos.wiki/wiki/Overlays) offer a convenient and efficient way to manually update or modify packages, ideal for addressing issues with upstream sources
-- Offers `isoImage` or `kexecTree` output formats depending on the host configuration
+- [Overlays](https://nixos.wiki/wiki/Overlays) offer a convenient way to manually update or modify packages, ideal for addressing issues with upstream sources
+- Deployment secrets using [sops-nix](https://github.com/Mic92/sops-nix) for secure handling of sensitive information
+- Supports declarative disk partitioning via [disko](https://github.com/nix-community/disko)
 - Offers `isoImage` or `kexecTree` output formats depending on the host configuration
 
 ## Structure
@@ -39,6 +38,7 @@ ponkila-persistent-epsilon | x86-64 | | Darwin
 Note: Some of these hosts might be currently being set up and will be added to hosts directory soon.
 
 ## Building (no cross-compile)
+
 Tested on Ubuntu 22.04.2 LTS aarch64, 5.15.0-69-generic
 
 - With Nix package manager (recommended)
@@ -48,49 +48,35 @@ Tested on Ubuntu 22.04.2 LTS aarch64, 5.15.0-69-generic
     <details>
     <summary>Install Nix</summary>
 
-      # Let root run the nix installer (optional)
-      $ mkdir -p $HOME/.config/nix
-      $ echo "build-users-group =" > $HOME/.config/nix/nix.conf
+      Let root run the nix installer (optional)
+      ```
+      mkdir -p $HOME/.config/nix
+      echo "build-users-group =" > $HOME/.config/nix/nix.conf
+      ```
 
-      # Install Nix in single-user mode
-      $ curl -L https://nixos.org/nix/install | sh
-      $ . $HOME/.nix-profile/etc/profile.d/nix.sh
+      Install Nix in single-user mode
+      ```
+      curl -L https://nixos.org/nix/install | sh
+      . $HOME/.nix-profile/etc/profile.d/nix.sh
+      ```
 
-      # Install nix-command
-      $ nix-env -iA nixpkgs.nix
+      Install nix-command
+      ```
+      nix-env -iA nixpkgs.nix
+      ```
 
-      # Allow experimental features (optional)
-      $ echo "experimental-features = nix-command flakes" >> $HOME/.config/nix/nix.conf
+      Allow experimental features (optional)
+      ```
+      echo "experimental-features = nix-command flakes" >> $HOME/.config/nix/nix.conf
+      ```
 
-      # Accept nix configuration from a flake (optional)
-      $ echo "accept-flake-config = true" >> $HOME/.config/nix/nix.conf
-    </details>
-- With Nix package manager (recommended)
-    ```
-    nix build .#<hostname>
-    ```
-    <details>
-    <summary>Install Nix</summary>
+      Accept nix configuration from a flake (optional)
+      ```
+      echo "accept-flake-config = true" >> $HOME/.config/nix/nix.conf
+      ```
 
-      # Let root run the nix installer (optional)
-      $ mkdir -p $HOME/.config/nix
-      $ echo "build-users-group =" > $HOME/.config/nix/nix.conf
-
-      # Install Nix in single-user mode
-      $ curl -L https://nixos.org/nix/install | sh
-      $ . $HOME/.nix-profile/etc/profile.d/nix.sh
-
-      # Install nix-command
-      $ nix-env -iA nixpkgs.nix
-
-      # Allow experimental features (optional)
-      $ echo "experimental-features = nix-command flakes" >> $HOME/.config/nix/nix.conf
-
-      # Accept nix configuration from a flake (optional)
-      $ echo "accept-flake-config = true" >> $HOME/.config/nix/nix.conf
     </details>
 
-- Within [Docker](https://docs.docker.com/desktop/install/linux-install/) / [Podman](https://podman.io/docs/tutorials/installation#installing-on-linux)
 - Within [Docker](https://docs.docker.com/desktop/install/linux-install/) / [Podman](https://podman.io/docs/tutorials/installation#installing-on-linux)
     ```
     podman build . --tag nix-builder --build-arg hostname=<hostname>
@@ -131,17 +117,41 @@ This command will format the disks according to the script. Once formatting is c
 
 - kexecTree
   
-  Outputs: bzImage, initrd, kexec-boot script, and netboot IPXE-script.
+  _Outputs: bzImage, initrd, kexec-boot script and netboot iPXE script._
   
-  Deploy:
-  
+  Deploy: Run the kexec-boot script
   ```
-  # Run a bash shell that provides the dependencies
-  $ nix develop
+  nix develop --command bash -c "sudo ./result/kexec-boot"
+  ```
 
-  # Run kexec-boot script
-  $ ./result/kexec-boot
-  ```
+  <details>
+  <summary>Bootstrap from Hetzner rescue</summary>
+
+    ```
+    # The installer needs sudo
+    apt install -y sudo
+
+    # Allow root to run the Nix installer
+    mkdir -p /etc/nix
+    echo "build-users-group =" > /etc/nix/nix.conf
+
+    # Install Nix in single-user mode
+    curl -L https://nixos.org/nix/install | sh
+    . $HOME/.nix-profile/etc/profile.d/nix.sh
+
+    # Install nix-command
+    nix-env -iA nixpkgs.nix
+
+    # Clone the repository and build the system
+    git clone https://github.com/ponkila/homestaking-infra.git
+    nix build --extra-experimental-features "nix-command flakes" .#<hostname>
+
+    # Install kexec-tools and run the script
+    apt-get install kexec-tools
+    sudo ./result/kexec-tree
+    ```
+
+  </details>
 
   <details>
   <summary>Netbooting Raspberry Pi 4 with UEFI Firmware</summary>
@@ -162,7 +172,7 @@ This command will format the disks according to the script. Once formatting is c
     cp -r pxe/efi result
     ```
 
-    Download the "standard" [RPi4 UEFI releases from Github](https://github.com/pftf/RPi4/releases) and copy the files (excluding RPI_EFI.fd) to the `result` directory.
+    Download the "standard" [RPi4 UEFI releases from Github](https://github.com/pftf/RPi4/releases) and extract the files (excluding RPI_EFI.fd) to the `result` directory.
     ```
     wget https://github.com/pftf/RPi4/releases/download/v1.34/RPi4_UEFI_Firmware_v1.34.zip
     unzip RPi4_UEFI_Firmware_v1.34.zip -d result -x RPI_EFI.fd
@@ -170,7 +180,7 @@ This command will format the disks according to the script. Once formatting is c
 
     Obtain all firmware overlays from the [Raspberry Pi Github repository](https://github.com/raspberrypi/firmware/tree/master/boot/overlays) and add them to the overlays folder in the `result` directory. When prompted to override files, keep the `miniuart-bt.dtbo` and `upstream-pi4.dtbo` from the UEFI project.
     ```
-    cp -n overlays/* result/tftpboot/overlays/
+    cp -n overlays/* result/overlays/
     ```
 
     Replace the autoexec.ipxe file in the projects folder with your own custom ipxe script.
@@ -190,47 +200,8 @@ This command will format the disks according to the script. Once formatting is c
 
   </details>
 
-  <details>
-  <summary>Bootstrap from hetzner rescue</summary>
-
-    The installer needs sudo
-    ```
-    apt install -y sudo
-    ```
-
-    Let root run the nix installer
-    ```
-    mkdir -p /etc/nix
-    echo "build-users-group =" > /etc/nix/nix.conf
-    ```
-
-    Install Nix in single-user mode
-    ```
-    curl -L https://nixos.org/nix/install | sh
-    . $HOME/.nix-profile/etc/profile.d/nix.sh
-    ```
-
-    Install nix-command
-    ```
-    nix-env -iA nixpkgs.nix
-    ```
-
-    Build
-    ```
-    git clone https://github.com/ponkila/homestaking-infra.git
-    nix build --extra-experimental-features "nix-command flakes" .#<hostname>
-    ```
-
-    Kexec
-    ```
-    apt-get install kexec-tools
-    ./result/kexec-tree
-    ```
-
-   </details>
-
 - isoImage
   
-  Outputs: ISO image which is loaded into RAM in stage-1
+  _Outputs: ISO image which is loaded into RAM in stage-1_
   
   Deploy: Bootable USB drive via [balenaEtcher](https://etcher.balena.io/) or [Ventoy](https://www.ventoy.net/en/index.html)
