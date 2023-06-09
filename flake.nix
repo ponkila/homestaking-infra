@@ -26,7 +26,7 @@
     nixobolus.url = "github:ponkila/nixobolus/jesse/wip";
     mission-control.url = "github:Platonic-Systems/mission-control";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-22.11";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-23.05";
     sops-nix.url = "github:Mic92/sops-nix";
   };
 
