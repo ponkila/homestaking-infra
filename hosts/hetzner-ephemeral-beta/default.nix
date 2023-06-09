@@ -9,11 +9,9 @@
   # Users group
   users.groups.users = { };
 
-  # Localization options
-  localization = {
-    hostname = "hetzner-ephemeral-beta";
-    timezone = "Europe/Helsinki";
-  };
+  # Localization
+  networking.hostName = "hetzner-ephemeral-beta";
+  time.timeZone = "Europe/Helsinki";
 
   # Use stable kernel
   boot.kernelPackages = pkgs.linuxPackagesFor (pkgs.linux);
