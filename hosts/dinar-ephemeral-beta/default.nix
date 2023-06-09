@@ -9,7 +9,7 @@ in
   # Use stable kernel
   boot.kernelPackages = pkgs.linuxPackagesFor (pkgs.linux);
 
-  homastakeros = {
+  homestakeros = {
     # Localization options
     localization = {
       hostname = "dinar-ephemeral-beta";
