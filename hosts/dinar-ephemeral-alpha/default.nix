@@ -53,19 +53,17 @@ in
     };
 
     # Mounts
-    mounts = [
-      {
-        enable = true;
-        description = "storage";
+    mounts.eth = {
+      enable = true;
+      description = "storage";
 
-        what = "/dev/sda1";
-        where = "/mnt/eth";
-        type = "ext4";
+      what = "/dev/sda1";
+      where = "/mnt/eth";
+      type = "ext4";
 
-        before = [ "sops-nix.service" "sshd.service" ];
-        wantedBy = [ "multi-user.target" ];
-      }
-    ];
+      before = [ "sops-nix.service" "sshd.service" ];
+      wantedBy = [ "multi-user.target" ];
+    };
   };
 
   # Secrets

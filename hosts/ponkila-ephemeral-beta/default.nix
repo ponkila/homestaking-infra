@@ -52,9 +52,9 @@ in
     };
 
     # Mount options
-    mounts = [
+    mounts = {
       # Secrets
-      {
+      secrets = {
         enable = true;
         description = "secrets storage";
 
@@ -64,9 +64,9 @@ in
 
         before = [ "sshd.service" ];
         wantedBy = [ "multi-user.target" ];
-      }
+      };
       # Erigon
-      {
+      erigon = {
         enable = true;
         description = "erigon storage";
 
@@ -76,9 +76,9 @@ in
         type = "btrfs";
 
         wantedBy = [ "multi-user.target" ];
-      }
+      };
       # Lighthouse
-      {
+      lighthouse = {
         enable = true;
         description = "lighthouse storage";
 
@@ -89,7 +89,7 @@ in
 
         wantedBy = [ "multi-user.target" ];
       }
-    ];
+    };
   };
 
   # Secrets
