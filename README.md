@@ -42,64 +42,71 @@ Note: Some of these hosts might be currently being set up and will be added to h
 Tested on Ubuntu 22.04.2 LTS aarch64, 5.15.0-69-generic
 
 - With Nix package manager (recommended)
+
+  ```
+  nix build .#<hostname>
+  ```
+
+  <details>
+  <summary>Install Nix</summary>
+    &nbsp;
+    
+    Allow root to run the Nix installer (optional)
     ```
-    nix build .#<hostname>
+    mkdir -p $HOME/.config/nix
+    echo "build-users-group =" > $HOME/.config/nix/nix.conf
     ```
-    <details>
-    <summary>Install Nix</summary>
 
-      Let root run the nix installer (optional)
-      ```
-      mkdir -p $HOME/.config/nix
-      echo "build-users-group =" > $HOME/.config/nix/nix.conf
-      ```
+    Install Nix in single-user mode
+    ```
+    curl -L https://nixos.org/nix/install | sh
+    . $HOME/.nix-profile/etc/profile.d/nix.sh
+    ```
 
-      Install Nix in single-user mode
-      ```
-      curl -L https://nixos.org/nix/install | sh
-      . $HOME/.nix-profile/etc/profile.d/nix.sh
-      ```
+    Install nix-command
+    ```
+    nix-env -iA nixpkgs.nix
+    ```
 
-      Install nix-command
-      ```
-      nix-env -iA nixpkgs.nix
-      ```
+    Allow experimental features (optional)
+    ```
+    echo "experimental-features = nix-command flakes" >> $HOME/.config/nix/nix.conf
+    ```
 
-      Allow experimental features (optional)
-      ```
-      echo "experimental-features = nix-command flakes" >> $HOME/.config/nix/nix.conf
-      ```
+    Accept nix configuration from a flake (optional)
+    ```
+    echo "accept-flake-config = true" >> $HOME/.config/nix/nix.conf
+    ```
 
-      Accept nix configuration from a flake (optional)
-      ```
-      echo "accept-flake-config = true" >> $HOME/.config/nix/nix.conf
-      ```
-
-    </details>
+  </details>
 
 - Within [Docker](https://docs.docker.com/desktop/install/linux-install/) / [Podman](https://podman.io/docs/tutorials/installation#installing-on-linux)
+  ```
+  podman build . --tag nix-builder --build-arg hostname=<hostname>
+  ```
+
+  ```
+  podman run -v "$PWD:$PWD":z -w "$PWD" nix-builder
+  ```
+
+  <details>
+  <summary>Debug notes</summary>
+    &nbsp;
+
+    This error occurs when `programs.fish.enable` is set to `true`
     ```
-    podman build . --tag nix-builder --build-arg hostname=<hostname>
+    building '/nix/store/dgy59sxqj2wq2418f82n14z9cljzjin4-man-cache.drv'...
+    error: builder for '/nix/store/dgy59sxqj2wq2418f82n14z9cljzjin4-man-cache.drv' failed with exit code 2
+    error: 1 dependencies of derivation '/nix/store/p6lx3x6fxbl7hhch5nnsrxxlcsnw524d-etc-man_db.conf.drv' failed to build
+    error: 1 dependencies of derivation '/nix/store/m341zgn4qz0na8pvf3vkv44im3m9i8q0-etc.drv' failed to build
+    building '/nix/store/yp47gm038kyizbzl1m8y52jq6brkw0da-system-path.drv'...
+    error: 1 dependencies of derivation '/nix/store/31h7aqrpzn2ykbv57xfbyj51zb6pz4fi-nixos-system-ponkila-ephemeral-beta-23.05.20230417.f00994e.drv' failed to build
+    error: 1 dependencies of derivation '/nix/store/as1q3nzf9kpxxcsr08n5y4zdsijj80qw-closure-info.drv' failed to build
+    error: 1 dependencies of derivation '/nix/store/qzl3krxf1z8viz9z3bxi6h0afhyk4s4y-kexec-boot.drv' failed to build
+    error: 1 dependencies of derivation '/nix/store/0ys7pxf0l529gmjpayb9ny37kc68bawf-kexec-tree.drv' failed to build
     ```
 
-    ```
-    podman run -v "$PWD:$PWD":z -w "$PWD" nix-builder
-    ```
-    <details>
-    <summary>Debug notes</summary>
-
-      This error occurs when `programs.fish.enable` is set to `true`
-      ...
-      building '/nix/store/dgy59sxqj2wq2418f82n14z9cljzjin4-man-cache.drv'...
-      error: builder for '/nix/store/dgy59sxqj2wq2418f82n14z9cljzjin4-man-cache.drv' failed with exit code 2
-      error: 1 dependencies of derivation '/nix/store/p6lx3x6fxbl7hhch5nnsrxxlcsnw524d-etc-man_db.conf.drv' failed to build
-      error: 1 dependencies of derivation '/nix/store/m341zgn4qz0na8pvf3vkv44im3m9i8q0-etc.drv' failed to build
-      building '/nix/store/yp47gm038kyizbzl1m8y52jq6brkw0da-system-path.drv'...
-      error: 1 dependencies of derivation '/nix/store/31h7aqrpzn2ykbv57xfbyj51zb6pz4fi-nixos-system-ponkila-ephemeral-beta-23.05.20230417.f00994e.drv' failed to build
-      error: 1 dependencies of derivation '/nix/store/as1q3nzf9kpxxcsr08n5y4zdsijj80qw-closure-info.drv' failed to build
-      error: 1 dependencies of derivation '/nix/store/qzl3krxf1z8viz9z3bxi6h0afhyk4s4y-kexec-boot.drv' failed to build
-      error: 1 dependencies of derivation '/nix/store/0ys7pxf0l529gmjpayb9ny37kc68bawf-kexec-tree.drv' failed to build
-    </details>
+  </details>
 
 ## Disk formatting
 
@@ -117,7 +124,7 @@ This command will format the disks according to the script. Once formatting is c
 
 - kexecTree
   
-  _Outputs: bzImage, initrd, kexec-boot script and netboot iPXE script._
+  Outputs: bzImage, initrd, kexec-boot script and netboot iPXE script.
   
   Deploy: Run the kexec-boot script
   ```
@@ -126,7 +133,8 @@ This command will format the disks according to the script. Once formatting is c
 
   <details>
   <summary>Bootstrap from Hetzner rescue</summary>
-
+    &nbsp;
+    
     ```
     # The installer needs sudo
     apt install -y sudo
@@ -155,7 +163,8 @@ This command will format the disks according to the script. Once formatting is c
 
   <details>
   <summary>Netbooting Raspberry Pi 4 with UEFI Firmware</summary>
-
+    &nbsp;
+    
     We'll be gathering the boot media (/tftpboot folder for PXE booting) in the `/result` directory. Make sure you have the following dependencies installed: docker, unzip.
 
     Clone the project repository and build the EDK2 Raspberry Pi 4 UEFI firmware. 
@@ -202,6 +211,6 @@ This command will format the disks according to the script. Once formatting is c
 
 - isoImage
   
-  _Outputs: ISO image which is loaded into RAM in stage-1_
+  Outputs: ISO image which is loaded into RAM in stage-1
   
   Deploy: Bootable USB drive via [balenaEtcher](https://etcher.balena.io/) or [Ventoy](https://www.ventoy.net/en/index.html)
