@@ -136,6 +136,8 @@
               ./system/formats/netboot-kexec.nix
               ./system/global.nix
               ./system/ramdisk.nix
+              ./home-manager/juuso.nix
+              ./home-manager/kari.nix
               home-manager.nixosModules.home-manager
               disko.nixosModules.disko
               {
