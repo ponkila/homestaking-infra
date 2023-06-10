@@ -24,8 +24,8 @@
       AllowStreamLocalForwarding no
       AuthenticationMethods publickey
     '';
-    passwordAuthentication = false;
-    kbdInteractiveAuthentication = false;
+    settings.PasswordAuthentication = false;
+    settings.KbdInteractiveAuthentication = false;
   };
 
   system.stateVersion = "23.05";
