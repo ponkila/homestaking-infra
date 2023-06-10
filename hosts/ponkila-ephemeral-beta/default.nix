@@ -88,7 +88,7 @@ in
         type = "btrfs";
 
         wantedBy = [ "multi-user.target" ];
-      }
+      };
     };
   };
 
