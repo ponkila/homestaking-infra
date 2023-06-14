@@ -294,13 +294,13 @@
           overlays = import ./overlays { inherit inputs; };
 
           nixosConfigurations = with nixpkgs.lib; {
-            "dinar-ephemeral-alpha" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] dinar-ephemeral-alpha);
-            "hetzner-ephemeral-alpha" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] hetzner-ephemeral-alpha);
-            "dinar-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] dinar-ephemeral-beta);
-            "ponkila-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] ponkila-ephemeral-beta);
+            "dinar-ephemeral-alpha" = nixosSystem dinar-ephemeral-alpha;
+            "hetzner-ephemeral-alpha" = nixosSystem hetzner-ephemeral-alpha;
+            "dinar-ephemeral-beta" = nixosSystem dinar-ephemeral-beta;
+            "ponkila-ephemeral-beta" = nixosSystem ponkila-ephemeral-beta;
           } // (with nixpkgs-stable.lib; {
-            "hetzner-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] hetzner-ephemeral-beta);
-            "ponkila-ephemeral-gamma" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] ponkila-ephemeral-gamma);
+            "hetzner-ephemeral-beta" = nixosSystem hetzner-ephemeral-beta;
+            "ponkila-ephemeral-gamma" = nixosSystem ponkila-ephemeral-gamma;
           });
 
           darwinConfigurations."ponkila-persistent-epsilon" = darwin.lib.darwinSystem {
