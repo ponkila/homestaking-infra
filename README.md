@@ -8,8 +8,8 @@ We are currently working on [HomestakerOS](https://github.com/ponkila/Homestaker
 
 ## Keypoints
 - Multiple NixOS configurations for running Ethereum nodes
+- Utilizes [nixobolus](https://github.com/ponkila/nixobolus) as a comprehensive module for all Ethereum-related components
 - Runs on RAM disk, providing significant performance benefits by reducing I/O operations
-- Utilization of [ethereum.nix](https://github.com/nix-community/ethereum.nix) providing an up-to-date package management solution
 - [Overlays](https://nixos.wiki/wiki/Overlays) offer a convenient way to manually update or modify packages, ideal for addressing issues with upstream sources
 - Deployment secrets using [sops-nix](https://github.com/Mic92/sops-nix) for secure handling of sensitive information
 - Supports declarative disk partitioning via [disko](https://github.com/nix-community/disko)
@@ -124,7 +124,7 @@ This command will format the disks according to the script. Once formatting is c
 
 - kexecTree
   
-  Outputs: bzImage, initrd, kexec-boot script and netboot iPXE script.
+  Output: bzImage, initrd, kexec-boot script and netboot iPXE script
   
   Deploy: Run the kexec-boot script
   ```
@@ -211,6 +211,6 @@ This command will format the disks according to the script. Once formatting is c
 
 - isoImage
   
-  Outputs: ISO image which is loaded into RAM in stage-1
+  Output: ISO image which is loaded into RAM in stage-1
   
-  Deploy: Bootable USB drive via [balenaEtcher](https://etcher.balena.io/) or [Ventoy](https://www.ventoy.net/en/index.html)
+  Deploy: Create a bootable USB drive via [balenaEtcher](https://etcher.balena.io/) or [Ventoy](https://www.ventoy.net/en/index.html)
