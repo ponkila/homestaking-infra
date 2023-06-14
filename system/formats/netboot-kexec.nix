@@ -22,12 +22,12 @@
     }];
   };
 
-  system.build.netbootIpxeScript = pkgs.writeTextDir "netboot.ipxe" ''
+  system.build.netbootIpxeScript = pkgs.writeText "netboot.ipxe" ''
     #!ipxe
     # Use the cmdline variable to allow the user to specify custom kernel params
     # when chainloading this script from other iPXE scripts like netboot.xyz
-    kernel ${pkgs.stdenv.hostPlatform.linux-kernel.target} init=${config.system.build.toplevel}/init initrd=initrd ${toString config.boot.kernelParams} ''${cmdline}
-    initrd initrd
+    kernel bzImage init=${config.system.build.toplevel}/init initrd=initrd.zst ${toString config.boot.kernelParams} ''${cmdline}
+    initrd initrd.zst
     boot
   '';
 
@@ -59,6 +59,10 @@
     {
       name = "kexec-boot";
       path = config.system.build.kexecScript;
+    }
+    {
+      name = "netboot.ipxe";
+      path = config.system.build.netbootIpxeScript;
     }
   ];
 }

@@ -106,6 +106,7 @@
           "hetzner-ephemeral-beta" = hetzner-ephemeral-beta.config.system.build.kexecTree;
           "dinar-ephemeral-beta" = dinar-ephemeral-beta.config.system.build.isoImage;
           "ponkila-ephemeral-beta" = ponkila-ephemeral-beta.config.system.build.kexecTree;
+          "ponkila-ephemeral-gamma" = ponkila-ephemeral-gamma.config.system.build.kexecTree;
         };
       };
       flake =
@@ -138,6 +139,49 @@
                   sops-nix.homeManagerModules.sops
                 ];
               }
+              {
+                boot.loader.systemd-boot.enable = true;
+                boot.loader.efi.canTouchEfiVariables = true;
+              }
+            ];
+          };
+
+          ponkila-ephemeral-gamma = {
+            system = "aarch64-linux";
+            specialArgs = { inherit inputs outputs; };
+            modules = [
+              ./hosts/ponkila-ephemeral-gamma
+              ./system/formats/netboot-kexec.nix
+              ./system/global.nix
+              ./system/ramdisk.nix
+              ./home-manager/core.nix
+              home-manager.nixosModules.home-manager
+              disko.nixosModules.disko
+              {
+                nixpkgs.overlays = [
+                  ethereum-nix.overlays.default
+                  outputs.overlays.additions
+                  outputs.overlays.modifications
+                  # Workaround for https://github.com/NixOS/nixpkgs/issues/154163
+                  # This issue only happens with the isoImage format
+                  (final: super: {
+                    makeModulesClosure = x:
+                      super.makeModulesClosure (x // { allowMissing = true; });
+                  })
+                ];
+              }
+              {
+                home-manager.sharedModules = [
+                  sops-nix.homeManagerModules.sops
+                ];
+              }
+              {
+                boot.loader.raspberryPi = {
+                  enable = true;
+                  version = 4;
+                };
+                boot.loader.grub.enable = false;
+              }
             ];
           };
 
@@ -164,6 +208,10 @@
                   sops-nix.homeManagerModules.sops
                 ];
               }
+              {
+                boot.loader.systemd-boot.enable = true;
+                boot.loader.efi.canTouchEfiVariables = true;
+              }
             ];
           };
 
@@ -189,6 +237,10 @@
                 home-manager.sharedModules = [
                   sops-nix.homeManagerModules.sops
                 ];
+              }
+              {
+                boot.loader.systemd-boot.enable = true;
+                boot.loader.efi.canTouchEfiVariables = true;
               }
             ];
           };
@@ -261,6 +313,7 @@
             "ponkila-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] ponkila-ephemeral-beta);
           } // (with nixpkgs-stable.lib; {
             "hetzner-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] hetzner-ephemeral-beta);
+            "ponkila-ephemeral-gamma" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] ponkila-ephemeral-gamma);
           });
 
           darwinConfigurations."ponkila-persistent-epsilon" = darwin.lib.darwinSystem {
