@@ -19,15 +19,14 @@
     darwin.url = "github:lnl7/nix-darwin";
     disko.inputs.nixpkgs.follows = "nixpkgs";
     disko.url = "github:nix-community/disko";
-    ethereum-nix.inputs.nixpkgs.follows = "nixpkgs";
-    ethereum-nix.url = "github:nix-community/ethereum.nix";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-root.url = "github:srid/flake-root";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
+    nixobolus.url = "github:ponkila/nixobolus";
     mission-control.url = "github:Platonic-Systems/mission-control";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-22.11";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-23.05";
     pre-commit-hooks-nix.url = "github:hercules-ci/pre-commit-hooks.nix/flakeModule";
     sops-nix.url = "github:Mic92/sops-nix";
   };
@@ -37,9 +36,9 @@
     { self
     , darwin
     , disko
-    , ethereum-nix
     , flake-parts
     , home-manager
+    , nixobolus
     , nixpkgs
     , nixpkgs-stable
     , sops-nix
@@ -118,18 +117,14 @@
             specialArgs = { inherit inputs outputs; };
             modules = [
               ./hosts/ponkila-ephemeral-beta
-              ./modules/eth/erigon.nix
-              ./modules/eth/lighthouse-beacon.nix
-              ./modules/eth/mev-boost.nix
               ./system/formats/netboot-kexec.nix
               ./system/global.nix
               ./system/ramdisk.nix
-              ./home-manager/core.nix
+              nixobolus.nixosModules.homestakeros
               home-manager.nixosModules.home-manager
               disko.nixosModules.disko
               {
                 nixpkgs.overlays = [
-                  ethereum-nix.overlays.default
                   outputs.overlays.additions
                   outputs.overlays.modifications
                 ];
@@ -154,12 +149,12 @@
               ./system/formats/netboot-kexec.nix
               ./system/global.nix
               ./system/ramdisk.nix
-              ./home-manager/core.nix
+              ./home-manager/juuso.nix
+              ./home-manager/kari.nix
               home-manager.nixosModules.home-manager
               disko.nixosModules.disko
               {
                 nixpkgs.overlays = [
-                  ethereum-nix.overlays.default
                   outputs.overlays.additions
                   outputs.overlays.modifications
                   # Workaround for https://github.com/NixOS/nixpkgs/issues/154163
@@ -250,17 +245,13 @@
             specialArgs = { inherit inputs outputs; };
             modules = [
               ./hosts/dinar-ephemeral-alpha
-              ./modules/eth/erigon.nix
-              ./modules/eth/lighthouse-beacon.nix
-              ./modules/eth/mev-boost.nix
               ./system/formats/copytoram-iso.nix
               ./system/global.nix
-              ./home-manager/core.nix
+              nixobolus.nixosModules.homestakeros
               home-manager.nixosModules.home-manager
               disko.nixosModules.disko
               {
                 nixpkgs.overlays = [
-                  ethereum-nix.overlays.default
                   outputs.overlays.additions
                   outputs.overlays.modifications
                 ];
@@ -278,17 +269,13 @@
             specialArgs = { inherit inputs outputs; };
             modules = [
               ./hosts/dinar-ephemeral-beta
-              ./modules/eth/erigon.nix
-              ./modules/eth/lighthouse-beacon.nix
-              ./modules/eth/mev-boost.nix
               ./system/formats/copytoram-iso.nix
               ./system/global.nix
-              ./home-manager/core.nix
+              nixobolus.nixosModules.homestakeros
               home-manager.nixosModules.home-manager
               disko.nixosModules.disko
               {
                 nixpkgs.overlays = [
-                  ethereum-nix.overlays.default
                   outputs.overlays.additions
                   outputs.overlays.modifications
                 ];
