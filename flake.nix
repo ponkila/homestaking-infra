@@ -27,6 +27,7 @@
     mission-control.url = "github:Platonic-Systems/mission-control";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-23.05";
+    pre-commit-hooks-nix.url = "github:hercules-ci/pre-commit-hooks.nix/flakeModule";
     sops-nix.url = "github:Mic92/sops-nix";
   };
 
@@ -49,6 +50,7 @@
       imports = [
         inputs.flake-root.flakeModule
         inputs.mission-control.flakeModule
+        inputs.pre-commit-hooks-nix.flakeModule
       ];
       systems = [
         "aarch64-darwin"
@@ -58,6 +60,14 @@
       ];
       perSystem = { pkgs, lib, config, system, ... }: {
         formatter = nixpkgs.legacyPackages.${system}.nixpkgs-fmt;
+
+        pre-commit.settings = {
+          hooks = {
+            shellcheck.enable = true;
+            nixpkgs-fmt.enable = true;
+          };
+        };
+
         mission-control.scripts = {
           nix-diff = {
             description = "Diff current and main branch builds.";
@@ -67,25 +77,28 @@
             category = "Tools";
           };
         };
-        devShells = {
-          default = pkgs.mkShell {
-            nativeBuildInputs = with pkgs; [
-              git
-              nix
-              nix-tree
-              jq
-              sops
-              ssh-to-age
-              rsync
-              zstd
-              cpio
-            ];
-            inputsFrom = [
-              config.flake-root.devShell
-              config.mission-control.devShell
-            ];
-          };
+
+        devShells.default = pkgs.mkShell {
+          nativeBuildInputs = with pkgs; [
+            git
+            nix
+            nix-tree
+            jq
+            sops
+            ssh-to-age
+            rsync
+            zstd
+            cpio
+          ];
+          inputsFrom = [
+            config.flake-root.devShell
+            config.mission-control.devShell
+          ];
+          shellHook = ''
+            ${config.pre-commit.installationScript}
+          '';
         };
+
         packages = with flake.nixosConfigurations; {
           "dinar-ephemeral-alpha" = dinar-ephemeral-alpha.config.system.build.isoImage;
           "hetzner-ephemeral-alpha" = hetzner-ephemeral-alpha.config.system.build.kexecTree;

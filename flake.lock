@@ -308,6 +308,21 @@
         "type": "github"
       }
     },
+    "flake-utils_2": {
+      "locked": {
+        "lastModified": 1667077288,
+        "narHash": "sha256-bdC8sFNDpT0HK74u9fUkpbf1MEzVYJ+ka7NXCdgBoaA=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "6ee9ebb6b1ee695d2cacc4faa053a7b9baa76817",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
     "foundry-nix": {
       "inputs": {
         "flake-utils": "flake-utils",
@@ -471,11 +486,11 @@
         "nixpkgs-stable": "nixpkgs-stable"
       },
       "locked": {
-        "lastModified": 1686742145,
-        "narHash": "sha256-PJSXG1kDfg3DPIEzxXLAclCOhlSHkL+ontWufLnhBwI=",
+        "lastModified": 1686746218,
+        "narHash": "sha256-I1UP6gDzhKHt1SvYY5OfmPapugLMuUhmpXq+PPlPG54=",
         "owner": "ponkila",
         "repo": "nixobolus",
-        "rev": "9f4059ef52af421518a3f009de7bf4f62019ab81",
+        "rev": "fcdbde953ae3573ad70ed2a4e2fa2f0fe72a892e",
         "type": "github"
       },
       "original": {
@@ -667,6 +682,20 @@
     },
     "nixpkgs_5": {
       "locked": {
+        "lastModified": 1667292599,
+        "narHash": "sha256-7ISOUI1aj6UKMPIL+wwthENL22L3+A9V+jS8Is3QsRo=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "ef2f213d9659a274985778bff4ca322f3ef3ac68",
+        "type": "github"
+      },
+      "original": {
+        "id": "nixpkgs",
+        "type": "indirect"
+      }
+    },
+    "nixpkgs_6": {
+      "locked": {
         "lastModified": 1686398752,
         "narHash": "sha256-nGWNQVhSw4VSL+S0D0cbrNR9vs9Bq7rlYR+1K5f5j6w=",
         "owner": "NixOS",
@@ -681,6 +710,26 @@
         "type": "github"
       }
     },
+    "pre-commit-hooks-nix": {
+      "inputs": {
+        "flake-utils": "flake-utils_2",
+        "nixpkgs": "nixpkgs_5"
+      },
+      "locked": {
+        "lastModified": 1667612001,
+        "narHash": "sha256-bnXYCDzkviKNeYwnh3YW2HpgSgUMnSGVsTtHNLXBXfE=",
+        "owner": "hercules-ci",
+        "repo": "pre-commit-hooks.nix",
+        "rev": "1ee64b852871d790a49f0b8e17b788f5eeb2d52a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hercules-ci",
+        "ref": "flakeModule",
+        "repo": "pre-commit-hooks.nix",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "darwin": "darwin",
@@ -692,12 +741,13 @@
         "nixobolus": "nixobolus",
         "nixpkgs": "nixpkgs_4",
         "nixpkgs-stable": "nixpkgs-stable_2",
+        "pre-commit-hooks-nix": "pre-commit-hooks-nix",
         "sops-nix": "sops-nix"
       }
     },
     "sops-nix": {
       "inputs": {
-        "nixpkgs": "nixpkgs_5",
+        "nixpkgs": "nixpkgs_6",
         "nixpkgs-stable": "nixpkgs-stable_3"
       },
       "locked": {
