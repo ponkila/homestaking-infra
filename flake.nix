@@ -19,6 +19,8 @@
     darwin.url = "github:lnl7/nix-darwin";
     disko.inputs.nixpkgs.follows = "nixpkgs";
     disko.url = "github:nix-community/disko";
+    ethereum-nix.url = "github:nix-community/ethereum.nix";
+    ethereum-nix.inputs.nixpkgs.follows = "nixpkgs";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-root.url = "github:srid/flake-root";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
@@ -89,6 +91,7 @@
             rsync
             zstd
             cpio
+            inputs.ethereum-nix.packages.${system}.staking-deposit-cli
           ];
           inputsFrom = [
             config.flake-root.devShell
