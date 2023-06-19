@@ -149,10 +149,9 @@
               ./system/formats/netboot-kexec.nix
               ./system/global.nix
               ./system/ramdisk.nix
-              ./home-manager/juuso.nix
-              ./home-manager/kari.nix
-              home-manager.nixosModules.home-manager
+              nixobolus.nixosModules.homestakeros
               disko.nixosModules.disko
+              sops-nix.nixosModules.sops
               {
                 nixpkgs.overlays = [
                   outputs.overlays.additions
@@ -163,11 +162,6 @@
                     makeModulesClosure = x:
                       super.makeModulesClosure (x // { allowMissing = true; });
                   })
-                ];
-              }
-              {
-                home-manager.sharedModules = [
-                  sops-nix.homeManagerModules.sops
                 ];
               }
               {
