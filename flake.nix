@@ -69,10 +69,10 @@
         };
 
         mission-control.scripts = {
-          nix-diff = {
-            description = "Diff current and main branch builds.";
+          get-graphs = {
+            description = "Get and update graphs (derivation trees)";
             exec = ''
-              sh ./scripts/nix-diff.sh "$@"
+              sh ./scripts/get-graphs.sh
             '';
             category = "Tools";
           };
