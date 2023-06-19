@@ -67,29 +67,17 @@ in
   };
 
   # Secrets
-  home-manager.users = {
-    root = { pkgs, ... }: {
-      sops = {
-        defaultSopsFile = ./secrets/default.yaml;
-        secrets = {
-          "wireguard/wg0" = {
-            path = "%r/wireguard/wg0.conf";
-          };
-        };
-        age.sshKeyPaths = [ sshKeysPath ];
+  sops = {
+    defaultSopsFile = ./secrets/default.yaml;
+    secrets = {
+      "wireguard/wg0" = {
+        path = "%r/wireguard/wg0.conf";
+      };
+      "jwt.hex" = {
+        path = "%r/jwt.hex";
       };
     };
-    core = { pkgs, ... }: {
-      sops = {
-        defaultSopsFile = ./secrets/default.yaml;
-        secrets = {
-          "jwt.hex" = {
-            path = "%r/jwt.hex";
-          };
-        };
-        age.sshKeyPaths = [ sshKeysPath ];
-      };
-    };
+    age.sshKeyPaths = [ sshKeysPath ];
   };
 
   system.stateVersion = "23.05";

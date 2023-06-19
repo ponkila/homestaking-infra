@@ -93,14 +93,12 @@ in
   };
 
   # Secrets
-  home-manager.users.core = { pkgs, ... }: {
-    sops = {
-      defaultSopsFile = ./secrets/default.yaml;
-      secrets."wireguard/wg0" = {
-        path = "%r/wireguard/wg0.conf";
-      };
-      age.sshKeyPaths = [ sshKeysPath ];
+  sops = {
+    defaultSopsFile = ./secrets/default.yaml;
+    secrets."wireguard/wg0" = {
+      path = "%r/wireguard/wg0.conf";
     };
+    age.sshKeyPaths = [ sshKeysPath ];
   };
 
   # Enable an ONC RPC directory service used by NFS

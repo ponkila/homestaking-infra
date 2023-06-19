@@ -121,17 +121,12 @@
               ./system/global.nix
               ./system/ramdisk.nix
               nixobolus.nixosModules.homestakeros
-              home-manager.nixosModules.home-manager
               disko.nixosModules.disko
+              sops-nix.nixosModules.sops
               {
                 nixpkgs.overlays = [
                   outputs.overlays.additions
                   outputs.overlays.modifications
-                ];
-              }
-              {
-                home-manager.sharedModules = [
-                  sops-nix.homeManagerModules.sops
                 ];
               }
               {
@@ -193,11 +188,6 @@
                 ];
               }
               {
-                home-manager.sharedModules = [
-                  sops-nix.homeManagerModules.sops
-                ];
-              }
-              {
                 boot.loader.systemd-boot.enable = true;
                 boot.loader.efi.canTouchEfiVariables = true;
               }
@@ -223,11 +213,6 @@
                 ];
               }
               {
-                home-manager.sharedModules = [
-                  sops-nix.homeManagerModules.sops
-                ];
-              }
-              {
                 boot.loader.systemd-boot.enable = true;
                 boot.loader.efi.canTouchEfiVariables = true;
               }
@@ -242,17 +227,12 @@
               ./system/formats/copytoram-iso.nix
               ./system/global.nix
               nixobolus.nixosModules.homestakeros
-              home-manager.nixosModules.home-manager
               disko.nixosModules.disko
+              sops-nix.nixosModules.sops
               {
                 nixpkgs.overlays = [
                   outputs.overlays.additions
                   outputs.overlays.modifications
-                ];
-              }
-              {
-                home-manager.sharedModules = [
-                  sops-nix.homeManagerModules.sops
                 ];
               }
             ];
@@ -266,17 +246,12 @@
               ./system/formats/copytoram-iso.nix
               ./system/global.nix
               nixobolus.nixosModules.homestakeros
-              home-manager.nixosModules.home-manager
               disko.nixosModules.disko
+              sops-nix.nixosModules.sops
               {
                 nixpkgs.overlays = [
                   outputs.overlays.additions
                   outputs.overlays.modifications
-                ];
-              }
-              {
-                home-manager.sharedModules = [
-                  sops-nix.homeManagerModules.sops
                 ];
               }
             ];
