@@ -56,7 +56,7 @@ for hostname in "${hostnames[@]}"; do
   # Get sorted build tree
   build_path=$(nix path-info --derivation .#"${hostname}" "${nix_flags[@]}" | tail -n 1)
   nix-store --query --requisites "$build_path" \
-    | awk -F'-' '{ print $2, $0 }' \
-    | sort -k1 \
-    | cut -d' ' -f2- >"$host_path/$hostname/nix-store-query.txt"
+    | awk -F'-' '{ print $0 }' \
+    | sort -t'-' -k2,2 -k3 \
+    | awk -F'/' '{ print $NF }' > "$host_path/$hostname/nix-store-query.txt"
 done
