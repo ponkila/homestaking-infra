@@ -45,7 +45,7 @@ fi
 # Fetch hostnames from $host_path
 hostnames=($(find "$host_path" -mindepth 1 -maxdepth 1 -type d -exec basename {} \;))
 
-# Build from the current branch
+# Loop trough hostnames
 for hostname in "${hostnames[@]}"; do
   # Skip if hostname is in the exclude list
   if [[ " ${exclude_hosts[*]} " =~ $hostname ]]; then
@@ -55,6 +55,6 @@ for hostname in "${hostnames[@]}"; do
 
   # Get sorted build tree
   build_path=$(nix path-info --derivation .#"${hostname}" "${nix_flags[@]}" | tail -n 1)
-  nix-store --query --requisites "$build_path" | sort -t'-' -k2 > "$host_path/$hostname/nix-store-query.txt"
-
+  nix-store --query --requisites "$build_path" \
+    | sort -t'-' -k2 > "$host_path/$hostname/nix-store-query.txt"
 done
