@@ -69,10 +69,10 @@
         };
 
         mission-control.scripts = {
-          get-graphs = {
-            description = "Get and update graphs (derivation trees)";
+          nsq = {
+            description = "Update and get the nix-store quaries.";
             exec = ''
-              sh ./scripts/get-graphs.sh
+              sh ./scripts/get-store-quaries.sh
             '';
             category = "Tools";
           };
