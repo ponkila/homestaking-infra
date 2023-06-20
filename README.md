@@ -47,7 +47,7 @@ ponkila-persistent-epsilon | x86-64 | | Darwin
   <summary>Install Nix</summary>
     &nbsp;
     
-    Allow root to run the Nix installer (optional)
+    Allow root to run the Nix installer (**optional**)
     ```
     mkdir -p $HOME/.config/nix
     echo "build-users-group =" > $HOME/.config/nix/nix.conf
@@ -131,26 +131,36 @@ This command will format the disks according to the script. Once formatting is c
   <summary>Bootstrap from Hetzner rescue</summary>
     &nbsp;
     
+    The installer needs sudo
     ```
-    # The installer needs sudo
     apt install -y sudo
+    ```
 
-    # Allow root to run the Nix installer
+    Allow root to run the Nix installer
+    ```
     mkdir -p /etc/nix
     echo "build-users-group =" > /etc/nix/nix.conf
+    ```
 
-    # Install Nix in single-user mode
+    Install Nix in single-user mode
+    ```
     curl -L https://nixos.org/nix/install | sh
     . $HOME/.nix-profile/etc/profile.d/nix.sh
+    ```
 
-    # Install nix-command
+    Install nix-command
+    ```
     nix-env -iA nixpkgs.nix
+    ```
 
-    # Clone the repository and build the system
+    Clone the repository and build the system
+    ```
     git clone https://github.com/ponkila/homestaking-infra.git
     nix build --extra-experimental-features "nix-command flakes" .#<hostname>
+    ```
 
-    # Install kexec-tools and run the script
+    Install kexec-tools and run the kexec-boot script
+    ```
     apt-get install kexec-tools
     sudo ./result/kexec-tree
     ```
@@ -160,8 +170,8 @@ This command will format the disks according to the script. Once formatting is c
   <details>
   <summary>Netbooting Raspberry Pi 4 with UEFI Firmware</summary>
     &nbsp;
-    
-    We'll be gathering the boot media (/tftpboot folder for PXE booting) in the `/result` directory. Make sure you have the following dependencies installed: docker, unzip.
+
+    We'll be gathering the boot media (/tftpboot folder for PXE booting) in the `/result` directory. Make sure you have the following dependencies installed: docker, unzip. Note: **This guide does not provide instructions on setting up the method for serving the boot media files.**
 
     Clone the project repository and build the EDK2 Raspberry Pi 4 UEFI firmware. 
     ```
@@ -188,7 +198,7 @@ This command will format the disks according to the script. Once formatting is c
     cp -n overlays/* result/overlays/
     ```
 
-    Replace the autoexec.ipxe file in the projects folder with your own custom ipxe script.
+    Replace the `autoexec.ipxe` file in the projects folder with your own custom iPXE script, and place the contents of the `result` directory in a directory used to serve the boot media from.
     ```
     cat > result/efi/boot/autoexec.ipxe << EOF
     #!ipxe
