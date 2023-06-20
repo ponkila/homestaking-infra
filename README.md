@@ -35,11 +35,7 @@ ponkila-ephemeral-beta | x86-64 | kexecTree | Lighthouse + Erigon
 ponkila-ephemeral-gamma | aarch64 | kexecTree | Raspberry Pi 4 
 ponkila-persistent-epsilon | x86-64 | | Darwin
 
-Note: Some of these hosts might be currently being set up and will be added to hosts directory soon.
-
 ## Building (no cross-compile)
-
-Tested on Ubuntu 22.04.2 LTS aarch64, 5.15.0-69-generic
 
 - With Nix package manager (recommended)
 
