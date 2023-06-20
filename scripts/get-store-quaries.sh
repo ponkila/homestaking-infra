@@ -36,7 +36,7 @@ cleanup() {
 find "$script_dir/.." -type f -name 'nix-store-query.txt' -exec rm -f {} \;
 
 # Stash any uncommitted changes (including untracked files)
-if [[ -n $(git status --porcelain) ]]; then
+if [[ -n $(git diff --quiet --exit-code) ]]; then
   echo "Stashing uncommitted changes..."
   git stash push --include-untracked >/dev/null
   stash_created=true
