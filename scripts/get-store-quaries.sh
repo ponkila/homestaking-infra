@@ -27,7 +27,7 @@ cleanup() {
   # Restore the stashed changes if they were created
   if [[ $stash_created ]]; then
     echo "Restoring stashed changes..."
-    git stash pop >/dev/null
+    git stash pop
   fi
   exit 0
 }
@@ -38,7 +38,7 @@ find "$script_dir/.." -type f -name 'nix-store-query.txt' -exec rm -f {} \;
 # Stash any uncommitted changes (including untracked files)
 if [[ -n $(git diff --quiet --exit-code) ]]; then
   echo "Stashing uncommitted changes..."
-  git stash push --include-untracked >/dev/null
+  git stash push --include-untracked
   stash_created=true
 fi
 
