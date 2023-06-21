@@ -2,7 +2,7 @@
 Ethereum home-staking infrastructure powered by Nix
 
 ## About
-Transparency is crucial for spreading knowledge among Ethereum infrastructures, benefiting new home-stakers and maintainers to improve their existing setup. With Nix, the entire configuration of the real, working infrastructure can be seen at glance. This is extremely useful for those involved in the maintenance of these machines, as it provides a clear understanding of what's under the hood.
+Transparency is crucial for spreading knowledge among Ethereum infrastructures, benefiting new home-stakers and maintainers to improve their existing setup. With Nix, the entire configuration of the real, working infrastructure can be seen at glance. This is also extremely useful for those involved in the maintenance of these machines, as it provides a clear understanding of what's under the hood.
 
 We are currently working on [HomestakerOS](https://github.com/ponkila/HomestakerOS) and [Nixobolus](https://github.com/ponkila/nixobolus), which are designed to provide users with an easy way to configure, build and deploy this kind of infrastructure via WebUI.
 
@@ -22,6 +22,7 @@ We are currently working on [HomestakerOS](https://github.com/ponkila/Homestaker
 - `modules`: Shared module configurations.
 - `overlay`: Patches and version overrides for some packages.
 - `pkgs`: Our custom packages.
+- `scripts`: Nix devshell scripts. Accessible via `nix develop`.
 - `system`: Shared system configurations and formats.
 
 ## Hosts
@@ -171,7 +172,7 @@ This command will format the disks according to the script. Once formatting is c
   <summary>Netbooting Raspberry Pi 4 with UEFI Firmware</summary>
     &nbsp;
 
-    We'll be gathering the boot media (/tftpboot folder for PXE booting) in the `/result` directory. Make sure you have the following dependencies installed: docker, unzip. Note: **This guide does not provide instructions on setting up the method for serving the boot media files.**
+    We'll be gathering the boot media (/tftpboot folder for PXE booting) in the `result` directory. Make sure you have the following dependencies installed: docker, unzip. Note: **This guide does not provide instructions on setting up the method for serving the boot media files.**
 
     Clone the project repository and build the EDK2 Raspberry Pi 4 UEFI firmware. 
     ```
