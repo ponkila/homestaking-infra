@@ -5,9 +5,8 @@
 
   # Modifies existing packages
   modifications = final: prev: {
-    lighthouse = prev.lighthouse.overrideAttrs (oldAttrs: rec {
-      # Enables aggressive optimisations including full LTO
-      PROFILE = "maxperf";
-    });
+    # example = prev.example.overrideAttrs (oldAttrs: rec {
+    # ...
+    # });
   };
 }

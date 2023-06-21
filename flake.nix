@@ -22,7 +22,7 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-root.url = "github:srid/flake-root";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
-    home-manager.url = "github:nix-community/home-manager";
+    home-manager.url = "github:nix-community/home-manager/release-23.05";
     nixobolus.url = "github:ponkila/nixobolus";
     mission-control.url = "github:Platonic-Systems/mission-control";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -121,17 +121,12 @@
               ./system/global.nix
               ./system/ramdisk.nix
               nixobolus.nixosModules.homestakeros
-              home-manager.nixosModules.home-manager
               disko.nixosModules.disko
+              sops-nix.nixosModules.sops
               {
                 nixpkgs.overlays = [
                   outputs.overlays.additions
                   outputs.overlays.modifications
-                ];
-              }
-              {
-                home-manager.sharedModules = [
-                  sops-nix.homeManagerModules.sops
                 ];
               }
               {
@@ -149,10 +144,9 @@
               ./system/formats/netboot-kexec.nix
               ./system/global.nix
               ./system/ramdisk.nix
-              ./home-manager/juuso.nix
-              ./home-manager/kari.nix
-              home-manager.nixosModules.home-manager
+              nixobolus.nixosModules.homestakeros
               disko.nixosModules.disko
+              sops-nix.nixosModules.sops
               {
                 nixpkgs.overlays = [
                   outputs.overlays.additions
@@ -163,11 +157,6 @@
                     makeModulesClosure = x:
                       super.makeModulesClosure (x // { allowMissing = true; });
                   })
-                ];
-              }
-              {
-                home-manager.sharedModules = [
-                  sops-nix.homeManagerModules.sops
                 ];
               }
               {
@@ -199,11 +188,6 @@
                 ];
               }
               {
-                home-manager.sharedModules = [
-                  sops-nix.homeManagerModules.sops
-                ];
-              }
-              {
                 boot.loader.systemd-boot.enable = true;
                 boot.loader.efi.canTouchEfiVariables = true;
               }
@@ -229,11 +213,6 @@
                 ];
               }
               {
-                home-manager.sharedModules = [
-                  sops-nix.homeManagerModules.sops
-                ];
-              }
-              {
                 boot.loader.systemd-boot.enable = true;
                 boot.loader.efi.canTouchEfiVariables = true;
               }
@@ -248,17 +227,12 @@
               ./system/formats/copytoram-iso.nix
               ./system/global.nix
               nixobolus.nixosModules.homestakeros
-              home-manager.nixosModules.home-manager
               disko.nixosModules.disko
+              sops-nix.nixosModules.sops
               {
                 nixpkgs.overlays = [
                   outputs.overlays.additions
                   outputs.overlays.modifications
-                ];
-              }
-              {
-                home-manager.sharedModules = [
-                  sops-nix.homeManagerModules.sops
                 ];
               }
             ];
@@ -272,17 +246,12 @@
               ./system/formats/copytoram-iso.nix
               ./system/global.nix
               nixobolus.nixosModules.homestakeros
-              home-manager.nixosModules.home-manager
               disko.nixosModules.disko
+              sops-nix.nixosModules.sops
               {
                 nixpkgs.overlays = [
                   outputs.overlays.additions
                   outputs.overlays.modifications
-                ];
-              }
-              {
-                home-manager.sharedModules = [
-                  sops-nix.homeManagerModules.sops
                 ];
               }
             ];
@@ -294,13 +263,13 @@
           overlays = import ./overlays { inherit inputs; };
 
           nixosConfigurations = with nixpkgs.lib; {
-            "dinar-ephemeral-alpha" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] dinar-ephemeral-alpha);
-            "hetzner-ephemeral-alpha" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] hetzner-ephemeral-alpha);
-            "dinar-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] dinar-ephemeral-beta);
-            "ponkila-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] ponkila-ephemeral-beta);
+            "dinar-ephemeral-alpha" = nixosSystem dinar-ephemeral-alpha;
+            "hetzner-ephemeral-alpha" = nixosSystem hetzner-ephemeral-alpha;
+            "dinar-ephemeral-beta" = nixosSystem dinar-ephemeral-beta;
+            "ponkila-ephemeral-beta" = nixosSystem ponkila-ephemeral-beta;
           } // (with nixpkgs-stable.lib; {
-            "hetzner-ephemeral-beta" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] hetzner-ephemeral-beta);
-            "ponkila-ephemeral-gamma" = nixosSystem (getAttrs [ "system" "specialArgs" "modules" ] ponkila-ephemeral-gamma);
+            "hetzner-ephemeral-beta" = nixosSystem hetzner-ephemeral-beta;
+            "ponkila-ephemeral-gamma" = nixosSystem ponkila-ephemeral-gamma;
           });
 
           darwinConfigurations."ponkila-persistent-epsilon" = darwin.lib.darwinSystem {
