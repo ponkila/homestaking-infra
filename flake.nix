@@ -65,8 +65,18 @@
           hooks = {
             shellcheck.enable = true;
             nixpkgs-fmt.enable = true;
+            flakecheck = {
+              enable = true;
+              name = "flakecheck";
+              description = "Check whether the flake evaluates and run its tests";
+              entry = "nix flake check --no-warn-dirty";
+              language = "system";
+              pass_filenames = false;
+            };
           };
         };
+        # Do not perform pre-commit hooks w/ nix flake check
+        pre-commit.check.enable = false;
 
         mission-control.scripts = {
           nsq = {
