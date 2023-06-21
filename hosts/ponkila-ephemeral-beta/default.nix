@@ -60,6 +60,7 @@ in
 
         what = "/dev/disk/by-label/secrets";
         where = "/var/mnt/secrets";
+        options = "subvolid=256";
         type = "btrfs";
 
         before = [ "sshd.service" ];
