@@ -70,10 +70,17 @@
 
         mission-control.scripts = {
           nsq = {
-            description = "Update and get the nix-store quaries.";
-            exec = ''
-              sh ./scripts/get-store-quaries.sh
+            description = ''
+              Update and get the nix-store quaries.
             '';
+            exec = ''sh ./scripts/get-store-quaries.sh'';
+            category = "Tools";
+          };
+          qemu = {
+            description = ''
+              Boot x86_64 kexecTree host in qemu.
+            '';
+            exec = ''sh ./scripts/init-qemu.sh "$@"'';
             category = "Tools";
           };
         };
