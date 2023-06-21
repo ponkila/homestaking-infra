@@ -69,10 +69,10 @@
         };
 
         mission-control.scripts = {
-          nix-diff = {
-            description = "Diff current and main branch builds.";
+          nsq = {
+            description = "Update and get the nix-store quaries.";
             exec = ''
-              sh ./scripts/nix-diff.sh "$@"
+              sh ./scripts/get-store-quaries.sh
             '';
             category = "Tools";
           };
