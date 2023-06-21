@@ -27,11 +27,6 @@ in
         enable = true;
       };
 
-      direnv = {
-        enable = true;
-        nix-direnv.enable = true;
-      };
-
       fish = {
         enable = true;
         vendor = {
@@ -87,6 +82,10 @@ in
         htop.enable = true;
         vim.enable = true;
         git.enable = true;
+        direnv = {
+          enable = true;
+          nix-direnv.enable = true;
+        };
 
         home-manager.enable = true;
       };
