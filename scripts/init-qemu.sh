@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# script for testing `kexecTree` hosts in qemu
+# script to boot up a host using qemu
 # usage: sh ./scripts/init-qemu.sh <hostname>
 # deps: nix qemu
 
