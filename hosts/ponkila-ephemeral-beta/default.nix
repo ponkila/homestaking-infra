@@ -30,11 +30,18 @@ in
       privateKeyPath = sshKeysPath;
     };
 
+    # Wireguard options
+    wireguard = {
+      enable = true;
+      configFile = config.sops.secrets."wireguard/wg0".path;
+    };
+
     # Erigon options
     erigon = {
       enable = true;
       endpoint = "http://${infra.ip}:8551";
       datadir = erigon.datadir;
+      jwtSecretFile = "/var/mnt/erigon/jwt.hex";
     };
 
     # Lighthouse options
@@ -49,6 +56,7 @@ in
         history-length = 256;
         max-db-size = 16;
       };
+      jwtSecretFile = "/var/mnt/lighthouse/jwt.hex";
     };
 
     # Mount options
@@ -97,7 +105,7 @@ in
   sops = {
     defaultSopsFile = ./secrets/default.yaml;
     secrets."wireguard/wg0" = {
-      path = "%r/wireguard/wg0.conf";
+      sopsFile = ./secrets/default.yaml;
     };
     age.sshKeyPaths = [ sshKeysPath ];
   };
