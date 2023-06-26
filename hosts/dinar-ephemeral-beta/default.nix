@@ -76,7 +76,6 @@ in
 
   # Secrets
   sops = {
-    defaultSopsFile = ./secrets/default.yaml;
     secrets."wireguard/wg0" = {
       sopsFile = ./secrets/default.yaml;
     };
