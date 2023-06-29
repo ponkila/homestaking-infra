@@ -28,27 +28,27 @@ in
 
     # SSH (system level) options
     ssh = {
-      privateKeyPath = sshKeysPath;
+      privateKeyFile = sshKeysPath;
     };
 
     # Erigon options
     erigon = {
       enable = true;
       endpoint = "http://${infra.ip}:8551";
-      datadir = "/mnt/eth/erigon";
+      dataDir = "/mnt/eth/erigon";
     };
 
     # Lighthouse options
     lighthouse = {
       enable = true;
       endpoint = "http://${infra.ip}:5052";
-      datadir = "/mnt/eth/lighthouse";
-      exec.endpoint = "http://${infra.ip}:8551";
+      dataDir = "/mnt/eth/lighthouse";
+      execEndpoint = "http://${infra.ip}:8551";
       mev-boost.endpoint = "http://${infra.ip}:18550";
       slasher = {
         enable = false;
-        history-length = 256;
-        max-db-size = 16;
+        historyLength = 256;
+        maxDatabaseSize = 16;
       };
     };
 

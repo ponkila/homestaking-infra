@@ -20,27 +20,6 @@
         "type": "github"
       }
     },
-    "darwin_2": {
-      "inputs": {
-        "nixpkgs": [
-          "nixobolus",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1686307493,
-        "narHash": "sha256-R4VEFnDn7nRmNxAu1LwNbjns5DPM8IBsvnrWmZ8ymPs=",
-        "owner": "lnl7",
-        "repo": "nix-darwin",
-        "rev": "7c16d31383a90e0e72ace0c35d2d66a18f90fb4f",
-        "type": "github"
-      },
-      "original": {
-        "owner": "lnl7",
-        "repo": "nix-darwin",
-        "type": "github"
-      }
-    },
     "devshell": {
       "inputs": {
         "nixpkgs": [
@@ -76,27 +55,6 @@
         "owner": "nix-community",
         "repo": "disko",
         "rev": "4823509bb3b014dc85abefc13efcfa076d36338a",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nix-community",
-        "repo": "disko",
-        "type": "github"
-      }
-    },
-    "disko_2": {
-      "inputs": {
-        "nixpkgs": [
-          "nixobolus",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1686794052,
-        "narHash": "sha256-llwDJz0CyBHUP6tq5mlhQ7VEZ/3ewcpRu+DYYywRhFI=",
-        "owner": "nix-community",
-        "repo": "disko",
-        "rev": "fa4ec0bd26a103b3aa0d5a60f60399724face977",
         "type": "github"
       },
       "original": {
@@ -470,8 +428,6 @@
     },
     "nixobolus": {
       "inputs": {
-        "darwin": "darwin_2",
-        "disko": "disko_2",
         "ethereum-nix": "ethereum-nix",
         "flake-parts": "flake-parts_5",
         "flake-root": "flake-root_3",
@@ -481,15 +437,16 @@
         "pre-commit-hooks-nix": "pre-commit-hooks-nix"
       },
       "locked": {
-        "lastModified": 1687375449,
-        "narHash": "sha256-bv0ofO6sxeOfobDH79WfR3dcJOQAk7xR0yHYWNS9qvU=",
+        "lastModified": 1687809117,
+        "narHash": "sha256-hdvob49aYFTGavszto2X10hV9d7/C5lQPS3AFaStd5c=",
         "owner": "ponkila",
         "repo": "nixobolus",
-        "rev": "2c57a94c6a0502b5285427d09ec34977120580c2",
+        "rev": "050cd64024b377b60eccfade37f2650424bae5eb",
         "type": "github"
       },
       "original": {
         "owner": "ponkila",
+        "ref": "chore/refactor",
         "repo": "nixobolus",
         "type": "github"
       }
