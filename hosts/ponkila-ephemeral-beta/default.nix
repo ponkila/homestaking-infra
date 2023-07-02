@@ -8,6 +8,13 @@ let
   sshKeysPath = "/var/mnt/secrets/ssh/id_ed25519";
 in
 {
+  fileSystems."/var/mnt/secrets" = lib.mkImageMediaOverride {
+    fsType = "btrfs";
+    device = "/dev/disk/by-label/erigon";
+    options = [ "subvolid=256" ];
+    neededForBoot = true;
+  };
+
   homestakeros = {
     # Localization options
     localization = {
@@ -61,19 +68,6 @@ in
 
     # Mount options
     mounts = {
-      # Secrets
-      secrets = {
-        enable = true;
-        description = "secrets storage";
-
-        what = "/dev/disk/by-label/secrets";
-        where = "/var/mnt/secrets";
-        options = "subvolid=256";
-        type = "btrfs";
-
-        before = [ "sshd.service" ];
-        wantedBy = [ "multi-user.target" ];
-      };
       # Erigon
       erigon = {
         enable = true;
