@@ -4,7 +4,7 @@
 }:
 {
   # These kmodules are implicit requirements of netboot
-  boot.initrd.availableKernelModules = [ "squashfs" "overlay" ];
+  boot.initrd.availableKernelModules = [ "squashfs" "overlay" "btrfs" ];
   boot.initrd.kernelModules = [ "loop" "overlay" ];
 
   fileSystems."/" = lib.mkImageMediaOverride {
