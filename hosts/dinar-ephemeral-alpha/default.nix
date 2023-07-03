@@ -50,7 +50,10 @@ in
       enable = true;
       endpoint = "http://${infra.ip}:5052";
       dataDir = "/mnt/eth/lighthouse";
-      mev-boost.endpoint = "http://${infra.ip}:18550";
+      mev-boost = {
+        enable = true;
+        endpoint = "http://${infra.ip}:18550";
+      };
       slasher = {
         enable = false;
         historyLength = 256;
