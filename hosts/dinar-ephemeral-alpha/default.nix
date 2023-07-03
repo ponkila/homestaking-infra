@@ -48,7 +48,7 @@ in
       dataDir = "/mnt/eth/lighthouse";
       mev-boost = {
         enable = true;
-        endpoint = "http://${infra.ip}:18550";
+        endpoint = "${infra.ip}:18550";
       };
       slasher = {
         enable = false;
