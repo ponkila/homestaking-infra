@@ -8,6 +8,9 @@ set -o pipefail
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 hostname=$1
 
+# Specifications
+mem="8192M"
+
 # Check if argument was given
 if [ $# -ne 1 ]; then
     echo "No hostname were provided."
@@ -26,23 +29,34 @@ if [ ! -d "$script_dir/../hosts/$hostname" ]; then
   exit 1
 fi
 
-# Check if the host uses the kexecTree format
-if [[ -z $(nix eval --json .#nixosConfigurations."$hostname".config.system.build.kexecTree 2>/dev/null) ]]; then
-    echo "$hostname does not use the kexecTree format."
-    exit 1
-fi
-
 # Build the host
 nix build .#"$hostname" || exit 1
 
-# Get kernel args from kexec-boot script
-kernel_args=$(sed -n '/--command-line/p' "$script_dir/../result/kexec-boot" | cut -d\" -f2)
+# Get config.system.build set
+build_set=$(nix eval --json .#nixosConfigurations."$hostname".config.system.build) || exit 1
 
-# Launch QEMU
-qemu-system-x86_64 \
-  -kernel "$script_dir/../result/bzImage" \
-  -initrd "$script_dir/../result/initrd.zst" \
-  -append "$kernel_args" -m 8192M
+# Launch QEMU based on format
+case $build_set in
+  *kexecTree*)
+    # Get kernel args from kexec-boot script
+    kernel_args=$(sed -n '/--command-line/p' "$script_dir/../result/kexec-boot" | cut -d\" -f2)
+    # Launch QEMU
+    qemu-system-x86_64 \
+      -kernel "$script_dir/../result/bzImage" \
+      -initrd "$script_dir/../result/initrd.zst" \
+      -append "$kernel_args" -m "$mem"
+    ;;
+  *isoImage*)
+    # Launch QEMU
+    qemu-system-x86_64 \
+      -cdrom "$script_dir/../result/iso/nixos.iso" \
+      -m "$mem"
+    ;;
+  *)
+    echo "$hostname does not have a supported format."
+    exit 1
+    ;;
+esac
 
 # qemu-system-aarch64 \
 #   -M virt -m 8192M -cpu cortex-a53 \
