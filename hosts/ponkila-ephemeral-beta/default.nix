@@ -34,7 +34,7 @@ in
 
     # SSH (system level) options
     ssh = {
-      privateKeyPath = sshKeysPath;
+      privateKeyFile = sshKeysPath;
     };
 
     # Wireguard options
