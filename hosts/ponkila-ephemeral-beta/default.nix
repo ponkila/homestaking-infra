@@ -8,6 +8,13 @@ let
   sshKeysPath = "/var/mnt/secrets/ssh/id_ed25519";
 in
 {
+  fileSystems."/var/mnt/secrets" = lib.mkImageMediaOverride {
+    fsType = "btrfs";
+    device = "/dev/disk/by-label/erigon";
+    options = [ "subvolid=256" ];
+    neededForBoot = true;
+  };
+
   homestakeros = {
     # Localization options
     localization = {
@@ -27,7 +34,13 @@ in
 
     # SSH (system level) options
     ssh = {
-      privateKeyFile = sshKeysPath;
+      privateKeyPath = sshKeysPath;
+    };
+
+    # Wireguard options
+    wireguard = {
+      enable = true;
+      configFile = config.sops.secrets."wireguard/wg0".path;
     };
 
     # Erigon options
@@ -35,6 +48,7 @@ in
       enable = true;
       endpoint = "http://${infra.ip}:8551";
       dataDir = erigon.datadir;
+      jwtSecretFile = "/var/mnt/erigon/jwt.hex";
     };
 
     # Lighthouse options
@@ -49,23 +63,11 @@ in
         historyLength = 256;
         maxDatabaseSize = 16;
       };
+      jwtSecretFile = "/var/mnt/lighthouse/jwt.hex";
     };
 
     # Mount options
     mounts = {
-      # Secrets
-      secrets = {
-        enable = true;
-        description = "secrets storage";
-
-        what = "/dev/disk/by-label/secrets";
-        where = "/var/mnt/secrets";
-        options = "subvolid=256";
-        type = "btrfs";
-
-        before = [ "sshd.service" ];
-        wantedBy = [ "multi-user.target" ];
-      };
       # Erigon
       erigon = {
         enable = true;
@@ -95,9 +97,8 @@ in
 
   # Secrets
   sops = {
-    defaultSopsFile = ./secrets/default.yaml;
     secrets."wireguard/wg0" = {
-      path = "%r/wireguard/wg0.conf";
+      sopsFile = ./secrets/default.yaml;
     };
     age.sshKeyPaths = [ sshKeysPath ];
   };
