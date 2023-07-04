@@ -27,7 +27,7 @@
     sops-nix.url = "github:Mic92/sops-nix";
   };
 
-  # add the inputs declared above to the argument attribute set
+  # Add the inputs declared above to the argument attribute set
   outputs =
     { self
     , flake-parts
@@ -70,6 +70,7 @@
         # Do not perform pre-commit hooks w/ nix flake check
         pre-commit.check.enable = false;
 
+        # Development tools for devshell
         mission-control.scripts = {
           nsq = {
             description = "Update and get the nix-store quaries.";
@@ -80,6 +81,8 @@
           };
         };
 
+        # Devshells for bootstrapping
+        # Accessible through 'nix develop' or 'nix-shell' (legacy)
         devShells.default = pkgs.mkShell {
           nativeBuildInputs = with pkgs; [
             git
@@ -101,6 +104,8 @@
           '';
         };
 
+        # Custom packages and aliases for building hosts
+        # Accessible through 'nix build', 'nix run', etc
         packages = with flake.nixosConfigurations; {
           "dinar-ephemeral-alpha" = dinar-ephemeral-alpha.config.system.build.isoImage;
           "hetzner-ephemeral-alpha" = hetzner-ephemeral-alpha.config.system.build.kexecTree;
@@ -257,9 +262,10 @@
 
         in
         {
-
           overlays = import ./overlays { inherit inputs; };
 
+          # NixOS configuration entrypoints
+          # Accessible through 'nix build', 'nix run', etc
           nixosConfigurations = with nixpkgs.lib; {
             "dinar-ephemeral-alpha" = nixosSystem dinar-ephemeral-alpha;
             "hetzner-ephemeral-alpha" = nixosSystem hetzner-ephemeral-alpha;
