@@ -10,11 +10,6 @@ trap cleanup SIGINT
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 host_path="$script_dir/../hosts"
 
-# Exclude hosts from $host_path
-exclude_hosts=(
-  "ponkila-persistent-epsilon"
-)
-
 # Default flags for nix-command
 nix_flags=(
   --no-warn-dirty
@@ -48,12 +43,6 @@ for hostname in "${hostnames[@]}"; do
   file_path="$host_path/$hostname/nix-store-query.txt"
   if [ -f "$file_path" ]; then
     rm "$file_path"
-  fi
-
-  # Skip if hostname is in the exclude list
-  if [[ " ${exclude_hosts[*]} " =~ $hostname ]]; then
-    echo "Skipping '$hostname'"
-    continue
   fi
 
   # Get sorted build tree
