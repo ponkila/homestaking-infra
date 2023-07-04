@@ -33,8 +33,7 @@ dinar-ephemeral-beta | x86-64 | isoImage | Lighthouse + Erigon
 hetzner-ephemeral-alpha | x86-64 | kexecTree | Dedicated build server
 hetzner-ephemeral-beta | aarch64 |  kexecTree | Cloud build server
 ponkila-ephemeral-beta | x86-64 | kexecTree | Lighthouse + Erigon
-ponkila-ephemeral-gamma | aarch64 | kexecTree | Raspberry Pi 4 
-ponkila-persistent-epsilon | x86-64 | | Darwin
+ponkila-ephemeral-gamma | aarch64 | kexecTree | Raspberry Pi 4
 
 ## Building (no cross-compile)
 
