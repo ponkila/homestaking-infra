@@ -15,8 +15,6 @@
   };
 
   inputs = {
-    darwin.inputs.nixpkgs.follows = "nixpkgs";
-    darwin.url = "github:lnl7/nix-darwin";
     disko.inputs.nixpkgs.follows = "nixpkgs";
     disko.url = "github:nix-community/disko";
     flake-parts.url = "github:hercules-ci/flake-parts";
@@ -34,7 +32,6 @@
   # add the inputs declared above to the argument attribute set
   outputs =
     { self
-    , darwin
     , disko
     , flake-parts
     , home-manager
@@ -53,9 +50,7 @@
         inputs.pre-commit-hooks-nix.flakeModule
       ];
       systems = [
-        "aarch64-darwin"
         "aarch64-linux"
-        "x86_64-darwin"
         "x86_64-linux"
       ];
       perSystem = { pkgs, lib, config, system, ... }: {
@@ -281,14 +276,6 @@
             "hetzner-ephemeral-beta" = nixosSystem hetzner-ephemeral-beta;
             "ponkila-ephemeral-gamma" = nixosSystem ponkila-ephemeral-gamma;
           });
-
-          darwinConfigurations."ponkila-persistent-epsilon" = darwin.lib.darwinSystem {
-            specialArgs = { inherit inputs outputs; };
-            system = "x86_64-darwin";
-            modules = [
-              ./hosts/ponkila-persistent-epsilon/default.nix
-            ];
-          };
         };
     };
 }
