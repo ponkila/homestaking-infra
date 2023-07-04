@@ -32,8 +32,16 @@ cleanup() {
   exit 0
 }
 
+# Fetch hostnames from $host_path
+hostnames=($(find "$host_path" -mindepth 1 -maxdepth 1 -type d -exec basename {} \;))
+
 # Remove old queries
-find "$script_dir/.." -type f -name 'nix-store-query.txt' -exec rm -f {} \;
+for host in "${hostnames[@]}"; do
+  file_path="$host_path/$host/nix-store-query.txt"
+  if [ -f "$file_path" ]; then
+    rm "$file_path"
+  fi
+done
 
 # Stash any uncommitted changes (including untracked files)
 if [[ -n $(git diff --quiet --exit-code) ]]; then
@@ -41,9 +49,6 @@ if [[ -n $(git diff --quiet --exit-code) ]]; then
   git stash push --include-untracked
   stash_created=true
 fi
-
-# Fetch hostnames from $host_path
-hostnames=($(find "$host_path" -mindepth 1 -maxdepth 1 -type d -exec basename {} \;))
 
 # Loop trough hostnames
 for hostname in "${hostnames[@]}"; do
