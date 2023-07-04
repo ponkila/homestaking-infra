@@ -73,9 +73,9 @@
         # Development tools for devshell
         mission-control.scripts = {
           nsq = {
-            description = "Update and get the nix-store quaries.";
+            description = "Update and get the nix-store queries.";
             exec = ''
-              sh ./scripts/get-store-quaries.sh
+              sh ./scripts/get-store-queries.sh
             '';
             category = "Tools";
           };
