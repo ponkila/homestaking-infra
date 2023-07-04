@@ -15,8 +15,6 @@
   };
 
   inputs = {
-    disko.inputs.nixpkgs.follows = "nixpkgs";
-    disko.url = "github:nix-community/disko";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-root.url = "github:srid/flake-root";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
@@ -32,7 +30,6 @@
   # add the inputs declared above to the argument attribute set
   outputs =
     { self
-    , disko
     , flake-parts
     , home-manager
     , nixobolus
@@ -126,7 +123,6 @@
               ./system/global.nix
               ./system/ramdisk.nix
               nixobolus.nixosModules.homestakeros
-              disko.nixosModules.disko
               sops-nix.nixosModules.sops
               {
                 nixpkgs.overlays = [
@@ -150,7 +146,6 @@
               ./system/global.nix
               ./system/ramdisk.nix
               nixobolus.nixosModules.homestakeros
-              disko.nixosModules.disko
               sops-nix.nixosModules.sops
               {
                 nixpkgs.overlays = [
@@ -232,7 +227,6 @@
               ./system/formats/copytoram-iso.nix
               ./system/global.nix
               nixobolus.nixosModules.homestakeros
-              disko.nixosModules.disko
               sops-nix.nixosModules.sops
               {
                 nixpkgs.overlays = [
@@ -251,7 +245,6 @@
               ./system/formats/copytoram-iso.nix
               ./system/global.nix
               nixobolus.nixosModules.homestakeros
-              disko.nixosModules.disko
               sops-nix.nixosModules.sops
               {
                 nixpkgs.overlays = [
