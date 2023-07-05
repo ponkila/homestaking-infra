@@ -10,11 +10,6 @@ trap cleanup SIGINT
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 host_path="$script_dir/../hosts"
 
-# Exclude hosts from $host_path
-exclude_hosts=(
-  "ponkila-persistent-epsilon"
-)
-
 # Default flags for nix-command
 nix_flags=(
   --no-warn-dirty
@@ -32,8 +27,8 @@ cleanup() {
   exit 0
 }
 
-# Remove old queries
-find "$script_dir/.." -type f -name 'nix-store-query.txt' -exec rm -f {} \;
+# Fetch hostnames from $host_path
+hostnames=($(find "$host_path" -mindepth 1 -maxdepth 1 -type d -exec basename {} \;))
 
 # Stash any uncommitted changes (including untracked files)
 if [[ -n $(git diff --quiet --exit-code) ]]; then
@@ -42,19 +37,16 @@ if [[ -n $(git diff --quiet --exit-code) ]]; then
   stash_created=true
 fi
 
-# Fetch hostnames from $host_path
-hostnames=($(find "$host_path" -mindepth 1 -maxdepth 1 -type d -exec basename {} \;))
-
 # Loop trough hostnames
 for hostname in "${hostnames[@]}"; do
-  # Skip if hostname is in the exclude list
-  if [[ " ${exclude_hosts[*]} " =~ $hostname ]]; then
-    echo "Skipping '$hostname'"
-    continue
+  # Remove old querie
+  file_path="$host_path/$hostname/nix-store-query.txt"
+  if [ -f "$file_path" ]; then
+    rm "$file_path"
   fi
 
   # Get sorted build tree
   build_path=$(nix path-info --derivation .#"${hostname}" "${nix_flags[@]}" | tail -n 1)
   nix-store --query --requisites "$build_path" \
-    | sort -t'-' -k2 > "$host_path/$hostname/nix-store-query.txt"
+    | sort -t'-' -k2 > "$file_path"
 done

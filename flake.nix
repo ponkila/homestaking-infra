@@ -15,10 +15,6 @@
   };
 
   inputs = {
-    darwin.inputs.nixpkgs.follows = "nixpkgs";
-    darwin.url = "github:lnl7/nix-darwin";
-    disko.inputs.nixpkgs.follows = "nixpkgs";
-    disko.url = "github:nix-community/disko";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-root.url = "github:srid/flake-root";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
@@ -31,11 +27,9 @@
     sops-nix.url = "github:Mic92/sops-nix";
   };
 
-  # add the inputs declared above to the argument attribute set
+  # Add the inputs declared above to the argument attribute set
   outputs =
     { self
-    , darwin
-    , disko
     , flake-parts
     , home-manager
     , nixobolus
@@ -53,9 +47,7 @@
         inputs.pre-commit-hooks-nix.flakeModule
       ];
       systems = [
-        "aarch64-darwin"
         "aarch64-linux"
-        "x86_64-darwin"
         "x86_64-linux"
       ];
       perSystem = { pkgs, lib, config, system, ... }: {
@@ -78,16 +70,19 @@
         # Do not perform pre-commit hooks w/ nix flake check
         pre-commit.check.enable = false;
 
+        # Development tools for devshell
         mission-control.scripts = {
           nsq = {
-            description = "Update and get the nix-store quaries.";
+            description = "Update and get the nix-store queries.";
             exec = ''
-              sh ./scripts/get-store-quaries.sh
+              sh ./scripts/get-store-queries.sh
             '';
             category = "Tools";
           };
         };
 
+        # Devshells for bootstrapping
+        # Accessible through 'nix develop' or 'nix-shell' (legacy)
         devShells.default = pkgs.mkShell {
           nativeBuildInputs = with pkgs; [
             git
@@ -109,6 +104,8 @@
           '';
         };
 
+        # Custom packages and aliases for building hosts
+        # Accessible through 'nix build', 'nix run', etc
         packages = with flake.nixosConfigurations; {
           "dinar-ephemeral-alpha" = dinar-ephemeral-alpha.config.system.build.isoImage;
           "hetzner-ephemeral-alpha" = hetzner-ephemeral-alpha.config.system.build.kexecTree;
@@ -129,7 +126,6 @@
               ./hosts/ponkila-ephemeral-beta
               nixobolus.nixosModules.kexecTree
               nixobolus.nixosModules.homestakeros
-              disko.nixosModules.disko
               sops-nix.nixosModules.sops
               {
                 nixpkgs.overlays = [
@@ -151,7 +147,6 @@
               ./hosts/ponkila-ephemeral-gamma
               nixobolus.nixosModules.kexecTree
               nixobolus.nixosModules.homestakeros
-              disko.nixosModules.disko
               sops-nix.nixosModules.sops
               {
                 nixpkgs.overlays = [
@@ -228,7 +223,6 @@
               ./hosts/dinar-ephemeral-alpha
               nixobolus.nixosModules.isoImage
               nixobolus.nixosModules.homestakeros
-              disko.nixosModules.disko
               sops-nix.nixosModules.sops
               {
                 nixpkgs.overlays = [
@@ -246,7 +240,6 @@
               ./hosts/dinar-ephemeral-beta
               nixobolus.nixosModules.isoImage
               nixobolus.nixosModules.homestakeros
-              disko.nixosModules.disko
               sops-nix.nixosModules.sops
               {
                 nixpkgs.overlays = [
@@ -259,9 +252,10 @@
 
         in
         {
-
           overlays = import ./overlays { inherit inputs; };
 
+          # NixOS configuration entrypoints
+          # Accessible through 'nix build', 'nix run', etc
           nixosConfigurations = with nixpkgs.lib; {
             "dinar-ephemeral-alpha" = nixosSystem dinar-ephemeral-alpha;
             "hetzner-ephemeral-alpha" = nixosSystem hetzner-ephemeral-alpha;
@@ -271,14 +265,6 @@
             "hetzner-ephemeral-beta" = nixosSystem hetzner-ephemeral-beta;
             "ponkila-ephemeral-gamma" = nixosSystem ponkila-ephemeral-gamma;
           });
-
-          darwinConfigurations."ponkila-persistent-epsilon" = darwin.lib.darwinSystem {
-            specialArgs = { inherit inputs outputs; };
-            system = "x86_64-darwin";
-            modules = [
-              ./hosts/ponkila-persistent-epsilon/default.nix
-            ];
-          };
         };
     };
 }
