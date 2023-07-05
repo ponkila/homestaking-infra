@@ -124,9 +124,7 @@
             specialArgs = { inherit inputs outputs; };
             modules = [
               ./hosts/ponkila-ephemeral-beta
-              ./system/formats/netboot-kexec.nix
-              ./system/global.nix
-              ./system/ramdisk.nix
+              nixobolus.nixosModules.kexecTree
               nixobolus.nixosModules.homestakeros
               sops-nix.nixosModules.sops
               {
@@ -147,9 +145,7 @@
             specialArgs = { inherit inputs outputs; };
             modules = [
               ./hosts/ponkila-ephemeral-gamma
-              ./system/formats/netboot-kexec.nix
-              ./system/global.nix
-              ./system/ramdisk.nix
+              nixobolus.nixosModules.kexecTree
               nixobolus.nixosModules.homestakeros
               sops-nix.nixosModules.sops
               {
@@ -180,11 +176,9 @@
             modules = [
               ./hosts/hetzner-ephemeral-alpha
               ./modules/sys2x/gc.nix
-              ./system/formats/netboot-kexec.nix
-              ./system/global.nix
-              ./system/ramdisk.nix
               ./home-manager/juuso.nix
               ./home-manager/kari.nix
+              nixobolus.nixosModules.kexecTree
               home-manager.nixosModules.home-manager
               {
                 nixpkgs.overlays = [
@@ -205,11 +199,9 @@
             modules = [
               ./hosts/hetzner-ephemeral-beta
               ./modules/sys2x/gc.nix
-              ./system/formats/netboot-kexec.nix
-              ./system/global.nix
-              ./system/ramdisk.nix
               ./home-manager/juuso.nix
               ./home-manager/kari.nix
+              nixobolus.nixosModules.kexecTree
               home-manager.nixosModules.home-manager
               {
                 nixpkgs.overlays = [
@@ -229,8 +221,7 @@
             specialArgs = { inherit inputs outputs; };
             modules = [
               ./hosts/dinar-ephemeral-alpha
-              ./system/formats/copytoram-iso.nix
-              ./system/global.nix
+              nixobolus.nixosModules.isoImage
               nixobolus.nixosModules.homestakeros
               sops-nix.nixosModules.sops
               {
@@ -247,8 +238,7 @@
             specialArgs = { inherit inputs outputs; };
             modules = [
               ./hosts/dinar-ephemeral-beta
-              ./system/formats/copytoram-iso.nix
-              ./system/global.nix
+              nixobolus.nixosModules.isoImage
               nixobolus.nixosModules.homestakeros
               sops-nix.nixosModules.sops
               {
