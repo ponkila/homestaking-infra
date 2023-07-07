@@ -397,16 +397,15 @@
         "pre-commit-hooks-nix": "pre-commit-hooks-nix"
       },
       "locked": {
-        "lastModified": 1688762938,
-        "narHash": "sha256-T/fvjo2Z07yUWnPQ5jLi+9ip/yXKKPsE8bHOI39fTyA=",
+        "lastModified": 1688567738,
+        "narHash": "sha256-gU0xsx9xoEsdvq0pA49Bnn+1Ud5lpPil5MaewQCsx5k=",
         "owner": "ponkila",
         "repo": "nixobolus",
-        "rev": "e69ffa0089a6da45c919f8131bfb40c9391672de",
+        "rev": "791c6281395771d701c73de6511b8339bca93bd9",
         "type": "github"
       },
       "original": {
         "owner": "ponkila",
-        "ref": "revisit-exports",
         "repo": "nixobolus",
         "type": "github"
       }
