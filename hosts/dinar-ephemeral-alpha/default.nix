@@ -28,13 +28,13 @@ in
     };
 
     # Wireguard options
-    wireguard = {
+    vpn.wireguard = {
       enable = true;
       configFile = config.sops.secrets."wireguard/wg0".path;
     };
 
     # Erigon options
-    erigon = {
+    execution.erigon = {
       enable = true;
       endpoint = "http://${infra.ip}:8551";
       dataDir = "/mnt/eth/erigon";
@@ -42,20 +42,23 @@ in
     };
 
     # Lighthouse options
-    lighthouse = {
+    consensus.lighthouse = {
       enable = true;
       endpoint = "http://${infra.ip}:5052";
+      execEndpoint = "http://${infra.ip}:8551";
       dataDir = "/mnt/eth/lighthouse";
-      mev-boost = {
-        enable = true;
-        endpoint = "${infra.ip}:18550";
-      };
       slasher = {
         enable = false;
         historyLength = 256;
         maxDatabaseSize = 16;
       };
       jwtSecretFile = "/mnt/eth/lighthouse/jwt.hex";
+    };
+
+    # Addons
+    addons.mev-boost = {
+      enable = true;
+      endpoint = "http://${infra.ip}:18550";
     };
 
     # Mounts
