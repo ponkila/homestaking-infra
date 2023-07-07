@@ -45,6 +45,7 @@ in
     consensus.lighthouse = {
       enable = true;
       endpoint = "http://${infra.ip}:5052";
+      execEndpoint = "http://${infra.ip}:8551";
       dataDir = "/mnt/eth/lighthouse";
       slasher = {
         enable = false;
