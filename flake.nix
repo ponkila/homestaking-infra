@@ -82,7 +82,7 @@
           qemu = {
             description = "Use QEMU to boot up a host.";
             exec = ''
-              sh ./scripts/init-qemu.sh "$@"
+              nix run path:scripts/init-qemu#init-qemu -- "$@"
             '';
             category = "Tools";
           };
