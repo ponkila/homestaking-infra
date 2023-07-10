@@ -107,13 +107,13 @@ ponkila-ephemeral-gamma | aarch64 | kexecTree | Raspberry Pi 4
 
 We use declarative disk partitioning by [disko](https://github.com/nix-community/disko). For each host, there should be disko script that contains the desired disk layout. There are a lot of [examples](https://github.com/nix-community/disko/tree/master/example) available on how to configure the layout.
 
-To apply the disk layout to a target machine, you'll need to boot the machine using the built image and obtain the `mounts.nix` file for that specific host. Once you have the file, execute the following command:
+To apply the disk layout to a target machine, you'll need to boot the machine using the built image, clone this repository and execute the following command in it:
 
 ```
-sudo nix run github:nix-community/disko -- --mode zap_create_mount ./mounts.nix
+nix develop --command bash -c ", disko"
 ```
 
-This command will format the disks according to the script. Once formatting is complete, reboot the machine and the disks should be ready to use.
+This command will format the disks according to the `mounts.nix` disko script, located in the host's directory. Once the formatting is complete, reboot the machine, and the disks should be ready to use.
 
 ## Formats & Deployment
 
