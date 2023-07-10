@@ -1,6 +1,3 @@
-# https://xyno.space/post/nix-darwin-introduction
-# https://github.com/Misterio77/nix-starter-configs/tree/main/standard
-# https://sourcegraph.com/github.com/shaunsingh/nix-darwin-dotfiles@8ce14d457f912f59645e167707c4d950ae1c3a6e/-/blob/flake.nix
 {
   description = "Ethereum home-staking infrastructure powered by Nix";
 
@@ -54,8 +51,10 @@
         "x86_64-linux"
       ];
       perSystem = { pkgs, lib, config, system, ... }: {
+        # Nix code formatter, accessible through 'nix fmt'
         formatter = nixpkgs.legacyPackages.${system}.nixpkgs-fmt;
 
+        # Git hook scripts for identifying issues before submission
         pre-commit.settings = {
           hooks = {
             shellcheck.enable = true;
@@ -63,14 +62,14 @@
             flakecheck = {
               enable = true;
               name = "flakecheck";
-              description = "Check whether the flake evaluates and run its tests";
+              description = "Check whether the flake evaluates and run its tests.";
               entry = "nix flake check --no-warn-dirty";
               language = "system";
               pass_filenames = false;
             };
           };
         };
-        # Do not perform pre-commit hooks w/ nix flake check
+        # Do not perform hooks with 'nix flake check'
         pre-commit.check.enable = false;
 
         # Development tools for devshell
@@ -137,6 +136,7 @@
                 ];
               }
               {
+                # Bootloader for x86_64-linux / aarch64-linux
                 boot.loader.systemd-boot.enable = true;
                 boot.loader.efi.canTouchEfiVariables = true;
               }
@@ -164,6 +164,7 @@
                 ];
               }
               {
+                # Bootloader for RaspberryPi 4
                 boot.loader.raspberryPi = {
                   enable = true;
                   version = 4;
@@ -190,6 +191,7 @@
                 ];
               }
               {
+                # Bootloader for x86_64-linux / aarch64-linux
                 boot.loader.systemd-boot.enable = true;
                 boot.loader.efi.canTouchEfiVariables = true;
               }
@@ -213,6 +215,7 @@
                 ];
               }
               {
+                # Bootloader for x86_64-linux / aarch64-linux
                 boot.loader.systemd-boot.enable = true;
                 boot.loader.efi.canTouchEfiVariables = true;
               }
@@ -255,10 +258,10 @@
 
         in
         {
+          # Patches and version overrides for some packages
           overlays = import ./overlays { inherit inputs; };
 
           # NixOS configuration entrypoints
-          # Accessible through 'nix build', 'nix run', etc
           nixosConfigurations = with nixpkgs.lib; {
             "dinar-ephemeral-alpha" = nixosSystem dinar-ephemeral-alpha;
             "hetzner-ephemeral-alpha" = nixosSystem hetzner-ephemeral-alpha;
