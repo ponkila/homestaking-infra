@@ -2,6 +2,7 @@
 # https://github.com/Misterio77/nix-starter-configs/tree/main/standard
 # https://sourcegraph.com/github.com/shaunsingh/nix-darwin-dotfiles@8ce14d457f912f59645e167707c4d950ae1c3a6e/-/blob/flake.nix
 {
+  description = "Ethereum home-staking infrastructure powered by Nix";
 
   nixConfig = {
     extra-substituters = [
