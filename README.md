@@ -110,10 +110,10 @@ We use declarative disk partitioning by [disko](https://github.com/nix-community
 To apply the disk layout to a target machine, you'll need to boot the machine using the built image, clone this repository and execute the following command in it:
 
 ```
-nix develop --command bash -c ", disko"
+nix run github:nix-community/disko -- --mode zap_create_mount ./nixosConfigurations/"$(hostname)"/mounts.nix
 ```
 
-This command will format the disks according to the `mounts.nix` disko script, located in the host's directory. Once the formatting is complete, reboot the machine, and the disks should be ready to use.
+This command will format the disks according to the `mount.nix` script for that specific host. Once the formatting is complete, reboot the machine, and the disks should be ready for use.
 
 ## Formats & Deployment
 
