@@ -18,12 +18,11 @@ We are currently working on [HomestakerOS](https://github.com/ponkila/Homestaker
 ## Structure
 - `flake.nix`: Entrypoint for host configurations.
 - `home-manager`: Home-manager configurations.
-- `hosts`: NixOS configurations. Accessible via `nix build`.
-- `modules`: Shared module configurations.
+- `modules`: Non-upstreamed modules.
+- `nixosConfigurations`: NixOS configurations. Accessible via `nix build`.
 - `overlay`: Patches and version overrides for some packages.
 - `pkgs`: Our custom packages.
 - `scripts`: Nix devshell scripts. Accessible via `nix develop`.
-- `system`: Shared system configurations and formats.
 
 ## Hosts
 | Hostname | System | Format | Info
