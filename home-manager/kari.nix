@@ -58,12 +58,9 @@ in
           vim = "nvim";
           ls = "exa -al --color=always --group-directories-first";
           tree = "exa -T";
-          rcp = "rsync -a --progress";
-          rmv = "rsync -a --progress --remove-source-files";
+          rcp = "rsync -PaL";
+          rmv = "rsync -PaL --remove-source-files";
           jctl = "journalctl -p 3 -xb";
-          nb = "nix build";
-          ns = "nix shell";
-          nf = "nix flake";
         };
         functions = { fish_greeting = ""; };
         interactiveShellInit =
@@ -85,6 +82,10 @@ in
         htop.enable = true;
         vim.enable = true;
         git.enable = true;
+        direnv = {
+          enable = true;
+          nix-direnv.enable = true;
+        };
 
         home-manager.enable = true;
       };

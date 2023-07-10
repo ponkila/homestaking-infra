@@ -78,7 +78,21 @@
             exec = ''
               sh ./scripts/get-store-queries.sh
             '';
-            category = "Tools";
+            category = "Development Tools";
+          };
+          qemu = {
+            description = "Use QEMU to boot up a host.";
+            exec = ''
+              nix run path:scripts/init-qemu#init-qemu -- "$@"
+            '';
+            category = "Development Tools";
+          };
+          disko = {
+            description = "Format disks according to the mount.nix of the current host.";
+            exec = ''
+              nix run github:nix-community/disko -- --mode zap_create_mount ./hosts/"$(hostname)"/mounts.nix
+            '';
+            category = "System Utilities";
           };
         };
 
