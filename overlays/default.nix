@@ -1,9 +1,9 @@
 { inputs, ... }:
 {
-  # Adds custom packages
+  # This one brings our custom packages from the 'pkgs' directory
   additions = final: _prev: import ../pkgs { pkgs = final; };
 
-  # Modifies existing packages
+  # This one contains whatever you want to overlay
   modifications = final: prev: {
     # example = prev.example.overrideAttrs (oldAttrs: rec {
     # ...
