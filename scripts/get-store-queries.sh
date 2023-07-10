@@ -8,7 +8,7 @@ trap cleanup EXIT
 trap cleanup SIGINT
 
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-host_path="$script_dir/../hosts"
+host_path="$script_dir/../nixosConfigurations"
 
 # Default flags for nix-command
 nix_flags=(

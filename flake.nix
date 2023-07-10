@@ -125,7 +125,7 @@
             system = "x86_64-linux";
             specialArgs = { inherit inputs outputs; };
             modules = [
-              ./hosts/ponkila-ephemeral-beta
+              ./nixosConfigurations/ponkila-ephemeral-beta
               nixobolus.nixosModules.kexecTree
               nixobolus.nixosModules.homestakeros
               sops-nix.nixosModules.sops
@@ -147,7 +147,7 @@
             system = "aarch64-linux";
             specialArgs = { inherit inputs outputs; };
             modules = [
-              ./hosts/ponkila-ephemeral-gamma
+              ./nixosConfigurations/ponkila-ephemeral-gamma
               nixobolus.nixosModules.kexecTree
               nixobolus.nixosModules.homestakeros
               sops-nix.nixosModules.sops
@@ -178,7 +178,7 @@
             system = "x86_64-linux";
             specialArgs = { inherit inputs outputs; };
             modules = [
-              ./hosts/hetzner-ephemeral-alpha
+              ./nixosConfigurations/hetzner-ephemeral-alpha
               ./modules/sys2x/gc.nix
               ./home-manager/juuso.nix
               ./home-manager/kari.nix
@@ -202,7 +202,7 @@
             system = "aarch64-linux";
             specialArgs = { inherit inputs outputs; };
             modules = [
-              ./hosts/hetzner-ephemeral-beta
+              ./nixosConfigurations/hetzner-ephemeral-beta
               ./modules/sys2x/gc.nix
               ./home-manager/juuso.nix
               ./home-manager/kari.nix
@@ -226,7 +226,7 @@
             system = "x86_64-linux";
             specialArgs = { inherit inputs outputs; };
             modules = [
-              ./hosts/dinar-ephemeral-alpha
+              ./nixosConfigurations/dinar-ephemeral-alpha
               nixobolus.nixosModules.isoImage
               nixobolus.nixosModules.homestakeros
               sops-nix.nixosModules.sops
@@ -243,7 +243,7 @@
             system = "x86_64-linux";
             specialArgs = { inherit inputs outputs; };
             modules = [
-              ./hosts/dinar-ephemeral-beta
+              ./nixosConfigurations/dinar-ephemeral-beta
               nixobolus.nixosModules.isoImage
               nixobolus.nixosModules.homestakeros
               sops-nix.nixosModules.sops
