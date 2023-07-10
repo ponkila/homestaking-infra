@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# script to update and get nix-store queries
-# usage: sh ./scripts/get-store-quaries.sh
-# deps: git nix
+# script to get and update nix-store queries
+# usage: sh ./scripts/get-store-queries.sh
+# deps: nix git
 
 set -o pipefail
 trap cleanup EXIT
@@ -39,7 +39,7 @@ fi
 
 # Loop trough hostnames
 for hostname in "${hostnames[@]}"; do
-  # Remove old querie
+  # Remove old query if exists
   file_path="$host_path/$hostname/nix-store-query.txt"
   if [ -f "$file_path" ]; then
     rm "$file_path"
