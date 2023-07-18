@@ -31,7 +31,7 @@ in
       what = "/dev/disk/by-label/nix";
       where = "/var/mnt/secrets";
       type = "btrfs";
-      options = "noatime subvol=secrets";
+      options = "subvolid=261";
 
       wantedBy = [ "multi-user.target" ];
     }
