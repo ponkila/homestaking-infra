@@ -8,6 +8,7 @@ let
   sshKeysPath = "/var/mnt/secrets/ssh/id_ed25519";
 in
 {
+  # Workaround for https://github.com/Mic92/sops-nix/issues/24  
   fileSystems."/var/mnt/secrets" = lib.mkImageMediaOverride {
     fsType = "btrfs";
     device = "/dev/disk/by-label/erigon";
