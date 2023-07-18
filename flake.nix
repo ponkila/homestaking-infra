@@ -195,6 +195,7 @@
               ./home-manager/kari.nix
               nixobolus.nixosModules.kexecTree
               home-manager.nixosModules.home-manager
+              sops-nix.nixosModules.sops
               {
                 nixpkgs.overlays = [
                   outputs.overlays.additions

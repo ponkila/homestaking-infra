@@ -1,4 +1,7 @@
 { pkgs, config, inputs, lib, ... }:
+let
+  sshKeysPath = "/var/mnt/secrets/ssh/id_ed25519";
+in
 {
   # User options
   users = {
@@ -26,9 +29,9 @@
       enable = true;
 
       what = "/dev/disk/by-label/nix";
-      where = "/var/mnt/.config";
+      where = "/var/mnt/secrets";
       type = "btrfs";
-      options = "subvolid=257";
+      options = "noatime subvol=secrets";
 
       wantedBy = [ "multi-user.target" ];
     }
@@ -59,6 +62,10 @@
   services.openssh = {
     enable = true;
     allowSFTP = false;
+    hostKeys = [{
+      path = sshKeysPath;
+      type = "ed25519";
+    }];
     extraConfig = ''
       AllowTcpForwarding yes
       X11Forwarding no
@@ -99,6 +106,31 @@
           value = 2;
         })
         (builtins.attrNames config.home-manager.users));
+    };
+  };
+
+  # Secrets
+  sops = {
+    secrets."cache-server/private-key" = {
+      sopsFile = ./secrets/default.yaml;
+    };
+    age.sshKeyPaths = [ sshKeysPath ];
+  };
+
+  # Binary cache server
+  services.nix-serve = {
+    enable = true;
+    secretKeyFile = config.sops.secrets."cache-server/private-key".path;
+  };
+
+  # Web server
+  services.nginx = {
+    enable = true;
+    recommendedProxySettings = true;
+    virtualHosts = {
+      "buidl0.ponkila.com" = {
+        locations."/".proxyPass = "http://${config.services.nix-serve.bindAddress}:${toString config.services.nix-serve.port}";
+      };
     };
   };
 
