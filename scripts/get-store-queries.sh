@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# script to get and update nix-store queries
-# usage: sh ./scripts/get-store-queries.sh
-# deps: nix git
+# Script to get and update nix-store queries for host configurations
+# Usage: sh ./scripts/get-store-queries.sh
+# Dependencies: nix, git
 
 set -o pipefail
 trap cleanup EXIT
@@ -10,14 +10,14 @@ trap cleanup SIGINT
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 host_path="$script_dir/../nixosConfigurations"
 
-# Default flags for nix-command
+# Default flags for nix commands
 nix_flags=(
-  --no-warn-dirty
   --accept-flake-config
   --extra-experimental-features 'nix-command flakes'
+  --no-warn-dirty
 )
 
-# Cleanup to be executed at exit
+# Cleanup function to be executed at exit
 cleanup() {
   # Restore the stashed changes if they were created
   if [[ $stash_created ]]; then
@@ -37,13 +37,11 @@ if [[ -n $(git diff --quiet --exit-code) ]]; then
   stash_created=true
 fi
 
-# Loop trough hostnames
+# Loop through hostnames
 for hostname in "${hostnames[@]}"; do
-  # Remove old query if exists
+  # Remove old query if it exists
   file_path="$host_path/$hostname/nix-store-query.txt"
-  if [ -f "$file_path" ]; then
-    rm "$file_path"
-  fi
+  [ -f "$file_path" ] && rm "$file_path"
 
   # Get sorted build tree
   build_path=$(nix path-info --derivation .#"${hostname}" "${nix_flags[@]}" | tail -n 1)
