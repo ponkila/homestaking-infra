@@ -28,7 +28,7 @@ cleanup() {
 }
 
 # Fetch hostnames from $host_path
-hostnames=($(find "$host_path" -mindepth 1 -maxdepth 1 -type d -exec basename {} \;))
+mapfile -t hostnames < <(find "$host_path" -mindepth 1 -maxdepth 1 -type d -exec basename {} \;)
 
 # Stash any uncommitted changes (including untracked files)
 if [[ -n $(git diff --quiet --exit-code) ]]; then
