@@ -24,18 +24,13 @@ in
   # Saiko's automatic gc
   sys2x.gc.useDiskAware = true;
 
-  systemd.mounts = [
-    {
-      enable = true;
-
-      what = "/dev/disk/by-label/nix";
-      where = "/var/mnt/secrets";
-      type = "btrfs";
-      options = "subvolid=261";
-
-      wantedBy = [ "multi-user.target" ];
-    }
-  ];
+  # Workaround for https://github.com/Mic92/sops-nix/issues/24  
+  fileSystems."/var/mnt/secrets" = lib.mkImageMediaOverride {
+    fsType = "btrfs";
+    device = "/dev/disk/by-label/nix";
+    options = [ "subvolid=261" ];
+    neededForBoot = true;
+  };
 
   systemd.services.nix-remount = {
     path = [ "/run/wrappers" ];
