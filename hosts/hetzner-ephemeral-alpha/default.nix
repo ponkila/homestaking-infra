@@ -124,11 +124,13 @@ in
   };
 
   # Web server
+  networking.firewall.allowedTCPPorts = [ 80 ];
   services.nginx = {
     enable = true;
     recommendedProxySettings = true;
     virtualHosts = {
       "buidl0.ponkila.com" = {
+        # Redirecting the HTTP traffic from port 80 to 'nix-serve' which operates on port 5000 by default
         locations."/".proxyPass = "http://${config.services.nix-serve.bindAddress}:${toString config.services.nix-serve.port}";
       };
     };
