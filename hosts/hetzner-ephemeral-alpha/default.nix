@@ -112,6 +112,7 @@ in
   # Secrets
   sops = {
     secrets."cache-server/private-key" = {
+      owner = "root";
       sopsFile = ./secrets/default.yaml;
     };
     age.sshKeyPaths = [ sshKeysPath ];
