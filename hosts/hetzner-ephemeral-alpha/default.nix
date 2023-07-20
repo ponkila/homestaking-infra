@@ -123,8 +123,6 @@ in
     enable = true;
     secretKeyFile = config.sops.secrets."cache-server/private-key".path;
   };
-  nix.settings.allowed-users = [ "nix-serve" ];
-  nix.settings.trusted-users = [ "nix-serve" ];
 
   # Web server
   networking.firewall.allowedTCPPorts = [ 80 ];
