@@ -161,7 +161,7 @@ This command will format the disks according to the `mount.nix` script for that 
     Install kexec-tools and run the kexec-boot script
     ```
     apt-get install kexec-tools
-    sudo ./result/kexec-tree
+    sudo ./result/kexec-boot
     ```
 
   </details>
