@@ -41,9 +41,9 @@
       enable = true;
 
       what = "/dev/disk/by-label/nix";
-      where = "/var/mnt/.config";
+      where = "/var/mnt/secrets";
       type = "btrfs";
-      options = "subvolid=256";
+      options = "subvolid=258";
 
       wantedBy = [ "multi-user.target" ];
     }
@@ -115,6 +115,14 @@
         })
         (builtins.attrNames config.home-manager.users));
     };
+  };
+
+  # Binary cache
+  services.nix-serve = {
+    enable = true;
+    secretKeyFile = "/var/mnt/secrets/cache-server/cache-priv-key.pem";
+    port = 5000;
+    openFirewall = true;
   };
 
   system.stateVersion = "23.05";
