@@ -200,7 +200,7 @@
               nixobolus.nixosModules.kexecTree
               nix-serve-ng.nixosModules.default
               home-manager.nixosModules.home-manager
-              sops-nix.nixosModules.sops
+              #sops-nix.nixosModules.sops
               {
                 nixpkgs.overlays = [
                   outputs.overlays.additions

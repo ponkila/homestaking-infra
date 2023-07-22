@@ -1,6 +1,6 @@
 { pkgs, config, inputs, lib, ... }:
 let
-  sshKeysPath = "/var/mnt/secrets/ssh/id_ed25519";
+  #sshKeysPath = "/var/mnt/secrets/ssh/id_ed25519";
 in
 {
   # User options
@@ -62,10 +62,10 @@ in
   services.openssh = {
     enable = true;
     allowSFTP = false;
-    hostKeys = [{
-      path = sshKeysPath;
-      type = "ed25519";
-    }];
+    # hostKeys = [{
+    #   path = sshKeysPath;
+    #   type = "ed25519";
+    # }];
     extraConfig = ''
       AllowTcpForwarding yes
       X11Forwarding no
@@ -110,19 +110,20 @@ in
   };
 
   # Secrets
-  sops = {
-    secrets."cache-server/private-key" = {
-      sopsFile = ./secrets/default.yaml;
-    };
-    age.sshKeyPaths = [ sshKeysPath ];
-  };
+  # sops = {
+  #   secrets."cache-server/private-key" = {
+  #     sopsFile = ./secrets/default.yaml;
+  #   };
+  #   age.sshKeyPaths = [ sshKeysPath ];
+  # };
 
   # Binary cache
   # https://github.com/srid/nixos-config/blob/master/nixos/cache-server.nix
-  sops.secrets."cache-server/private-key".owner = "root";
+  #sops.secrets."cache-server/private-key".owner = "root";
   services.nix-serve = {
     enable = true;
-    secretKeyFile = config.sops.secrets."cache-server/private-key".path;
+    #secretKeyFile =  config.sops.secrets."cache-server/private-key".path;
+    secretKeyFile = "/var/mnt/secrets/cache-server/cache-priv-key.pem";
   };
   nix.settings.allowed-users = [ "nix-serve" ];
   nix.settings.trusted-users = [ "nix-serve" ];
