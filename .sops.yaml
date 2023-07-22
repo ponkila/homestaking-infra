@@ -4,7 +4,6 @@ keys:
   - &juuso 8F84B8738E67A3453F05D29BC2DC6A67CB7F891F
   - &jesse 773DC99EDAF29D356155DC91269CF32D790D1789
   - &ponkila-ephemeral-beta age1rahna5rce9mj0js0p7dgt6wseqyzxjawva82tfdelzuvmngr5fdqa2geuy
-  - &hetzner-ephemeral-alpha age135sk8075lhw3u8qgncq7w9y9qjrjyvavvq8j7w8dewnew97xrsxs2cawxl
 creation_rules:
   - path_regex: hosts/ponkila-ephemeral-beta/secrets/[^/]+\.yaml$
     key_groups:
@@ -24,9 +23,3 @@ creation_rules:
         - *juuso
         age:
         - *dinar-ephemeral-beta
-  - path_regex: hosts/hetzner-ephemeral-alpha/secrets/[^/]+\.yaml$
-    key_groups:
-      - pgp:
-        - *jesse
-        age:
-        - *hetzner-ephemeral-alpha

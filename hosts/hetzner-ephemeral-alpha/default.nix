@@ -1,7 +1,4 @@
 { pkgs, config, inputs, lib, ... }:
-let
-  #sshKeysPath = "/var/mnt/secrets/ssh/id_ed25519";
-in
 {
   # User options
   users = {
@@ -62,10 +59,6 @@ in
   services.openssh = {
     enable = true;
     allowSFTP = false;
-    # hostKeys = [{
-    #   path = sshKeysPath;
-    #   type = "ed25519";
-    # }];
     extraConfig = ''
       AllowTcpForwarding yes
       X11Forwarding no
@@ -109,34 +102,12 @@ in
     };
   };
 
-  # Secrets
-  # sops = {
-  #   secrets."cache-server/private-key" = {
-  #     sopsFile = ./secrets/default.yaml;
-  #   };
-  #   age.sshKeyPaths = [ sshKeysPath ];
-  # };
-
   # Binary cache
-  # https://github.com/srid/nixos-config/blob/master/nixos/cache-server.nix
-  #sops.secrets."cache-server/private-key".owner = "root";
   services.nix-serve = {
     enable = true;
-    #secretKeyFile =  config.sops.secrets."cache-server/private-key".path;
     secretKeyFile = "/var/mnt/secrets/cache-server/cache-priv-key.pem";
-  };
-
-  # Web server
-  networking.firewall.allowedTCPPorts = [ 80 ];
-  services.nginx = {
-    enable = true;
-    recommendedProxySettings = true;
-    virtualHosts = {
-      "buidl0.ponkila.com" = {
-        # Redirecting the HTTP traffic from port 80 to 'nix-serve' which operates on port 5000 by default
-        locations."/".proxyPass = "http://${config.services.nix-serve.bindAddress}:${toString config.services.nix-serve.port}";
-      };
-    };
+    port = 5000;
+    openFirewall = true;
   };
 
   system.stateVersion = "23.05";

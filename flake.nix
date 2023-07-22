@@ -7,7 +7,7 @@
     extra-substituters = [
       "https://cache.nixos.org"
       "https://nix-community.cachix.org"
-      "http://buidl0.ponkila.com"
+      "http://buidl0.ponkila.com:5000"
     ];
     extra-trusted-public-keys = [
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
@@ -200,7 +200,6 @@
               nixobolus.nixosModules.kexecTree
               nix-serve-ng.nixosModules.default
               home-manager.nixosModules.home-manager
-              #sops-nix.nixosModules.sops
               {
                 nixpkgs.overlays = [
                   outputs.overlays.additions
