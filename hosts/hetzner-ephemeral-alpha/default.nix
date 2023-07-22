@@ -117,22 +117,26 @@ in
     age.sshKeyPaths = [ sshKeysPath ];
   };
 
-  # Binary cache server
+  # Binary cache
+  # https://github.com/srid/nixos-config/blob/master/nixos/cache-server.nix
+  sops.secrets."cache-server/private-key".owner = "root";
   services.nix-serve = {
     enable = true;
     secretKeyFile = config.sops.secrets."cache-server/private-key".path;
   };
+  nix.settings.allowed-users = [ "nix-serve" ];
+  nix.settings.trusted-users = [ "nix-serve" ];
 
-  # Web server
+  # Nginx web server
   networking.firewall.allowedTCPPorts = [ 80 ];
   services.nginx = {
-    enable = true;
-    recommendedProxySettings = true;
-    virtualHosts = {
-      "buidl0.ponkila.com" = {
-        # Redirecting the HTTP traffic from port 80 to 'nix-serve' which operates on port 5000 by default
-        locations."/".proxyPass = "http://${config.services.nix-serve.bindAddress}:${toString config.services.nix-serve.port}";
-      };
+    virtualHosts."buidl0.ponkila.com" = {
+      locations."/".extraConfig = ''
+        proxy_pass http://localhost:${toString config.services.nix-serve.port};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      '';
     };
   };
 
