@@ -125,19 +125,17 @@ in
     #secretKeyFile =  config.sops.secrets."cache-server/private-key".path;
     secretKeyFile = "/var/mnt/secrets/cache-server/cache-priv-key.pem";
   };
-  nix.settings.allowed-users = [ "nix-serve" ];
-  nix.settings.trusted-users = [ "nix-serve" ];
 
-  # Nginx web server
+  # Web server
   networking.firewall.allowedTCPPorts = [ 80 ];
   services.nginx = {
-    virtualHosts."buidl0.ponkila.com" = {
-      locations."/".extraConfig = ''
-        proxy_pass http://localhost:${toString config.services.nix-serve.port};
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      '';
+    enable = true;
+    recommendedProxySettings = true;
+    virtualHosts = {
+      "buidl0.ponkila.com" = {
+        # Redirecting the HTTP traffic from port 80 to 'nix-serve' which operates on port 5000 by default
+        locations."/".proxyPass = "http://${config.services.nix-serve.bindAddress}:${toString config.services.nix-serve.port}";
+      };
     };
   };
 
