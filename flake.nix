@@ -25,6 +25,7 @@
     mission-control.url = "github:Platonic-Systems/mission-control";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-23.05";
+    nix-serve-ng.url = "github:aristanetworks/nix-serve-ng";
     pre-commit-hooks-nix.url = "github:hercules-ci/pre-commit-hooks.nix/flakeModule";
     sops-nix.url = "github:Mic92/sops-nix";
   };
@@ -37,6 +38,7 @@
     , nixobolus
     , nixpkgs
     , nixpkgs-stable
+    , nix-serve-ng
     , sops-nix
     , ...
     }@inputs:
@@ -196,6 +198,7 @@
               ./home-manager/juuso.nix
               ./home-manager/kari.nix
               nixobolus.nixosModules.kexecTree
+              nix-serve-ng.nixosModules.default
               home-manager.nixosModules.home-manager
               sops-nix.nixosModules.sops
               {
