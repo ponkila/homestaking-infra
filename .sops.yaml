@@ -2,6 +2,7 @@ keys:
   - &dinar-ephemeral-beta age1fuxy7v9jfgzz3p4f0k5gna8rhmgp792cmnyrzuum3zkssqn0rqmqq34p98
   - &dinar-ephemeral-alpha age10256ff6jm2fqjekg4ta3y6ym6s63ppgxrnfrjlsnknd8jduksvasrgqnsy
   - &juuso 8F84B8738E67A3453F05D29BC2DC6A67CB7F891F
+  - &jesse 773DC99EDAF29D356155DC91269CF32D790D1789
   - &ponkila-ephemeral-beta age1rahna5rce9mj0js0p7dgt6wseqyzxjawva82tfdelzuvmngr5fdqa2geuy
 creation_rules:
   - path_regex: nixosConfigurations/ponkila-ephemeral-beta/secrets/[^/]+\.yaml$
