@@ -97,7 +97,7 @@
           disko = {
             description = "Format disks according to the mount.nix of the current host.";
             exec = ''
-              nix run github:nix-community/disko -- --mode zap_create_mount ./hosts/"$(hostname)"/mounts.nix
+              nix run github:nix-community/disko -- --mode zap_create_mount ./nixosConfigurations/"$(hostname)"/mounts.nix
             '';
             category = "System Utilities";
           };
