@@ -224,6 +224,7 @@
               ./home-manager/juuso.nix
               ./home-manager/kari.nix
               nixobolus.nixosModules.kexecTree
+              nix-serve-ng.nixosModules.default
               home-manager.nixosModules.home-manager
               {
                 nixpkgs.overlays = [
