@@ -7,10 +7,14 @@
     extra-substituters = [
       "https://cache.nixos.org"
       "https://nix-community.cachix.org"
+      "http://buidl0.ponkila.com:5000"
+      "http://buidl1.ponkila.com:5000"
     ];
     extra-trusted-public-keys = [
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "buidl0.ponkila.com:qJZUo9Aji8cTc0v6hIGqbWT8sy+IT/rmSKUFTfhVGGw="
+      "buidl1.ponkila.com:ZIIETN3bdTS4DtymDmVGKqG6UOPy4gU89DPCfAKDcx8="
     ];
   };
 
@@ -23,6 +27,7 @@
     mission-control.url = "github:Platonic-Systems/mission-control";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-23.05";
+    nix-serve-ng.url = "github:aristanetworks/nix-serve-ng";
     pre-commit-hooks-nix.url = "github:hercules-ci/pre-commit-hooks.nix/flakeModule";
     sops-nix.url = "github:Mic92/sops-nix";
   };
@@ -35,6 +40,7 @@
     , nixobolus
     , nixpkgs
     , nixpkgs-stable
+    , nix-serve-ng
     , sops-nix
     , ...
     }@inputs:
@@ -194,6 +200,7 @@
               ./home-manager/juuso.nix
               ./home-manager/kari.nix
               nixobolus.nixosModules.kexecTree
+              nix-serve-ng.nixosModules.default
               home-manager.nixosModules.home-manager
               {
                 nixpkgs.overlays = [
@@ -217,6 +224,7 @@
               ./home-manager/juuso.nix
               ./home-manager/kari.nix
               nixobolus.nixosModules.kexecTree
+              nix-serve-ng.nixosModules.default
               home-manager.nixosModules.home-manager
               {
                 nixpkgs.overlays = [
