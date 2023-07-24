@@ -2,7 +2,7 @@
 Ethereum home-staking infrastructure powered by Nix
 
 ## About
-Transparency is crucial for spreading knowledge among Ethereum infrastructures, benefiting new home-stakers and maintainers to improve their existing setup. With Nix, the entire configuration of the real, working infrastructure can be seen at glance. This is extremely useful for those involved in the maintenance of these machines, as it provides a clear understanding of what's under the hood.
+Transparency is crucial for spreading knowledge among Ethereum infrastructures, benefiting new home-stakers and maintainers to improve their existing setup. With Nix, the entire configuration of the real, working infrastructure can be seen at glance. This is also extremely useful for those involved in the maintenance of these machines, as it provides a clear understanding of what's under the hood.
 
 We are currently working on [HomestakerOS](https://github.com/ponkila/HomestakerOS) and [Nixobolus](https://github.com/ponkila/nixobolus), which are designed to provide users with an easy way to configure, build and deploy this kind of infrastructure via WebUI.
 
@@ -18,11 +18,11 @@ We are currently working on [HomestakerOS](https://github.com/ponkila/Homestaker
 ## Structure
 - `flake.nix`: Entrypoint for host configurations.
 - `home-manager`: Home-manager configurations.
-- `hosts`: NixOS configurations. Accessible via `nix build`.
-- `modules`: Shared module configurations.
+- `modules`: Non-upstreamed modules.
+- `nixosConfigurations`: NixOS configurations. Accessible via `nix build`.
 - `overlay`: Patches and version overrides for some packages.
 - `pkgs`: Our custom packages.
-- `system`: Shared system configurations and formats.
+- `scripts`: Nix devshell scripts. Accessible via `nix develop`.
 
 ## Hosts
 | Hostname | System | Format | Info
@@ -32,8 +32,7 @@ dinar-ephemeral-beta | x86-64 | isoImage | Lighthouse + Erigon
 hetzner-ephemeral-alpha | x86-64 | kexecTree | Dedicated build server
 hetzner-ephemeral-beta | aarch64 |  kexecTree | Cloud build server
 ponkila-ephemeral-beta | x86-64 | kexecTree | Lighthouse + Erigon
-ponkila-ephemeral-gamma | aarch64 | kexecTree | Raspberry Pi 4 
-ponkila-persistent-epsilon | x86-64 | | Darwin
+ponkila-ephemeral-gamma | aarch64 | kexecTree | Raspberry Pi 4
 
 ## Building (no cross-compile)
 
@@ -108,13 +107,13 @@ ponkila-persistent-epsilon | x86-64 | | Darwin
 
 We use declarative disk partitioning by [disko](https://github.com/nix-community/disko). For each host, there should be disko script that contains the desired disk layout. There are a lot of [examples](https://github.com/nix-community/disko/tree/master/example) available on how to configure the layout.
 
-To apply the disk layout to a target machine, you'll need to boot the machine using the built image and obtain the `mounts.nix` file for that specific host. Once you have the file, execute the following command:
+To apply the disk layout to a target machine, you'll need to boot the machine using the built image, clone this repository and execute the following command in it:
 
 ```
-sudo nix run github:nix-community/disko -- --mode zap_create_mount ./mounts.nix
+nix run github:nix-community/disko -- --mode zap_create_mount ./nixosConfigurations/"$(hostname)"/mounts.nix
 ```
 
-This command will format the disks according to the script. Once formatting is complete, reboot the machine and the disks should be ready to use.
+This command will format the disks according to the `mount.nix` script for that specific host. Once the formatting is complete, reboot the machine, and the disks should be ready for use.
 
 ## Formats & Deployment
 
@@ -162,7 +161,7 @@ This command will format the disks according to the script. Once formatting is c
     Install kexec-tools and run the kexec-boot script
     ```
     apt-get install kexec-tools
-    sudo ./result/kexec-tree
+    sudo ./result/kexec-boot
     ```
 
   </details>
@@ -171,7 +170,7 @@ This command will format the disks according to the script. Once formatting is c
   <summary>Netbooting Raspberry Pi 4 with UEFI Firmware</summary>
     &nbsp;
 
-    We'll be gathering the boot media (/tftpboot folder for PXE booting) in the `/result` directory. Make sure you have the following dependencies installed: docker, unzip. Note: **This guide does not provide instructions on setting up the method for serving the boot media files.**
+    We'll be gathering the boot media (/tftpboot folder for PXE booting) in the `result` directory. Make sure you have the following dependencies installed: docker, unzip. Note: **This guide does not provide instructions on setting up the method for serving the boot media files.**
 
     Clone the project repository and build the EDK2 Raspberry Pi 4 UEFI firmware. 
     ```
