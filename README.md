@@ -241,7 +241,7 @@ The above command will produce the following output:
     --builder http://192.168.100.10:18550 \
     --execution-jwt /var/mnt/lighthouse/jwt.hex \
     --prune-payloads false \
-    --metrics \
+    --metrics
 ```
 
 Wondering how you can determine the command to access other services and configurations? You can explore the flake interactively by loading it into the `nix repl`. Here's how you can do it:
