@@ -219,3 +219,36 @@ This command will format the disks according to the `mount.nix` script for that 
   Output: ISO image which is loaded into RAM in stage-1
   
   Deploy: Create a bootable USB drive via [balenaEtcher](https://etcher.balena.io/) or [Ventoy](https://www.ventoy.net/en/index.html)
+
+## Fetch Information
+
+To fetch information about the running services and their properties, we can use the `nix eval` command. Let's take a specific example where we want to examine the systemd execution command of the lighthouse client running on the `ponkila-ephemeral-beta` host. It should be noted that these client configurations exist within nixobolus' [homestakeros module](https://github.com/ponkila/nixobolus/blob/main/modules/homestakeros/default.nix), so they are not present in this repository.
+
+```shell
+nix eval --json github:ponkila/homestaking-infra#nixosConfigurations.ponkila-ephemeral-beta.config.systemd.services.lighthouse.script | jq -r '.'
+```
+
+The above command will produce the following output:
+
+```shell
+/nix/store/bjw427m2ysssbk29cxamsmdk88c8v93k-lighthouse-4.3.0/bin/lighthouse bn \
+                      --datadir /var/mnt/lighthouse \
+                      --network mainnet \
+                      --http --http-address 192.168.100.10 \
+                      --http-port 5052 \
+                      --http-allow-origin "*" \
+                      --execution-endpoint http://192.168.100.10:8551 \
+                      --builder http://192.168.100.10:18550 \
+                      --execution-jwt /var/mnt/lighthouse/jwt.hex \
+                      --prune-payloads false \
+                      --metrics \
+```
+
+Wondering how you can determine the command to access other services and configurations? You can explore the flake interactively by loading it into the `nix repl`. Here's how you can do it:
+
+```Shell
+nix repl
+:lf github:ponkila/homestaking-infra#
+```
+
+By running the above commands, you'll enter the interactive shell with the flake loaded, allowing you to explore its structure using tab completion. Most likely, the "path" you are looking for starts with `nixosConfigurations.<hostname>.config`.
