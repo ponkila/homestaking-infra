@@ -232,16 +232,16 @@ The above command will produce the following output:
 
 ```shell
 /nix/store/bjw427m2ysssbk29cxamsmdk88c8v93k-lighthouse-4.3.0/bin/lighthouse bn \
-                      --datadir /var/mnt/lighthouse \
-                      --network mainnet \
-                      --http --http-address 192.168.100.10 \
-                      --http-port 5052 \
-                      --http-allow-origin "*" \
-                      --execution-endpoint http://192.168.100.10:8551 \
-                      --builder http://192.168.100.10:18550 \
-                      --execution-jwt /var/mnt/lighthouse/jwt.hex \
-                      --prune-payloads false \
-                      --metrics \
+    --datadir /var/mnt/lighthouse \
+    --network mainnet \
+    --http --http-address 192.168.100.10 \
+    --http-port 5052 \
+    --http-allow-origin "*" \
+    --execution-endpoint http://192.168.100.10:8551 \
+    --builder http://192.168.100.10:18550 \
+    --execution-jwt /var/mnt/lighthouse/jwt.hex \
+    --prune-payloads false \
+    --metrics \
 ```
 
 Wondering how you can determine the command to access other services and configurations? You can explore the flake interactively by loading it into the `nix repl`. Here's how you can do it:
