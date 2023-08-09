@@ -433,15 +433,16 @@
         "pre-commit-hooks-nix": "pre-commit-hooks-nix"
       },
       "locked": {
-        "lastModified": 1691032366,
-        "narHash": "sha256-ynM8vf5dU1vDfoDCW2oCfzIpYiUmGJDWbtolgcKBbHM=",
+        "lastModified": 1691605116,
+        "narHash": "sha256-HCoW6XBBgex0KmIpBQxWa7PH8qxDDO3y2J1T94Fxq4I=",
         "owner": "ponkila",
         "repo": "nixobolus",
-        "rev": "1ddbf4d0bd0fdda1e91e45bf120af5c1ef860fbd",
+        "rev": "b91f46f9debe106951654237a5286aea0318257a",
         "type": "github"
       },
       "original": {
         "owner": "ponkila",
+        "ref": "feat/rpcdaemon",
         "repo": "nixobolus",
         "type": "github"
       }
