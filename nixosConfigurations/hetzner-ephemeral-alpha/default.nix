@@ -13,6 +13,9 @@
   networking.hostName = "hetzner-ephemeral-alpha";
   time.timeZone = "Europe/Helsinki";
 
+  # Use stable kernel
+  boot.kernelPackages = pkgs.linuxPackagesFor (pkgs.linux);
+
   # Support for cross compilation
   boot.binfmt.emulatedSystems = [
     "aarch64-linux"
