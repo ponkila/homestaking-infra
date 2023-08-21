@@ -205,6 +205,7 @@
               ./modules/sys2x/gc.nix
               ./home-manager/juuso.nix
               ./home-manager/kari.nix
+              ./home-manager/allu.nix
               nixobolus.nixosModules.kexecTree
               nix-serve-ng.nixosModules.default
               home-manager.nixosModules.home-manager
@@ -230,6 +231,7 @@
               ./modules/sys2x/gc.nix
               ./home-manager/juuso.nix
               ./home-manager/kari.nix
+              ./home-manager/allu.nix
               nixobolus.nixosModules.kexecTree
               nix-serve-ng.nixosModules.default
               home-manager.nixosModules.home-manager
@@ -289,10 +291,10 @@
           # NixOS configuration entrypoints
           nixosConfigurations = with nixpkgs.lib; {
             "dinar-ephemeral-alpha" = nixosSystem dinar-ephemeral-alpha;
-            "hetzner-ephemeral-alpha" = nixosSystem hetzner-ephemeral-alpha;
             "dinar-ephemeral-beta" = nixosSystem dinar-ephemeral-beta;
             "ponkila-ephemeral-beta" = nixosSystem ponkila-ephemeral-beta;
           } // (with nixpkgs-stable.lib; {
+            "hetzner-ephemeral-alpha" = nixosSystem hetzner-ephemeral-alpha;
             "hetzner-ephemeral-beta" = nixosSystem hetzner-ephemeral-beta;
             "ponkila-ephemeral-gamma" = nixosSystem ponkila-ephemeral-gamma;
           });
