@@ -114,5 +114,11 @@
     openFirewall = true;
   };
 
+  # Port for HomestakerOS
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [ 8081 ];
+  };
+
   system.stateVersion = "23.05";
 }
