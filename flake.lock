@@ -433,15 +433,16 @@
         "pre-commit-hooks-nix": "pre-commit-hooks-nix"
       },
       "locked": {
-        "lastModified": 1692374319,
-        "narHash": "sha256-DH3cN3jikGGmuX5gWYhwmXUr+AqSMdtRfe2Tb39JyCE=",
+        "lastModified": 1694020264,
+        "narHash": "sha256-gziL+HoCTTbiezVpNh75rV1qREZbxAmWQB9PF3AurB0=",
         "owner": "ponkila",
         "repo": "nixobolus",
-        "rev": "b1fe9b07cdc500a9786092d666715fe9760cb9c5",
+        "rev": "85bc809a6fcb6bbbff8fb06a477c46279f997879",
         "type": "github"
       },
       "original": {
         "owner": "ponkila",
+        "ref": "feat/ssv",
         "repo": "nixobolus",
         "type": "github"
       }
