@@ -101,6 +101,18 @@ in
 
         wantedBy = [ "multi-user.target" ];
       };
+      # Addons
+      addons = {
+        enable = true;
+        description = "addons storage";
+
+        what = "/dev/disk/by-label/erigon";
+        where = "/var/mnt/addons";
+        options = "noatime,subvolid=258";
+        type = "btrfs";
+
+        wantedBy = [ "multi-user.target" ];
+      };
     };
   };
 
