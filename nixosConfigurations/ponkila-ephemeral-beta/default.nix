@@ -69,10 +69,10 @@ in
       endpoint = "http://${infra.ip}:18550";
     };
     addons.ssv-node = {
-      dataDir = "/var/mnt/secrets/ssv/data";
+      dataDir = "/var/mnt/addons/ssv";
       execEndpoint = "ws://${infra.ip}:8545";
       consEndpoint = "http://${infra.ip}:5052";
-      privateKeyFile = "/var/mnt/secrets/ssv/ssv_operator_key";
+      privateKeyFile = "/var/mnt/addons/ssv/ssv_operator_key";
     };
 
     # Mount options
