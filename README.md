@@ -225,7 +225,7 @@ This command will format the disks according to the `mount.nix` script for that 
 To fetch information about the running services and their properties, we can use the `nix eval` command. Let's take a specific example where we want to examine the systemd execution command of the lighthouse client running on the `ponkila-ephemeral-beta` host. It should be noted that these client configurations exist within nixobolus' [homestakeros module](https://github.com/ponkila/nixobolus/blob/main/modules/homestakeros/default.nix), so they are not present in this repository.
 
 ```shell
-nix eval --json github:ponkila/homestaking-infra#nixosConfigurations.ponkila-ephemeral-beta.config.systemd.services.lighthouse.script | jq -r '.'
+nix eval --json github:ponkila/homestaking-infra#nixosConfigurations.ponkila-ephemeral-beta.config.systemd.services.lighthouse.serviceConfig.ExecStart | jq -r '.'
 ```
 
 The above command will produce the following output:
