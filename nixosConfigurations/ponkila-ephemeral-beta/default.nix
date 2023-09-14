@@ -70,8 +70,6 @@ in
     };
     addons.ssv-node = {
       dataDir = "/var/mnt/addons/ssv";
-      execEndpoint = "ws://${infra.ip}:8545";
-      consEndpoint = "http://${infra.ip}:5052";
       privateKeyFile = "/var/mnt/addons/ssv/ssv_operator_key";
     };
 
