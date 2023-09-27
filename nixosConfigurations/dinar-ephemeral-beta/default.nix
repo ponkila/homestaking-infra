@@ -60,6 +60,10 @@ in
       enable = true;
       endpoint = "http://${infra.ip}:18550";
     };
+    addons.ssv-node = {
+      dataDir = "/mnt/eth/ssv";
+      privateKeyFile = "/mnt/eth/ssv/ssv_operator_key";
+    };
 
     # Mounts
     mounts.eth = {

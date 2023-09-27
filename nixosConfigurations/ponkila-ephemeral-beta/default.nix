@@ -68,6 +68,10 @@ in
       enable = true;
       endpoint = "http://${infra.ip}:18550";
     };
+    addons.ssv-node = {
+      dataDir = "/var/mnt/addons/ssv";
+      privateKeyFile = "/var/mnt/addons/ssv/ssv_operator_key";
+    };
 
     # Mount options
     mounts = {
@@ -91,6 +95,18 @@ in
         what = "/dev/disk/by-label/lighthouse";
         where = lighthouse.datadir;
         options = "noatime";
+        type = "btrfs";
+
+        wantedBy = [ "multi-user.target" ];
+      };
+      # Addons
+      addons = {
+        enable = true;
+        description = "addons storage";
+
+        what = "/dev/disk/by-label/erigon";
+        where = "/var/mnt/addons";
+        options = "noatime,subvolid=258";
         type = "btrfs";
 
         wantedBy = [ "multi-user.target" ];
