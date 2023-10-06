@@ -59,7 +59,7 @@
       ];
       perSystem = { pkgs, lib, config, system, ... }: {
         # Nix code formatter, accessible through 'nix fmt'
-        formatter = nixpkgs.legacyPackages.${system}.nixpkgs-fmt;
+        formatter = nixpkgs.legacyPackages.${system}.alejandra;
 
         # Git hook scripts for identifying issues before submission
         pre-commit.settings = {
