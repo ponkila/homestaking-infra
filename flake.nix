@@ -18,16 +18,14 @@
   };
 
   inputs = {
+    devenv.url = "github:cachix/devenv";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    flake-root.url = "github:srid/flake-root";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager/release-23.05";
     nixobolus.url = "github:ponkila/nixobolus";
-    mission-control.url = "github:Platonic-Systems/mission-control";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-23.05";
     nix-serve-ng.url = "github:aristanetworks/nix-serve-ng";
-    pre-commit-hooks-nix.url = "github:hercules-ci/pre-commit-hooks.nix/flakeModule";
     sops-nix.url = "github:Mic92/sops-nix";
   };
 
@@ -47,10 +45,9 @@
     flake-parts.lib.mkFlake { inherit inputs; } rec {
 
       imports = [
-        inputs.flake-root.flakeModule
-        inputs.mission-control.flakeModule
-        inputs.pre-commit-hooks-nix.flakeModule
+        inputs.devenv.flakeModule
       ];
+
       systems = [
         "aarch64-darwin"
         "aarch64-linux"
@@ -61,53 +58,11 @@
         # Nix code formatter, accessible through 'nix fmt'
         formatter = nixpkgs.legacyPackages.${system}.alejandra;
 
-        # Git hook scripts for identifying issues before submission
-        pre-commit.settings = {
-          hooks = {
-            shellcheck.enable = true;
-            nixpkgs-fmt.enable = true;
-            flakecheck = {
-              enable = true;
-              name = "flakecheck";
-              description = "Check whether the flake evaluates and run its tests.";
-              entry = "nix flake check --no-warn-dirty";
-              language = "system";
-              pass_filenames = false;
-            };
-          };
-        };
-        # Do not perform hooks with 'nix flake check'
-        pre-commit.check.enable = false;
-
-        # Development tools for devshell
-        mission-control.scripts = {
-          nsq = {
-            description = "Get and update the nix-store queries.";
-            exec = ''
-              sh ./scripts/get-store-queries.sh
-            '';
-            category = "Development Tools";
-          };
-          qemu = {
-            description = "Use QEMU to boot up a host.";
-            exec = ''
-              nix run path:scripts/init-qemu#init-qemu -- "$@"
-            '';
-            category = "Development Tools";
-          };
-          disko = {
-            description = "Format disks according to the mount.nix of the current host.";
-            exec = ''
-              nix run github:nix-community/disko -- --mode zap_create_mount ./nixosConfigurations/"$(hostname)"/mounts.nix
-            '';
-            category = "System Utilities";
-          };
-        };
-
-        # Devshells for bootstrapping
-        # Accessible through 'nix develop' or 'nix-shell' (legacy)
-        devShells.default = pkgs.mkShell {
-          nativeBuildInputs = with pkgs; [
+        # Development shell
+        # Accessible trough 'nix develop .# --impure' or 'direnv allow'
+        devenv.shells = {
+          default = {
+            packages = with pkgs; [
             git
             nix
             nix-tree
@@ -118,13 +73,44 @@
             zstd
             cpio
           ];
-          inputsFrom = [
-            config.flake-root.devShell
-            config.mission-control.devShell
-          ];
-          shellHook = ''
-            ${config.pre-commit.installationScript}
+            scripts = {
+              nsq.exec = ''
+                sh ./scripts/get-store-queries.sh
+              '';
+              qemu.exec = ''
+                nix run path:scripts/init-qemu#init-qemu -- "$@"
+              '';
+              disko.exec = ''
+                nix run github:nix-community/disko -- --mode zap_create_mount ./nixosConfigurations/"$(hostname)"/mounts.nix
+              '';
+            };
+            env = {
+              NIX_CONFIG = ''
+                accept-flake-config = true
+                extra-experimental-features = flakes nix-command
+                warn-dirty = false
+              '';
+            };
+            enterShell = ''
+              cat <<INFO
+
+              ### homestaking-infra ###
+
+              Available commands:
+
+                nsq         : Get and update the nix-store queries
+                init-qemu   : Use QEMU to boot up a host
+                disko       : Format disks according to the mount.nix of the current host
+
+              INFO
           '';
+            pre-commit.hooks = {
+              alejandra.enable = true;
+              shellcheck.enable = true;
+            };
+            # Workaround for https://github.com/cachix/devenv/issues/760
+            containers = pkgs.lib.mkForce {};
+          };
         };
 
         # Custom packages and aliases for building hosts
