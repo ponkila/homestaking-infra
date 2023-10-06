@@ -2,7 +2,7 @@
 
 let
   # General
-  infra.ip = "192.168.100.31";
+  infra.ip = "192.168.100.21";
   sshKeysPath = "/mnt/eth/secrets/ssh/id_ed25519";
 in
 {
