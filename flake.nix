@@ -123,7 +123,6 @@
         packages = with flake.nixosConfigurations; {
           "dinar-ephemeral-alpha" = dinar-ephemeral-alpha.config.system.build.isoImage;
           "hetzner-ephemeral-alpha" = hetzner-ephemeral-alpha.config.system.build.kexecTree;
-          "hetzner-ephemeral-beta" = hetzner-ephemeral-beta.config.system.build.kexecTree;
           "dinar-ephemeral-beta" = dinar-ephemeral-beta.config.system.build.isoImage;
           "ponkila-ephemeral-beta" = ponkila-ephemeral-beta.config.system.build.kexecTree;
           "ponkila-ephemeral-gamma" = ponkila-ephemeral-gamma.config.system.build.kexecTree;
@@ -211,32 +210,6 @@
           ];
         };
 
-        hetzner-ephemeral-beta = {
-          system = "aarch64-linux";
-          specialArgs = {inherit inputs outputs;};
-          modules = [
-            ./nixosConfigurations/hetzner-ephemeral-beta
-            ./modules/sys2x/gc.nix
-            ./home-manager/juuso.nix
-            ./home-manager/kari.nix
-            ./home-manager/tommi.nix
-            nixobolus.nixosModules.kexecTree
-            nix-serve-ng.nixosModules.default
-            home-manager.nixosModules.home-manager
-            {
-              nixpkgs.overlays = [
-                outputs.overlays.additions
-                outputs.overlays.modifications
-              ];
-            }
-            {
-              # Bootloader for x86_64-linux / aarch64-linux
-              boot.loader.systemd-boot.enable = true;
-              boot.loader.efi.canTouchEfiVariables = true;
-            }
-          ];
-        };
-
         dinar-ephemeral-alpha = {
           system = "x86_64-linux";
           specialArgs = {inherit inputs outputs;};
@@ -283,7 +256,6 @@
           }
           // (with nixpkgs-stable.lib; {
             "hetzner-ephemeral-alpha" = nixosSystem hetzner-ephemeral-alpha;
-            "hetzner-ephemeral-beta" = nixosSystem hetzner-ephemeral-beta;
             "ponkila-ephemeral-gamma" = nixosSystem ponkila-ephemeral-gamma;
           });
       };
