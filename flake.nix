@@ -193,7 +193,6 @@
             ./modules/sys2x/gc.nix
             ./home-manager/juuso.nix
             ./home-manager/kari.nix
-            ./home-manager/allu.nix
             ./home-manager/tommi.nix
             nixobolus.nixosModules.kexecTree
             nix-serve-ng.nixosModules.default
@@ -220,7 +219,6 @@
             ./modules/sys2x/gc.nix
             ./home-manager/juuso.nix
             ./home-manager/kari.nix
-            ./home-manager/allu.nix
             ./home-manager/tommi.nix
             nixobolus.nixosModules.kexecTree
             nix-serve-ng.nixosModules.default
