@@ -1,13 +1,17 @@
-{ pkgs, config, inputs, lib, ... }:
-with lib;
-let
-  cfg = config.users.kari;
-in
 {
+  pkgs,
+  config,
+  inputs,
+  lib,
+  ...
+}:
+with lib; let
+  cfg = config.users.kari;
+in {
   options.users.kari = {
     authorizedKeys = mkOption {
       type = types.listOf types.str;
-      default = [ ];
+      default = [];
     };
   };
 
@@ -15,12 +19,12 @@ in
     users.users.kari = {
       isNormalUser = true;
       group = "kari";
-      extraGroups = [ "wheel" "users" ];
+      extraGroups = ["wheel" "users"];
       openssh.authorizedKeys.keys = cfg.authorizedKeys;
       shell = pkgs.fish;
     };
-    users.groups.kari = { };
-    environment.shells = [ pkgs.fish ];
+    users.groups.kari = {};
+    environment.shells = [pkgs.fish];
 
     programs = {
       neovim = {
@@ -40,7 +44,6 @@ in
     # Home-manager
     home-manager.users.root.home.stateVersion = config.home-manager.users.kari.home.stateVersion;
     home-manager.users.kari = {
-
       home.stateVersion = "23.05";
 
       home.packages = with pkgs; [
@@ -62,11 +65,12 @@ in
           rmv = "rsync -PaL --remove-source-files";
           jctl = "journalctl -p 3 -xb";
         };
-        functions = { fish_greeting = ""; };
+        functions = {fish_greeting = "";};
         interactiveShellInit =
           ''
             set -x EDITOR nvim
-          '' +
+          ''
+          +
           # Use vim bindings and cursors
           ''
             fish_vi_key_bindings

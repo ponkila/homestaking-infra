@@ -1,13 +1,17 @@
-{ pkgs, config, inputs, lib, ... }:
-with lib;
-let
-  cfg = config.users.tommi;
-in
 {
+  pkgs,
+  config,
+  inputs,
+  lib,
+  ...
+}:
+with lib; let
+  cfg = config.users.tommi;
+in {
   options.users.tommi = {
     authorizedKeys = mkOption {
       type = types.listOf types.str;
-      default = [ ];
+      default = [];
     };
   };
 
@@ -15,15 +19,14 @@ in
     users.users.tommi = {
       isNormalUser = true;
       group = "tommi";
-      extraGroups = [ "wheel" "users" ];
+      extraGroups = ["wheel" "users"];
       openssh.authorizedKeys.keys = cfg.authorizedKeys;
       shell = pkgs.fish;
     };
-    users.groups.tommi = { };
-    environment.shells = [ pkgs.fish ];
+    users.groups.tommi = {};
+    environment.shells = [pkgs.fish];
 
-    home-manager.users.tommi = { pkgs, ... }: {
-
+    home-manager.users.tommi = {pkgs, ...}: {
       home.stateVersion = "23.05";
 
       programs.nix-index.enable = true;

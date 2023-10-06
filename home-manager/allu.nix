@@ -1,13 +1,17 @@
-{ pkgs, config, inputs, lib, ... }:
-with lib;
-let
-  cfg = config.users.allu;
-in
 {
+  pkgs,
+  config,
+  inputs,
+  lib,
+  ...
+}:
+with lib; let
+  cfg = config.users.allu;
+in {
   options.users.allu = {
     authorizedKeys = mkOption {
       type = types.listOf types.str;
-      default = [ ];
+      default = [];
     };
   };
 
@@ -15,15 +19,14 @@ in
     users.users.allu = {
       isNormalUser = true;
       group = "allu";
-      extraGroups = [ "wheel" "users" ];
+      extraGroups = ["wheel" "users"];
       openssh.authorizedKeys.keys = cfg.authorizedKeys;
       shell = pkgs.fish;
     };
-    users.groups.allu = { };
-    environment.shells = [ pkgs.fish ];
+    users.groups.allu = {};
+    environment.shells = [pkgs.fish];
 
-    home-manager.users.allu = { pkgs, ... }: {
-
+    home-manager.users.allu = {pkgs, ...}: {
       home.stateVersion = "23.05";
 
       programs.nix-index.enable = true;

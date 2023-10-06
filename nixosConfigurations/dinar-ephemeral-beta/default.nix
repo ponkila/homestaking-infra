@@ -1,11 +1,14 @@
-{ pkgs, config, inputs, lib, ... }:
-
-let
+{
+  pkgs,
+  config,
+  inputs,
+  lib,
+  ...
+}: let
   # General
   infra.ip = "192.168.100.30";
   sshKeysPath = "/mnt/eth/secrets/ssh/id_ed25519";
-in
-{
+in {
   # Use stable kernel
   boot.kernelPackages = pkgs.linuxPackagesFor (pkgs.linux);
 
@@ -74,8 +77,8 @@ in
       where = "/mnt/eth";
       type = "ext4";
 
-      before = [ "sops-nix.service" "sshd.service" ];
-      wantedBy = [ "multi-user.target" ];
+      before = ["sops-nix.service" "sshd.service"];
+      wantedBy = ["multi-user.target"];
     };
   };
 
@@ -84,7 +87,7 @@ in
     secrets."wireguard/wg0" = {
       sopsFile = ./secrets/default.yaml;
     };
-    age.sshKeyPaths = [ sshKeysPath ];
+    age.sshKeyPaths = [sshKeysPath];
   };
 
   system.stateVersion = "23.05";
