@@ -1,13 +1,17 @@
-{ pkgs, config, inputs, lib, ... }:
-with lib;
-let
-  cfg = config.users.juuso;
-in
 {
+  pkgs,
+  config,
+  inputs,
+  lib,
+  ...
+}:
+with lib; let
+  cfg = config.users.juuso;
+in {
   options.users.juuso = {
     authorizedKeys = mkOption {
       type = types.listOf types.str;
-      default = [ ];
+      default = [];
     };
   };
 
@@ -15,17 +19,16 @@ in
     users.users.juuso = {
       isNormalUser = true;
       group = "juuso";
-      extraGroups = [ "wheel" "users" ];
+      extraGroups = ["wheel" "users"];
       openssh.authorizedKeys.keys = cfg.authorizedKeys;
       shell = pkgs.fish;
     };
-    users.groups.juuso = { };
-    environment.shells = [ pkgs.fish ];
+    users.groups.juuso = {};
+    environment.shells = [pkgs.fish];
 
     # Home-manager
     home-manager.users.root.home.stateVersion = config.home-manager.users.juuso.home.stateVersion;
-    home-manager.users.juuso = { pkgs, ... }: {
-
+    home-manager.users.juuso = {pkgs, ...}: {
       home.stateVersion = "23.05";
 
       programs.nix-index.enable = true;
@@ -49,20 +52,22 @@ in
       programs.fish = with config.home-manager.users.juuso; {
         enable = true;
         loginShellInit = ''
-          ${if pkgs.system == "aarch64-darwin" then
-          "set -x ponkila (getconf DARWIN_USER_TEMP_DIR)${sops.secrets."wireguard/ponkila.conf".name}"
-          else ""}
+          ${
+            if pkgs.system == "aarch64-darwin"
+            then "set -x ponkila (getconf DARWIN_USER_TEMP_DIR)${sops.secrets."wireguard/ponkila.conf".name}"
+            else ""
+          }
           set -x GNUPGHOME ${home.homeDirectory}/.gnupg/trezor
           set -x PATH '${lib.concatStringsSep ":" [
-          "${home.homeDirectory}/.nix-profile/bin"
-          "/run/wrappers/bin"
-          "/etc/profiles/per-user/${home.username}/bin"
-          "/run/current-system/sw/bin"
-          "/nix/var/nix/profiles/default/bin"
-          "/opt/homebrew/bin"
-          "/usr/bin"
-          "/sbin"
-          "/bin"
+            "${home.homeDirectory}/.nix-profile/bin"
+            "/run/wrappers/bin"
+            "/etc/profiles/per-user/${home.username}/bin"
+            "/run/current-system/sw/bin"
+            "/nix/var/nix/profiles/default/bin"
+            "/opt/homebrew/bin"
+            "/usr/bin"
+            "/sbin"
+            "/bin"
           ]}'
         '';
       };

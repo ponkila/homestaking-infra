@@ -1,6 +1,5 @@
 # sudo nix run github:nix-community/disko -- --mode zap_create_mount ./mounts.nix --arg disks '[ "/dev/sda" ]'
-
-{ disks ? [ "/dev/sda" ], ... }: {
+{disks ? ["/dev/sda"], ...}: {
   disko.devices = {
     disk = {
       sda = {
@@ -19,7 +18,7 @@
               content = {
                 type = "filesystem";
                 format = "ext4";
-                # mountpoint has invisible /mnt prefix 
+                # mountpoint has invisible /mnt prefix
                 # systemd should handle mount
                 #mountpoint = "/eth";
               };
