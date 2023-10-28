@@ -57,9 +57,29 @@
         pkgs,
         lib,
         config,
+        self',
         system,
         ...
-      }: {
+      }: let
+        # Function to create a basic shell script package
+        # https://www.ertt.ca/nix/shell-scripts/#org6f67de6
+        mkScriptPackage = {
+          name,
+          deps,
+        }: let
+          pkgs = import nixpkgs {inherit system;};
+          scriptPath = ./scripts/${name}.sh;
+          script = (pkgs.writeScriptBin name (builtins.readFile scriptPath)).overrideAttrs (old: {
+            buildCommand = "${old.buildCommand}\n patchShebangs $out";
+          });
+        in
+          pkgs.symlinkJoin {
+            inherit name;
+            paths = [script] ++ deps;
+            buildInputs = [pkgs.makeWrapper];
+            postBuild = "wrapProgram $out/bin/${name} --prefix PATH : $out/bin";
+          };
+      in {
         # Nix code formatter, accessible through 'nix fmt'
         formatter = nixpkgs.legacyPackages.${system}.alejandra;
 
@@ -77,14 +97,10 @@
               rsync
               zstd
               cpio
+              self'.packages.init-qemu
+              self'.packages.nsq
             ];
             scripts = {
-              nsq.exec = ''
-                sh ./scripts/get-store-queries.sh
-              '';
-              qemu.exec = ''
-                nix run path:scripts/init-qemu#init-qemu -- "$@"
-              '';
               disko.exec = ''
                 nix run github:nix-community/disko -- --mode zap_create_mount ./nixosConfigurations/"$(hostname)"/mounts.nix
               '';
@@ -118,15 +134,43 @@
           };
         };
 
+        apps = {
+          init-qemu = {
+            type = "app";
+            program = "${self.packages.${system}.init-qemu}/bin/init-qemu";
+          };
+          nsq = {
+            type = "app";
+            program = "${self.packages.${system}.nsq}/bin/nsq";
+          };
+        };
+
         # Custom packages and aliases for building hosts
         # Accessible through 'nix build', 'nix run', etc
-        packages = with flake.nixosConfigurations; {
-          "dinar-ephemeral-alpha" = dinar-ephemeral-alpha.config.system.build.isoImage;
-          "hetzner-ephemeral-alpha" = hetzner-ephemeral-alpha.config.system.build.kexecTree;
-          "dinar-ephemeral-beta" = dinar-ephemeral-beta.config.system.build.isoImage;
-          "ponkila-ephemeral-beta" = ponkila-ephemeral-beta.config.system.build.kexecTree;
-          "ponkila-ephemeral-gamma" = ponkila-ephemeral-gamma.config.system.build.kexecTree;
-        };
+        packages =
+          {
+            "nsq" = mkScriptPackage {
+              name = "nsq";
+              deps = [
+                pkgs.nix
+                pkgs.git
+              ];
+            };
+            "init-qemu" = mkScriptPackage {
+              name = "init-qemu";
+              deps = [
+                pkgs.nix
+                pkgs.qemu
+              ];
+            };
+          }
+          // (with flake.nixosConfigurations; {
+            "dinar-ephemeral-alpha" = dinar-ephemeral-alpha.config.system.build.isoImage;
+            "hetzner-ephemeral-alpha" = hetzner-ephemeral-alpha.config.system.build.kexecTree;
+            "dinar-ephemeral-beta" = dinar-ephemeral-beta.config.system.build.isoImage;
+            "ponkila-ephemeral-beta" = ponkila-ephemeral-beta.config.system.build.kexecTree;
+            "ponkila-ephemeral-gamma" = ponkila-ephemeral-gamma.config.system.build.kexecTree;
+          });
       };
       flake = let
         inherit (self) outputs;
