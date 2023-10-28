@@ -159,9 +159,11 @@
             };
             "init-qemu" = mkScriptPackage {
               name = "init-qemu";
-              deps = [
-                pkgs.nix
-                pkgs.qemu
+              deps = with pkgs; [
+                gawk
+                gnused
+                nix
+                qemu
               ];
             };
           }
