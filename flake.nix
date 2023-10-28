@@ -151,9 +151,10 @@
           {
             "nsq" = mkScriptPackage {
               name = "nsq";
-              deps = [
-                pkgs.nix
-                pkgs.git
+              deps = with pkgs; [
+                git
+                jq
+                nix
               ];
             };
             "init-qemu" = mkScriptPackage {
