@@ -63,5 +63,5 @@ for format in "${supported_formats[@]}"; do
   fi
 done
 
-echo "error: unsupported format '$format' for hostname '$hostname'."
+echo "error: $hostname does not have a supported format"
 exit 1
