@@ -46,6 +46,14 @@
     }
   ];
 
+  # Support large builds without running out of space
+  boot.tmp = {
+    useTmpfs = true;
+    tmpfsSize = "80%";
+    cleanOnBoot = true;
+  };
+
+  # Mount '/nix/.rw-store' and '/tmp' to disk
   systemd.services.nix-remount = {
     path = ["/run/wrappers"];
     enable = true;
@@ -59,9 +67,12 @@
       /run/wrappers/bin/mount /dev/disk/by-label/nix -o subvolid=256 /nix/.rw-store
       mkdir -p /nix/.rw-store/work
       mkdir -p /nix/.rw-store/store
+      mkdir -p /nix/.rw-store/tmp
+      chmod 1777 /nix/.rw-store/tmp
     '';
     script = ''
       /run/wrappers/bin/mount -t overlay overlay -o lowerdir=/nix/.ro-store:/nix/store,upperdir=/nix/.rw-store/store,workdir=/nix/.rw-store/work /nix/store
+      /run/wrappers/bin/mount --bind /nix/.rw-store/tmp /tmp
     '';
 
     wantedBy = ["multi-user.target"];
