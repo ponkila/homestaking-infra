@@ -22,7 +22,7 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager/release-23.05";
-    nixobolus.url = "github:ponkila/nixobolus";
+    nixobolus.url = "github:ponkila/nixobolus/juuso/jan2024";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-23.05";
     nix-serve-ng.url = "github:aristanetworks/nix-serve-ng";
@@ -60,6 +60,14 @@
         system,
         ...
       }: {
+        _module.args.pkgs = import inputs.nixpkgs {
+          inherit system;
+          overlays = [
+            nixobolus.overlays.default
+          ];
+          config = {};
+        };
+
         # Nix code formatter, accessible through 'nix fmt'
         formatter = nixpkgs.legacyPackages.${system}.alejandra;
 
@@ -141,6 +149,7 @@
             sops-nix.nixosModules.sops
             {
               nixpkgs.overlays = [
+                nixobolus.overlays.default
                 outputs.overlays.additions
                 outputs.overlays.modifications
               ];
@@ -163,6 +172,7 @@
             sops-nix.nixosModules.sops
             {
               nixpkgs.overlays = [
+                nixobolus.overlays.default
                 outputs.overlays.additions
                 outputs.overlays.modifications
                 # Workaround for https://github.com/NixOS/nixpkgs/issues/154163
@@ -198,6 +208,7 @@
             home-manager.nixosModules.home-manager
             {
               nixpkgs.overlays = [
+                nixobolus.overlays.default
                 outputs.overlays.additions
                 outputs.overlays.modifications
               ];
@@ -220,6 +231,7 @@
             sops-nix.nixosModules.sops
             {
               nixpkgs.overlays = [
+                nixobolus.overlays.default
                 outputs.overlays.additions
                 outputs.overlays.modifications
               ];
@@ -237,6 +249,7 @@
             sops-nix.nixosModules.sops
             {
               nixpkgs.overlays = [
+                nixobolus.overlays.default
                 outputs.overlays.additions
                 outputs.overlays.modifications
               ];
