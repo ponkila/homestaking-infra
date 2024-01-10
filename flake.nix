@@ -22,7 +22,7 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager/release-23.05";
-    nixobolus.url = "github:ponkila/nixobolus/juuso/jan2024";
+    nixobolus.url = "github:ponkila/nixobolus";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-23.05";
     nix-serve-ng.url = "github:aristanetworks/nix-serve-ng";

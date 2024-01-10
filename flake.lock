@@ -658,16 +658,15 @@
         "nixpkgs-stable": "nixpkgs-stable_3"
       },
       "locked": {
-        "lastModified": 1704821148,
+        "lastModified": 1704898376,
         "narHash": "sha256-4FpbNrWOEGNJsWpU4cMGV5r4rLikiadVxX1sXENj4ZY=",
         "owner": "ponkila",
         "repo": "nixobolus",
-        "rev": "b93c2b978d0074a3f1e1f4ba52a3a27d4622e0ec",
+        "rev": "3e5e47d625e30d3c2415ef87fe8bd1cae17ab0e2",
         "type": "github"
       },
       "original": {
         "owner": "ponkila",
-        "ref": "juuso/jan2024",
         "repo": "nixobolus",
         "type": "github"
       }
