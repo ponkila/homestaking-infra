@@ -30,7 +30,7 @@ in {
     # Wireguard options
     vpn.wireguard = {
       enable = true;
-      configFile = config.sops.secrets."wireguard/wg0".path;
+      configFile = "/mnt/secrets/wireguard/dinar.conf";
     };
 
     # Erigon options
@@ -80,12 +80,12 @@ in {
   };
 
   # Secrets
-  sops = {
-    secrets."wireguard/wg0" = {
-      sopsFile = ./secrets/default.yaml;
-    };
-    age.sshKeyPaths = [sshKeysPath];
-  };
+  # sops = {
+  #   secrets."wireguard/wg0" = {
+  #     sopsFile = ./secrets/default.yaml;
+  #   };
+  #   age.sshKeyPaths = [sshKeysPath];
+  # };
 
   system.stateVersion = "23.05";
 }
