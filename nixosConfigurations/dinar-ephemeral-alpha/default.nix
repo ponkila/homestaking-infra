@@ -9,9 +9,6 @@
   infra.ip = "192.168.100.21";
   sshKeysPath = "/mnt/eth/secrets/ssh/id_ed25519";
 in {
-  # Use stable kernel
-  boot.kernelPackages = pkgs.linuxPackagesFor (pkgs.linux);
-
   homestakeros = {
     # Localization options
     localization = {

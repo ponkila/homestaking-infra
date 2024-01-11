@@ -127,9 +127,9 @@
         # Custom packages and aliases for building hosts
         # Accessible through 'nix build', 'nix run', etc
         packages = with flake.nixosConfigurations; {
-          "dinar-ephemeral-alpha" = dinar-ephemeral-alpha.config.system.build.isoImage;
+          "dinar-ephemeral-alpha" = dinar-ephemeral-alpha.config.system.build.kexecTree;
           "hetzner-ephemeral-alpha" = hetzner-ephemeral-alpha.config.system.build.kexecTree;
-          "dinar-ephemeral-beta" = dinar-ephemeral-beta.config.system.build.isoImage;
+          "dinar-ephemeral-beta" = dinar-ephemeral-beta.config.system.build.kexecTree;
           "ponkila-ephemeral-beta" = ponkila-ephemeral-beta.config.system.build.kexecTree;
           "ponkila-ephemeral-gamma" = ponkila-ephemeral-gamma.config.system.build.kexecTree;
         };
@@ -224,7 +224,7 @@
           specialArgs = {inherit inputs outputs;};
           modules = [
             ./nixosConfigurations/dinar-ephemeral-alpha
-            nixobolus.nixosModules.isoImage
+            nixobolus.nixosModules.kexecTree
             nixobolus.nixosModules.homestakeros
             sops-nix.nixosModules.sops
             {
@@ -234,6 +234,11 @@
                 outputs.overlays.modifications
               ];
             }
+            {
+              # Bootloader for x86_64-linux / aarch64-linux
+              boot.loader.systemd-boot.enable = true;
+              boot.loader.efi.canTouchEfiVariables = true;
+            }
           ];
         };
 
@@ -242,7 +247,7 @@
           specialArgs = {inherit inputs outputs;};
           modules = [
             ./nixosConfigurations/dinar-ephemeral-beta
-            nixobolus.nixosModules.isoImage
+            nixobolus.nixosModules.kexecTree
             nixobolus.nixosModules.homestakeros
             sops-nix.nixosModules.sops
             {
@@ -251,6 +256,11 @@
                 outputs.overlays.additions
                 outputs.overlays.modifications
               ];
+            }
+            {
+              # Bootloader for x86_64-linux / aarch64-linux
+              boot.loader.systemd-boot.enable = true;
+              boot.loader.efi.canTouchEfiVariables = true;
             }
           ];
         };
