@@ -6,7 +6,7 @@
   ...
 }: let
   # General
-  infra.ip = "192.168.240.31";
+  infra.ip = "192.168.100.31";
 in {
   homestakeros = {
     # Localization options
