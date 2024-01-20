@@ -6,8 +6,7 @@
   ...
 }: let
   # General
-  infra.ip = "192.168.100.21";
-  sshKeysPath = "/mnt/eth/secrets/ssh/id_ed25519";
+  infra.ip = "192.168.240.31";
 in {
   homestakeros = {
     # Localization options
@@ -22,13 +21,13 @@ in {
         "sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAID5aw7sqJrXdKdNVu9IAyCCw1OYHXFQmFu/s/K+GAmGfAAAABHNzaDo= da@pusu"
         "sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAINwWpZR5WuzyJlr7jYoe0mAYp+MJ12doozfqGz9/8NP/AAAABHNzaDo= da@pusu"
       ];
-      privateKeyFile = sshKeysPath;
+      privateKeyFile = "/mnt/eth/ssh/id_ed25519";
     };
 
     # Wireguard options
     vpn.wireguard = {
       enable = true;
-      configFile = "/mnt/secrets/wireguard/dinar.conf";
+      configFile = "/mnt/eth/wireguard/wg0.conf";
     };
 
     # Erigon options
@@ -72,18 +71,10 @@ in {
       where = "/mnt/eth";
       type = "ext4";
 
-      before = ["sops-nix.service" "sshd.service"];
+      before = ["sshd.service"];
       wantedBy = ["multi-user.target"];
     };
   };
-
-  # Secrets
-  # sops = {
-  #   secrets."wireguard/wg0" = {
-  #     sopsFile = ./secrets/default.yaml;
-  #   };
-  #   age.sshKeyPaths = [sshKeysPath];
-  # };
 
   system.stateVersion = "23.05";
 }
