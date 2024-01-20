@@ -27,7 +27,7 @@ in {
     # Wireguard options
     vpn.wireguard = {
       enable = true;
-      configFile = "/mnt/eth/wireguard/wg0.conf";
+      configFile = "/mnt/eth/wg0.conf";
     };
 
     # Erigon options
@@ -35,7 +35,7 @@ in {
       enable = true;
       endpoint = "http://${infra.ip}:8551";
       dataDir = "/mnt/eth/erigon";
-      jwtSecretFile = "/mnt/eth/erigon/jwt.hex";
+      jwtSecretFile = "/mnt/eth/jwt.hex";
     };
 
     # Lighthouse options
@@ -49,7 +49,7 @@ in {
         historyLength = 256;
         maxDatabaseSize = 16;
       };
-      jwtSecretFile = "/mnt/eth/lighthouse/jwt.hex";
+      jwtSecretFile = "/mnt/eth/jwt.hex";
     };
 
     # Addons
