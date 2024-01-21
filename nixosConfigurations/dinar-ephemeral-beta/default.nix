@@ -6,12 +6,12 @@
   ...
 }: let
   # General
-  infra.ip = "192.168.100.31";
+  infra.ip = "192.168.100.32";
 in {
   homestakeros = {
     # Localization options
     localization = {
-      hostname = "dinar-ephemeral-alpha";
+      hostname = "dinar-ephemeral-beta";
       timezone = "Europe/Helsinki";
     };
 
