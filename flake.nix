@@ -111,7 +111,6 @@
         # Accessible through 'nix build', 'nix run', etc
         packages = with flake.nixosConfigurations; {
           "dinar-ephemeral-alpha" = dinar-ephemeral-alpha.config.system.build.kexecTree;
-          "hetzner-ephemeral-alpha" = hetzner-ephemeral-alpha.config.system.build.kexecTree;
           "dinar-ephemeral-beta" = dinar-ephemeral-beta.config.system.build.kexecTree;
           "ponkila-ephemeral-beta" = ponkila-ephemeral-beta.config.system.build.kexecTree;
           "ponkila-ephemeral-gamma" = ponkila-ephemeral-gamma.config.system.build.kexecTree;
