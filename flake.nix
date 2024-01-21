@@ -146,8 +146,6 @@
             {
               nixpkgs.overlays = [
                 nixobolus.overlays.default
-                outputs.overlays.additions
-                outputs.overlays.modifications
               ];
             }
             {
@@ -169,8 +167,6 @@
             {
               nixpkgs.overlays = [
                 nixobolus.overlays.default
-                outputs.overlays.additions
-                outputs.overlays.modifications
                 # Workaround for https://github.com/NixOS/nixpkgs/issues/154163
                 # This issue only happens with the isoImage format
                 (final: super: {
@@ -201,8 +197,6 @@
             {
               nixpkgs.overlays = [
                 nixobolus.overlays.default
-                outputs.overlays.additions
-                outputs.overlays.modifications
               ];
             }
           ];
@@ -219,16 +213,11 @@
             {
               nixpkgs.overlays = [
                 nixobolus.overlays.default
-                outputs.overlays.additions
-                outputs.overlays.modifications
               ];
             }
           ];
         };
       in {
-        # Patches and version overrides for some packages
-        overlays = import ./overlays {inherit inputs;};
-
         # NixOS configuration entrypoints
         nixosConfigurations = with nixpkgs.lib;
           {
