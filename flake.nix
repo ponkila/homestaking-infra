@@ -41,6 +41,7 @@
       ];
 
       perSystem = {
+        self',
         pkgs,
         lib,
         config,
@@ -66,18 +67,12 @@
             packages = with pkgs; [
               sops
               ssh-to-age
+              self'.packages.init-qemu
+              self'.packages.nsq
             ];
-            scripts = {
-              nsq.exec = ''
-                sh ./scripts/get-store-queries.sh
-              '';
-              qemu.exec = ''
-                nix run path:scripts/init-qemu#init-qemu -- "$@"
-              '';
-              disko.exec = ''
-                nix run github:nix-community/disko -- --mode zap_create_mount ./nixosConfigurations/"$(hostname)"/mounts.nix
-              '';
-            };
+            scripts.disko.exec = ''
+              nix run github:nix-community/disko -- --mode zap_create_mount ./nixosConfigurations/"$(hostname)"/mounts.nix
+            '';
             env = {
               NIX_CONFIG = ''
                 accept-flake-config = true
