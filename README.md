@@ -17,11 +17,7 @@ We are currently working on [HomestakerOS](https://github.com/ponkila/Homestaker
 
 ## Structure
 - `flake.nix`: Entrypoint for host configurations.
-- `home-manager`: Home-manager configurations.
-- `modules`: Non-upstreamed modules.
 - `nixosConfigurations`: NixOS configurations. Accessible via `nix build`.
-- `overlay`: Patches and version overrides for some packages.
-- `pkgs`: Our custom packages.
 - `scripts`: Nix devshell scripts. Accessible via `nix develop`.
 
 ## Hosts
@@ -29,7 +25,6 @@ We are currently working on [HomestakerOS](https://github.com/ponkila/Homestaker
 |-|-|-|-|
 dinar-ephemeral-alpha | x86-64 | isoImage | Lighthouse + Erigon
 dinar-ephemeral-beta | x86-64 | isoImage | Lighthouse + Erigon
-hetzner-ephemeral-alpha | x86-64 | kexecTree | Dedicated build server
 ponkila-ephemeral-beta | x86-64 | kexecTree | Lighthouse + Erigon
 ponkila-ephemeral-gamma | aarch64 | kexecTree | Raspberry Pi 4
 
@@ -44,7 +39,7 @@ ponkila-ephemeral-gamma | aarch64 | kexecTree | Raspberry Pi 4
   <details>
   <summary>Install Nix</summary>
     &nbsp;
-    
+
     Allow root to run the Nix installer (**optional**)
     ```
     mkdir -p $HOME/.config/nix
@@ -117,9 +112,9 @@ This command will format the disks according to the `mount.nix` script for that 
 ## Formats & Deployment
 
 - kexecTree
-  
+
   Output: bzImage, initrd, kexec-boot script and netboot iPXE script
-  
+
   Deploy: Run the kexec-boot script
   ```
   nix develop --command bash -c "sudo ./result/kexec-boot"
@@ -128,7 +123,7 @@ This command will format the disks according to the `mount.nix` script for that 
   <details>
   <summary>Bootstrap from Hetzner rescue</summary>
     &nbsp;
-    
+
     The installer needs sudo
     ```
     apt install -y sudo
@@ -171,13 +166,13 @@ This command will format the disks according to the `mount.nix` script for that 
 
     We'll be gathering the boot media (/tftpboot folder for PXE booting) in the `result` directory. Make sure you have the following dependencies installed: docker, unzip. Note: **This guide does not provide instructions on setting up the method for serving the boot media files.**
 
-    Clone the project repository and build the EDK2 Raspberry Pi 4 UEFI firmware. 
+    Clone the project repository and build the EDK2 Raspberry Pi 4 UEFI firmware.
     ```
     git clone https://github.com/valtzu/pipxe.git
     cd pixpe
     sudo docker-compose up
     ```
-    
+
     Create a result directory and copy the UEFI firmware files there.
     ```
     mkdir -p result
@@ -214,9 +209,9 @@ This command will format the disks according to the `mount.nix` script for that 
   </details>
 
 - isoImage
-  
+
   Output: ISO image which is loaded into RAM in stage-1
-  
+
   Deploy: Create a bootable USB drive via [balenaEtcher](https://etcher.balena.io/) or [Ventoy](https://www.ventoy.net/en/index.html)
 
 ## Fetch Information
