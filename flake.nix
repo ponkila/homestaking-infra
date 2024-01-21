@@ -60,26 +60,7 @@
         self',
         system,
         ...
-      }: let
-        # Function to create a basic shell script package
-        # https://www.ertt.ca/nix/shell-scripts/#org6f67de6
-        mkScriptPackage = {
-          name,
-          deps,
-        }: let
-          pkgs = import nixpkgs {inherit system;};
-          scriptPath = ./scripts/${name}.sh;
-          script = (pkgs.writeScriptBin name (builtins.readFile scriptPath)).overrideAttrs (old: {
-            buildCommand = "${old.buildCommand}\n patchShebangs $out";
-          });
-        in
-          pkgs.symlinkJoin {
-            inherit name;
-            paths = [script] ++ deps;
-            buildInputs = [pkgs.makeWrapper];
-            postBuild = "wrapProgram $out/bin/${name} --prefix PATH : $out/bin";
-          };
-      in {
+      }: {
         # Nix code formatter, accessible through 'nix fmt'
         formatter = nixpkgs.legacyPackages.${system}.alejandra;
 
@@ -134,38 +115,12 @@
           };
         };
 
-        apps = {
-          init-qemu = {
-            type = "app";
-            program = "${self.packages.${system}.init-qemu}/bin/init-qemu";
-          };
-          nsq = {
-            type = "app";
-            program = "${self.packages.${system}.nsq}/bin/nsq";
-          };
-        };
-
         # Custom packages and aliases for building hosts
         # Accessible through 'nix build', 'nix run', etc
         packages =
           {
-            "nsq" = mkScriptPackage {
-              name = "nsq";
-              deps = with pkgs; [
-                git
-                jq
-                nix
-              ];
-            };
-            "init-qemu" = mkScriptPackage {
-              name = "init-qemu";
-              deps = with pkgs; [
-                gawk
-                gnused
-                nix
-                qemu
-              ];
-            };
+            "nsq" = pkgs.callPackage ./packages/nsq {};
+            "init-qemu" = pkgs.callPackage ./packages/init-qemu {};
           }
           // (with flake.nixosConfigurations; {
             "dinar-ephemeral-alpha" = dinar-ephemeral-alpha.config.system.build.isoImage;
