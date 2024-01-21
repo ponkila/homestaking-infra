@@ -1,19 +1,17 @@
 #!/usr/bin/env bash
 # Script to get and update nix-store queries for host configurations
-# Usage: sh ./scripts/get-store-queries.sh
-# Dependencies: nix, git
 
 set -o pipefail
 trap cleanup EXIT
 trap cleanup SIGINT
 
-script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-host_path="$script_dir/../nixosConfigurations"
+config_dir="nixosConfigurations"
 
 # Default flags for nix commands
 nix_flags=(
   --accept-flake-config
   --extra-experimental-features 'nix-command flakes'
+  --impure
   --no-warn-dirty
 )
 
@@ -27,8 +25,8 @@ cleanup() {
   exit 0
 }
 
-# Fetch hostnames from $host_path
-mapfile -t hostnames < <(find "$host_path" -mindepth 1 -maxdepth 1 -type d -exec basename {} \;)
+# Fetch hostnames from 'flake.nix'
+mapfile -t hostnames < <(nix eval --json .#nixosConfigurations --apply builtins.attrNames | jq -r '.[]')
 
 # Stash any uncommitted changes (including untracked files)
 if [[ -n $(git diff --quiet --exit-code) ]]; then
@@ -40,7 +38,7 @@ fi
 # Loop through hostnames
 for hostname in "${hostnames[@]}"; do
   # Remove old query if it exists
-  file_path="$host_path/$hostname/nix-store-query.txt"
+  file_path="$config_dir/$hostname/nix-store-query.txt"
   [ -f "$file_path" ] && rm "$file_path"
 
   # Get sorted build tree

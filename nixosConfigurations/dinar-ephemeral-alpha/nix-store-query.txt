@@ -724,7 +724,7 @@
 /nix/store/bspvshfk7vizq72949rwyvmvhkdyq243-clock-0.8.4.tar.gz.drv
 /nix/store/6b69cfhhz1h7824gxq7155labsvc4g40-Clone-0.46.tar.gz.drv
 /nix/store/3vcvl6wips020w55ilsnvvcacil999a5-closure-info.drv
-/nix/store/9ndvd8ln3a7ykjqx1k9nadmqnzqxqvda-closure-info.drv
+/nix/store/x9f94l7pp64gf77ncgcsf3yjiw4k9iqk-closure-info.drv
 /nix/store/s9g1rk8la4yd2rqz0gvm8k4bahvdr4h9-cmake-0.1.50.drv
 /nix/store/3jqbd9gw4077fjvqipszn3arfd0r6wqc-cmake-3.25.3.drv
 /nix/store/disygw9qg8qngl9pb0njz9i225n7i3ss-cmake-3.25.3.tar.gz.drv
@@ -1895,9 +1895,9 @@
 /nix/store/r9c2p9bfngynygbfj8m8s0fm53zvs34p-errno-dragonfly-0.1.2.drv
 /nix/store/9whx1m2a5x97ny5fhm18v3qcqp1x7zac-error-chain-0.12.4.drv
 /nix/store/h0sgbf7x0n41pcclvxsynn7qs2vdmcan-etc-bashrc.drv
-/nix/store/5mjq4yvbc8b8vr3fh53v8m9nvcfq43b6-etc.drv
+/nix/store/9hj2cvihd328b72sgna36q2q2xnmh1p9-etc.drv
 /nix/store/nqxgpc2aa2wjx4fcmmxy8nasc03ll2y0-etc-fish-config.fish.drv
-/nix/store/1vy1ffbys7zf5jy44m416l1q40iy0b57-etc-fish-nixos-env-preinit.fish.drv
+/nix/store/47kbdjw5ilw4nracjhg0z288g32s2nhp-etc-fish-nixos-env-preinit.fish.drv
 /nix/store/waw82imxqv7j5b992gwnxkrq7zigv3fb-etc-fstab.drv
 /nix/store/x77rjr16fnsn2skq6khbs5fc1snhkny6-etc-fuse.conf.drv
 /nix/store/fk3pgw6h0y5iwkndwxh9imfn9b1yww5h-etc-gitconfig.drv
@@ -1912,12 +1912,12 @@
 /nix/store/nrcw0s3781j4p2r04yrvwibnq666k648-etc-modprobe.d-nixos.conf.drv
 /nix/store/dnrwpp183az9v4a6zmmhmfg2mjarw9s9-etc-nanorc.drv
 /nix/store/7w6vy46f5gaanay1bm9ni0k7428pp7x6-etc-netgroup.drv
-/nix/store/x75kn1w0qgipdv1ahyg75zw2c717lccx-etc-nix-registry.json.drv
+/nix/store/9dc9fjrlx5wj3sbhri8q0q7k93jjfnkw-etc-nix-registry.json.drv
 /nix/store/xcisjhd9n2xf0qq7zq7k45mcjsl980xv-etc-nscd.conf.drv
 /nix/store/q0y6hsgq70s69v2yabr0z61ip48g5aas-etc-nsswitch.conf.drv
 /nix/store/fcf60q6syf347pn0qljplfyqs8wgd2y1-etc-os-release.drv
-/nix/store/hfbxqq10c4r43rc2iwz10332423d7p9j-etc-pam-environment.drv
-/nix/store/1n3g8xlrxv41ww1b7am09r9c90ip05k9-etc-profile.drv
+/nix/store/1jnl48mcmc91xnnjyfkis53a5f49yy83-etc-pam-environment.drv
+/nix/store/w0rrnb7nlvlwn2lqp8wz9ga5qdp5n88h-etc-profile.drv
 /nix/store/gkvnccfa2kvzmm6k46dkf3x9knzq8r8z-etc-resolvconf.conf.drv
 /nix/store/iw8f95rr01dd92735c2zmvm3p7l223m8-etc-shells.drv
 /nix/store/b7cwhw15hbb4mmjv1iqhh0flyzhx4wgf-etc-ssh-ssh_config.drv
@@ -2619,7 +2619,7 @@
 /nix/store/j4lk1cij380x7qn4phv82pz6acn2i12r-info.sh
 /nix/store/cd62fz1hfxghfl1ii5nmcz9ddxx59hmg-iniconfig-2.0.0.tar.gz.drv
 /nix/store/wmz83vn3dwaaxa4zlhk6g9ba9nbn2p3n-iniconfig-2.0.0.tar.gz.drv
-/nix/store/8g1h9w7s3kcc5fdbxpq32drg3macmzfv-initrd.drv
+/nix/store/bbwq7cvfzrn8lh8p317d2dxjvwprwnlw-initrd.drv
 /nix/store/zrvb86dgq7bpvlcn5a1295kv0b3z4vw9-initrd-fsinfo.drv
 /nix/store/ixl1f50gl6agr5awfmz7pmwsndi4d6fm-initrd-kmod-blacklist-ubuntu.drv
 /nix/store/pkv54nm10a7ys29yhpzhr9dsfpaddx0b-initrd-linux-6.7.drv
@@ -2711,11 +2711,11 @@
 /nix/store/5r5lk99j7y628gdkfn2xb5z6jp6imi44-keccak-hash-0.10.0.drv
 /nix/store/pkmvxa18irni60z6ngj3cncv186f38zw-keep-path.patch
 /nix/store/mjhbi958529d1650zfdjks5irsas2kcl-kernel-modules.drv
-/nix/store/zlql3s26wmvjc0rkd5fprrv9k3m298qw-kexec-boot.drv
+/nix/store/g9dq1agrjg6wpi6r4gfi834yqwljqyfx-kexec-boot.drv
 /nix/store/w78nqj7cdmwnhxsr1808aapfr0sz02ir-kexec-tools-2.0.26.drv
 /nix/store/49gnis36rr3zr27sap6ali5skksicf4w-kexec-tools-2.0.26_fish-completions.drv
 /nix/store/bgj1zxi0j02b4l8ygxl5gbxg4bjqx6nj-kexec-tools-2.0.26.tar.xz.drv
-/nix/store/i8iwhrrqyxrx3rgf8bg1z7qar5nh281r-kexec-tree.drv
+/nix/store/y0kpqp3nms0xxvl4r2pq8sazkwlis5xj-kexec-tree.drv
 /nix/store/s1m6xviarphalqbbg0iva6vk51qn44zf-keymap.drv
 /nix/store/9291b4xmjbammasys192li0b4abxjyyi-keyutils-1.6.3.drv
 /nix/store/prkgbdwi9iilwwb66f8zzc6z7y27k641-keyutils-1.6.3.drv
@@ -3341,7 +3341,7 @@
 /nix/store/ssll4c346zp30zb43nm8sqrnzyv4p67s-neon.patch?id=1d1de341e1404a46b15ae3e84bc400d474cf1a2c.drv
 /nix/store/ykf91mjr7lnz1qqbb5d90pgh3js0mw59-netavark-1.7.0.drv
 /nix/store/4qj64jp2lzrzr2vxrc5v4wpymvf90l1g-netavark-1.7.0-vendor.tar.gz.drv
-/nix/store/lsm2bvp9jh9pkgq4hs535z3y6lxhqg7s-netboot.ipxe.drv
+/nix/store/lwbpqmzqwd4jqhhlxkc5yfqypid8h6iq-netboot.ipxe.drv
 /nix/store/i09f5kwp2pbgnlb9269np1dgfz87jqwz-Net-HTTP-6.19.tar.gz.drv
 /nix/store/ds7ghj0wsj6wqj112dahq1z49r16zz5v-Net-HTTP-6.23.tar.gz.drv
 /nix/store/5y1z16h04j6dgqhy37fr7zzcw06vmb8z-netlink-packet-core-0.4.2.drv
@@ -3421,7 +3421,7 @@
 /nix/store/a14mcpqdf8ifahzwqb33nj4wm6nybyy6-nixos-rebuild_fish-completions.drv
 /nix/store/z4nc7w8armx56zmbpampfcmjqv8vkgjb-nixos-rebuild.sh
 /nix/store/y9xqil19zslfr71xa8hk04xks7903533-nixos-render-docs-0.0.drv
-/nix/store/pqbxagvc02yvgbshcxa3n0m43fnysv1f-nixos-system-dinar-ephemeral-alpha-24.05.20240119.bbe7d8f.drv
+/nix/store/pjbg4yi6ym1aiy7qn0lvq8j7wjwzhihr-nixos-system-dinar-ephemeral-alpha-24.05.20240119.bbe7d8f.drv
 /nix/store/0c2wz1x287xlkzas5lqcgqs85lpsy914-nixos-tmpfiles.d.drv
 /nix/store/yyrh92g94j8ljs6jaylqb8s7lkh6kggi-nixos-version.8
 /nix/store/yilpw1z1jnv7nndyc4qi8z0z9a9jqjfg-nixos-version.drv
@@ -4421,7 +4421,7 @@
 /nix/store/fdlmycn5lky65zgc7wryxs099p9zhym8-setenv-0.1.1.3.drv
 /nix/store/mb00jxaxb8hbxq1f21svl6j13sfyjy53-setenv-0.1.1.3-r1.cabal.drv
 /nix/store/ym674b7yxbm6yc46ipyzkgadi5i83z1f-setenv-0.1.1.3.tar.gz.drv
-/nix/store/bws65xpzcwql3b6mx4g0xf3b7imwhi9p-set-environment.drv
+/nix/store/4ggsb6sm64kml7y5a7b7qhrp860dq1ms-set-environment.drv
 /nix/store/ngg1cv31c8c7bcm2n8ww4g06nq7s4zhm-set-source-date-epoch-to-latest.sh
 /nix/store/pidj896qmai0iq83syhkq58ia5js0pil-setup-debug-info-dirs-hook.drv
 /nix/store/yrzwhzajmb24ha2ya2xyg0i4gz7qcy21-setup-debug-info-dirs.sh
@@ -4544,8 +4544,8 @@
 /nix/store/4a3qxnlq7r1gjwfjfqrizpf30hh22bz1-source
 /nix/store/6l9i8i0gb9a5b9nm3lhc33zdn9kivn0b-source
 /nix/store/7d6xpsla7gw94hsbwsa79lkpnab269v4-source
+/nix/store/i0j8c80sr7kriw2vc11j6mzkarxy74n0-source
 /nix/store/kwd6lmx004rkv2r00vj3fcg5ijfvnagk-source
-/nix/store/mz7x5rg7bk9hkvp40bm81mlmyzajkiyy-source
 /nix/store/nsi5sdh2xw0gy3vas4xihm0yqjsj9ryn-source
 /nix/store/xf6jcw3c6j2mmg77s9vr7v9vdsafax8h-source
 /nix/store/zvachah99jw4gq1q6irbymlamn3rdngy-source
@@ -4830,7 +4830,7 @@
 /nix/store/ib4dg16rq0iy0l89fs7a44yymdw7skp8-sqlite-autoconf-3410200.tar.gz.drv
 /nix/store/hb5988dqlnim05nb0m7x4sjdcpg48176-sqlite-autoconf-3440200.tar.gz.drv
 /nix/store/b4rhzhj3wqd8ad1s6cbqvvkd5cmpbv0h-squashfs-4.6.1.drv
-/nix/store/k1d27pg1qc0zc32rcm6gp6m5c5ikw0x9-squashfs.img.drv
+/nix/store/jbmg3jckkdlc60bmsma5lf0cm9jcsv9a-squashfs.img.drv
 /nix/store/z2lcjag195sk5l632zvb0hha130rfzdd-sratom-0.6.16.drv
 /nix/store/m9xpmdklxbw3y08z5n59g10ma5bkrf4j-sratom-0.6.16.tar.xz.drv
 /nix/store/cv66qz814s7n3jpdhh58zi3x70p8p3b7-srt-1.5.2.drv

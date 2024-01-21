@@ -18,7 +18,7 @@ We are currently working on [HomestakerOS](https://github.com/ponkila/Homestaker
 ## Structure
 - `flake.nix`: Entrypoint for host configurations.
 - `nixosConfigurations`: NixOS configurations. Accessible via `nix build`.
-- `scripts`: Nix devshell scripts. Accessible via `nix develop`.
+- `packages`: Our custom packages, accessible trough `nix run`, etc.
 
 ## Hosts
 | Hostname | System | Format | Info
