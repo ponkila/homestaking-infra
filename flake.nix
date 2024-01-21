@@ -70,9 +70,6 @@
               self'.packages.init-qemu
               self'.packages.nsq
             ];
-            scripts.disko.exec = ''
-              nix run github:nix-community/disko -- --mode zap_create_mount ./nixosConfigurations/"$(hostname)"/mounts.nix
-            '';
             env = {
               NIX_CONFIG = ''
                 accept-flake-config = true
@@ -89,7 +86,6 @@
 
                 nsq         : Get and update the nix-store queries
                 init-qemu   : Use QEMU to boot up a host
-                disko       : Format disks according to the mount.nix of the current host
 
               INFO
             '';
