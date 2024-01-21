@@ -71,7 +71,6 @@ in {
       where = "/mnt/eth";
       type = "ext4";
 
-      before = ["sshd.service"];
       wantedBy = ["multi-user.target"];
     };
   };
