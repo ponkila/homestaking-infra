@@ -8,24 +8,19 @@
     extra-substituters = [
       "https://cache.nixos.org"
       "https://nix-community.cachix.org"
-      "http://buidl0.ponkila.com:5000"
     ];
     extra-trusted-public-keys = [
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      "buidl0.ponkila.com:qJZUo9Aji8cTc0v6hIGqbWT8sy+IT/rmSKUFTfhVGGw="
     ];
   };
 
   inputs = {
     devenv.url = "github:cachix/devenv";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    home-manager.inputs.nixpkgs.follows = "nixpkgs";
-    home-manager.url = "github:nix-community/home-manager/release-23.05";
     nixobolus.url = "github:ponkila/nixobolus";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-23.05";
-    nix-serve-ng.url = "github:aristanetworks/nix-serve-ng";
     sops-nix.url = "github:Mic92/sops-nix";
   };
 
@@ -33,24 +28,16 @@
   outputs = {
     self,
     flake-parts,
-    home-manager,
     nixobolus,
     nixpkgs,
     nixpkgs-stable,
-    nix-serve-ng,
     sops-nix,
     ...
   } @ inputs:
     flake-parts.lib.mkFlake {inherit inputs;} rec {
+      systems = nixpkgs.lib.systems.flakeExposed;
       imports = [
         inputs.devenv.flakeModule
-      ];
-
-      systems = [
-        "aarch64-darwin"
-        "aarch64-linux"
-        "x86_64-darwin"
-        "x86_64-linux"
       ];
 
       perSystem = {
@@ -60,6 +47,7 @@
         system,
         ...
       }: {
+        # Overlays
         _module.args.pkgs = import inputs.nixpkgs {
           inherit system;
           overlays = [
@@ -76,15 +64,8 @@
         devenv.shells = {
           default = {
             packages = with pkgs; [
-              git
-              nix
-              nix-tree
-              jq
               sops
               ssh-to-age
-              rsync
-              zstd
-              cpio
             ];
             scripts = {
               nsq.exec = ''
@@ -150,8 +131,6 @@
             {
               nixpkgs.overlays = [
                 nixobolus.overlays.default
-                outputs.overlays.additions
-                outputs.overlays.modifications
               ];
               boot.loader.grub.enable = false;
             }
@@ -169,37 +148,12 @@
             {
               nixpkgs.overlays = [
                 nixobolus.overlays.default
-                outputs.overlays.additions
-                outputs.overlays.modifications
                 # Workaround for https://github.com/NixOS/nixpkgs/issues/154163
                 # This issue only happens with the isoImage format
                 (final: super: {
                   makeModulesClosure = x:
                     super.makeModulesClosure (x // {allowMissing = true;});
                 })
-              ];
-              boot.loader.grub.enable = false;
-            }
-          ];
-        };
-
-        hetzner-ephemeral-alpha = {
-          system = "x86_64-linux";
-          specialArgs = {inherit inputs outputs;};
-          modules = [
-            ./nixosConfigurations/hetzner-ephemeral-alpha
-            ./modules/sys2x/gc.nix
-            ./home-manager/juuso.nix
-            ./home-manager/kari.nix
-            ./home-manager/tommi.nix
-            nixobolus.nixosModules.kexecTree
-            nix-serve-ng.nixosModules.default
-            home-manager.nixosModules.home-manager
-            {
-              nixpkgs.overlays = [
-                nixobolus.overlays.default
-                outputs.overlays.additions
-                outputs.overlays.modifications
               ];
               boot.loader.grub.enable = false;
             }
@@ -217,8 +171,6 @@
             {
               nixpkgs.overlays = [
                 nixobolus.overlays.default
-                outputs.overlays.additions
-                outputs.overlays.modifications
               ];
               boot.loader.grub.enable = false;
             }
@@ -236,17 +188,12 @@
             {
               nixpkgs.overlays = [
                 nixobolus.overlays.default
-                outputs.overlays.additions
-                outputs.overlays.modifications
               ];
               boot.loader.grub.enable = false;
             }
           ];
         };
       in {
-        # Patches and version overrides for some packages
-        overlays = import ./overlays {inherit inputs;};
-
         # NixOS configuration entrypoints
         nixosConfigurations = with nixpkgs.lib;
           {
@@ -255,7 +202,6 @@
             "ponkila-ephemeral-beta" = nixosSystem ponkila-ephemeral-beta;
           }
           // (with nixpkgs-stable.lib; {
-            "hetzner-ephemeral-alpha" = nixosSystem hetzner-ephemeral-alpha;
             "ponkila-ephemeral-gamma" = nixosSystem ponkila-ephemeral-gamma;
           });
       };
