@@ -20,8 +20,6 @@
   inputs = {
     devenv.url = "github:cachix/devenv";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    home-manager.inputs.nixpkgs.follows = "nixpkgs";
-    home-manager.url = "github:nix-community/home-manager/release-23.05";
     nixobolus.url = "github:ponkila/nixobolus";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-23.05";
@@ -33,7 +31,6 @@
   outputs = {
     self,
     flake-parts,
-    home-manager,
     nixobolus,
     nixpkgs,
     nixpkgs-stable,
@@ -130,7 +127,6 @@
         # Accessible through 'nix build', 'nix run', etc
         packages = with flake.nixosConfigurations; {
           "dinar-ephemeral-alpha" = dinar-ephemeral-alpha.config.system.build.isoImage;
-          "hetzner-ephemeral-alpha" = hetzner-ephemeral-alpha.config.system.build.kexecTree;
           "dinar-ephemeral-beta" = dinar-ephemeral-beta.config.system.build.isoImage;
           "ponkila-ephemeral-beta" = ponkila-ephemeral-beta.config.system.build.kexecTree;
           "ponkila-ephemeral-gamma" = ponkila-ephemeral-gamma.config.system.build.kexecTree;
@@ -194,33 +190,6 @@
           ];
         };
 
-        hetzner-ephemeral-alpha = {
-          system = "x86_64-linux";
-          specialArgs = {inherit inputs outputs;};
-          modules = [
-            ./nixosConfigurations/hetzner-ephemeral-alpha
-            ./modules/sys2x/gc.nix
-            ./home-manager/juuso.nix
-            ./home-manager/kari.nix
-            ./home-manager/tommi.nix
-            nixobolus.nixosModules.kexecTree
-            nix-serve-ng.nixosModules.default
-            home-manager.nixosModules.home-manager
-            {
-              nixpkgs.overlays = [
-                nixobolus.overlays.default
-                outputs.overlays.additions
-                outputs.overlays.modifications
-              ];
-            }
-            {
-              # Bootloader for x86_64-linux / aarch64-linux
-              boot.loader.systemd-boot.enable = true;
-              boot.loader.efi.canTouchEfiVariables = true;
-            }
-          ];
-        };
-
         dinar-ephemeral-alpha = {
           system = "x86_64-linux";
           specialArgs = {inherit inputs outputs;};
@@ -268,7 +237,6 @@
             "ponkila-ephemeral-beta" = nixosSystem ponkila-ephemeral-beta;
           }
           // (with nixpkgs-stable.lib; {
-            "hetzner-ephemeral-alpha" = nixosSystem hetzner-ephemeral-alpha;
             "ponkila-ephemeral-gamma" = nixosSystem ponkila-ephemeral-gamma;
           });
       };
