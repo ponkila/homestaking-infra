@@ -8,7 +8,7 @@ mem=$(free -m | awk '/^Mem:/ {print $2 "M"}')
 cpucount=$(grep -c '^processor' /proc/cpuinfo)
 
 # Check arguments
-if [ "$#" -lt 1 ]; then
+if [ "$1" = "-h" ] || [ "$1" = "--help" ] || [ "$#" -lt 1 ]; then
     echo "Usage: init-qemu <hostname> [additional qemu args]"
     exit 1
 fi
