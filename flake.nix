@@ -107,14 +107,19 @@
           };
         };
 
-        # Custom packages and aliases for building hosts
-        # Accessible through 'nix build', 'nix run', etc
-        packages = with flake.nixosConfigurations; {
-          "dinar-ephemeral-alpha" = dinar-ephemeral-alpha.config.system.build.kexecTree;
-          "dinar-ephemeral-beta" = dinar-ephemeral-beta.config.system.build.kexecTree;
-          "ponkila-ephemeral-beta" = ponkila-ephemeral-beta.config.system.build.kexecTree;
-          "ponkila-ephemeral-gamma" = ponkila-ephemeral-gamma.config.system.build.kexecTree;
-        };
+        # Custom packages, accessible trough 'nix build', 'nix run', etc.
+        packages =
+          rec {
+            "nsq" = pkgs.callPackage ./packages/nsq {};
+            "init-qemu" = pkgs.callPackage ./packages/init-qemu {};
+          }
+          # Entrypoint aliases, accessible trough 'nix build'
+          // (with flake.nixosConfigurations; {
+            "dinar-ephemeral-alpha" = dinar-ephemeral-alpha.config.system.build.kexecTree;
+            "dinar-ephemeral-beta" = dinar-ephemeral-beta.config.system.build.kexecTree;
+            "ponkila-ephemeral-beta" = ponkila-ephemeral-beta.config.system.build.kexecTree;
+            "ponkila-ephemeral-gamma" = ponkila-ephemeral-gamma.config.system.build.kexecTree;
+          });
       };
       flake = let
         inherit (self) outputs;
