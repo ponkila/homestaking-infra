@@ -76,5 +76,11 @@ in {
     };
   };
 
+  # Tommi's toybox
+  services.qemuGuest.enable = true;
+  environment.systemPackages = with pkgs; [
+    parted
+  ];
+
   system.stateVersion = "23.05";
 }
