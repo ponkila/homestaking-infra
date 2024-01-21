@@ -153,11 +153,7 @@
                 outputs.overlays.additions
                 outputs.overlays.modifications
               ];
-            }
-            {
-              # Bootloader for x86_64-linux / aarch64-linux
-              boot.loader.systemd-boot.enable = true;
-              boot.loader.efi.canTouchEfiVariables = true;
+              boot.loader.grub.enable = false;
             }
           ];
         };
@@ -182,13 +178,6 @@
                     super.makeModulesClosure (x // {allowMissing = true;});
                 })
               ];
-            }
-            {
-              # Bootloader for RaspberryPi 4
-              boot.loader.raspberryPi = {
-                enable = true;
-                version = 4;
-              };
               boot.loader.grub.enable = false;
             }
           ];
@@ -212,11 +201,7 @@
                 outputs.overlays.additions
                 outputs.overlays.modifications
               ];
-            }
-            {
-              # Bootloader for x86_64-linux / aarch64-linux
-              boot.loader.systemd-boot.enable = true;
-              boot.loader.efi.canTouchEfiVariables = true;
+              boot.loader.grub.enable = false;
             }
           ];
         };
@@ -235,11 +220,7 @@
                 outputs.overlays.additions
                 outputs.overlays.modifications
               ];
-            }
-            {
-              # Bootloader for x86_64-linux / aarch64-linux
-              boot.loader.systemd-boot.enable = true;
-              boot.loader.efi.canTouchEfiVariables = true;
+              boot.loader.grub.enable = false;
             }
           ];
         };
@@ -258,11 +239,7 @@
                 outputs.overlays.additions
                 outputs.overlays.modifications
               ];
-            }
-            {
-              # Bootloader for x86_64-linux / aarch64-linux
-              boot.loader.systemd-boot.enable = true;
-              boot.loader.efi.canTouchEfiVariables = true;
+              boot.loader.grub.enable = false;
             }
           ];
         };
