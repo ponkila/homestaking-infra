@@ -21,7 +21,6 @@
     nixobolus.url = "github:ponkila/nixobolus";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-23.05";
-    nix-serve-ng.url = "github:aristanetworks/nix-serve-ng";
     sops-nix.url = "github:Mic92/sops-nix";
   };
 
@@ -32,7 +31,6 @@
     nixobolus,
     nixpkgs,
     nixpkgs-stable,
-    nix-serve-ng,
     sops-nix,
     ...
   } @ inputs:
@@ -49,6 +47,7 @@
         system,
         ...
       }: {
+        # Overlays
         _module.args.pkgs = import inputs.nixpkgs {
           inherit system;
           overlays = [
@@ -65,15 +64,8 @@
         devenv.shells = {
           default = {
             packages = with pkgs; [
-              git
-              nix
-              nix-tree
-              jq
               sops
               ssh-to-age
-              rsync
-              zstd
-              cpio
             ];
             scripts = {
               nsq.exec = ''
