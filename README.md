@@ -12,7 +12,6 @@ We are currently working on [HomestakerOS](https://github.com/ponkila/Homestaker
 - Runs on RAM disk, providing significant performance benefits by reducing I/O operations
 - [Overlays](https://nixos.wiki/wiki/Overlays) offer a convenient way to manually update or modify packages, ideal for addressing issues with upstream sources
 - Deployment secrets using [sops-nix](https://github.com/Mic92/sops-nix) for secure handling of sensitive information
-- Supports declarative disk partitioning via [disko](https://github.com/nix-community/disko)
 - Offers `isoImage` or `kexecTree` output formats depending on the host configuration
 
 ## Structure
@@ -96,18 +95,6 @@ ponkila-ephemeral-gamma | aarch64 | kexecTree | Raspberry Pi 4
     ```
 
   </details>
-
-## Disk formatting
-
-We use declarative disk partitioning by [disko](https://github.com/nix-community/disko). For each host, there should be disko script that contains the desired disk layout. There are a lot of [examples](https://github.com/nix-community/disko/tree/master/example) available on how to configure the layout.
-
-To apply the disk layout to a target machine, you'll need to boot the machine using the built image, clone this repository and execute the following command in it:
-
-```
-nix run github:nix-community/disko -- --mode zap_create_mount ./nixosConfigurations/"$(hostname)"/mounts.nix
-```
-
-This command will format the disks according to the `mount.nix` script for that specific host. Once the formatting is complete, reboot the machine, and the disks should be ready for use.
 
 ## Formats & Deployment
 
