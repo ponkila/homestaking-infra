@@ -22,8 +22,8 @@ We are currently working on [HomestakerOS](https://github.com/ponkila/Homestaker
 ## Hosts
 | Hostname | System | Format | Info
 |-|-|-|-|
-dinar-ephemeral-alpha | x86-64 | isoImage | Lighthouse + Erigon
-dinar-ephemeral-beta | x86-64 | isoImage | Lighthouse + Erigon
+dinar-ephemeral-alpha | x86-64 | kexecTree | Lighthouse + Erigon
+dinar-ephemeral-beta | x86-64 | kexecTree | Lighthouse + Erigon
 ponkila-ephemeral-beta | x86-64 | kexecTree | Lighthouse + Erigon
 ponkila-ephemeral-gamma | aarch64 | kexecTree | Raspberry Pi 4
 
