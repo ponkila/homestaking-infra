@@ -93,5 +93,7 @@ in {
     extraOptions = "--follow";
   };
 
+  services.getty.autologinUser = "core";
+
   system.stateVersion = "23.05";
 }
