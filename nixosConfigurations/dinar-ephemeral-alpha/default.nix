@@ -89,7 +89,7 @@ in {
 
   services.SystemdJournal2Gelf = {
     enable = true;
-    graylogServer = "192.168.86.4:12201";
+    graylogServer = "192.168.250.15:12201";
     extraOptions = "--follow";
   };
 
