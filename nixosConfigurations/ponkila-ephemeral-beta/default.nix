@@ -75,6 +75,7 @@ in {
     addons.ssv-node = {
       dataDir = "/var/mnt/addons/ssv";
       privateKeyFile = "/var/mnt/addons/ssv/ssv_operator_key";
+      privateKeyPasswordFile = "/var/mnt/addons/ssv/password";
     };
 
     # Mount options
@@ -120,9 +121,11 @@ in {
 
   # Secrets
   sops = {
-    secrets."wireguard/wg0" = {
-      sopsFile = ./secrets/default.yaml;
-    };
+    defaultSopsFile = ./secrets/default.yaml;
+    secrets."wireguard/wg0" = {};
+    secrets."ssvnode/password" = {};
+    secrets."ssvnode/publicKey" = {};
+    secrets."ssvnode/privateKey" = {};
     age.sshKeyPaths = [sshKeysPath];
   };
 

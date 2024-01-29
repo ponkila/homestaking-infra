@@ -601,15 +601,16 @@
         "nixpkgs-stable": "nixpkgs-stable_3"
       },
       "locked": {
-        "lastModified": 1705944752,
-        "narHash": "sha256-EKhtNsGnh8KaKdWtiiY3wbhHzscdgweHEAWuXgS3x/w=",
+        "lastModified": 1706564013,
+        "narHash": "sha256-G5FkEaLxBC2hDtqw0/HAhQOtWZBwN4vurVmvZTa0q08=",
         "owner": "ponkila",
         "repo": "nixobolus",
-        "rev": "d13d1191ed2f91ff66a65881514056a88629210e",
+        "rev": "ed6a3ef9c948781d2c4e1d771e2d9bb130c50a5e",
         "type": "github"
       },
       "original": {
         "owner": "ponkila",
+        "ref": "juuso/ssvnode-mainnet",
         "repo": "nixobolus",
         "type": "github"
       }

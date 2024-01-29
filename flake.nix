@@ -18,7 +18,7 @@
   inputs = {
     devenv.url = "github:cachix/devenv";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    nixobolus.url = "github:ponkila/nixobolus";
+    nixobolus.url = "github:ponkila/nixobolus/juuso/ssvnode-mainnet";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-23.05";
     sops-nix.url = "github:Mic92/sops-nix";
