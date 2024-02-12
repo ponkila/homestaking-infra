@@ -600,11 +600,11 @@
         "nixpkgs-stable": "nixpkgs-stable_3"
       },
       "locked": {
-        "lastModified": 1707757857,
-        "narHash": "sha256-NaZ6AQbxLTJHylx/plxWaWRn2etk+byjbCQq7u1q2eM=",
+        "lastModified": 1707781875,
+        "narHash": "sha256-CSxT/H8CJZbt5DzuSh4Vw05yDpQSRabHAeDkcvnd0DY=",
         "owner": "ponkila",
         "repo": "nixobolus",
-        "rev": "20cbd3c47bcf6637453091901d24fb55190a6329",
+        "rev": "79988e8ddc2cfb42bcd5a911b75a14cbbdf7c526",
         "type": "github"
       },
       "original": {
