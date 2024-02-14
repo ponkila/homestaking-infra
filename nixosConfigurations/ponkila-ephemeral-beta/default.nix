@@ -74,8 +74,8 @@ in {
     };
     addons.ssv-node = {
       dataDir = "/var/mnt/addons/ssv";
-      privateKeyFile = "/var/mnt/addons/ssv/ssv_operator_key";
-      privateKeyPasswordFile = "/var/mnt/addons/ssv/password";
+      privateKeyFile = config.sops.secrets."ssvnode/privateKey".path;
+      privateKeyPasswordFile = config.sops.secrets."ssvnode/password".path;
     };
 
     # Mount options
