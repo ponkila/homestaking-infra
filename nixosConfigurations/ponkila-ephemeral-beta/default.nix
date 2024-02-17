@@ -7,15 +7,15 @@
 }: let
   # General
   infra.ip = "192.168.100.10";
-  lighthouse.datadir = "/var/mnt/lighthouse";
-  erigon.datadir = "/var/mnt/erigon";
-  sshKeysPath = "/var/mnt/secrets/ssh/id_ed25519";
+  lighthouse.datadir = "/var/mnt/xfs/lighthouse";
+  erigon.datadir = "/var/mnt/xfs/erigon";
+  sshKeysPath = "/var/mnt/xfs/secrets/ssh/id_ed25519";
 in {
+  boot.initrd.availableKernelModules = ["xfs" "dm_mod" "dm-raid" "dm_integrity" "raid0"];
   # Workaround for https://github.com/Mic92/sops-nix/issues/24
-  fileSystems."/var/mnt/secrets" = lib.mkImageMediaOverride {
-    fsType = "btrfs";
-    device = "/dev/disk/by-label/nvme";
-    options = ["subvolid=262"];
+  fileSystems."/var/mnt/xfs" = lib.mkImageMediaOverride {
+    fsType = "xfs";
+    device = "/dev/mapper/wd-ethereum";
     neededForBoot = true;
   };
 
@@ -50,7 +50,7 @@ in {
       enable = true;
       endpoint = "http://${infra.ip}:8551";
       dataDir = erigon.datadir;
-      jwtSecretFile = "/var/mnt/erigon/jwt.hex";
+      jwtSecretFile = "/var/mnt/xfs/erigon/jwt.hex";
     };
 
     # Lighthouse options
@@ -64,7 +64,7 @@ in {
         historyLength = 256;
         maxDatabaseSize = 16;
       };
-      jwtSecretFile = "/var/mnt/lighthouse/jwt.hex";
+      jwtSecretFile = "/var/mnt/xfs/lighthouse/jwt.hex";
     };
 
     # Addons
@@ -73,49 +73,9 @@ in {
       endpoint = "http://${infra.ip}:18550";
     };
     addons.ssv-node = {
-      dataDir = "/var/mnt/addons/ssv";
+      dataDir = "/var/mnt/xfs/addons/ssv";
       privateKeyFile = config.sops.secrets."ssvnode/privateKey".path;
       privateKeyPasswordFile = config.sops.secrets."ssvnode/password".path;
-    };
-
-    # Mount options
-    mounts = {
-      # Erigon
-      erigon = {
-        enable = true;
-        description = "erigon storage";
-
-        what = "/dev/disk/by-label/nvme";
-        where = erigon.datadir;
-        options = "subvolid=258,noatime";
-        type = "btrfs";
-
-        wantedBy = ["multi-user.target"];
-      };
-      # Lighthouse
-      lighthouse = {
-        enable = true;
-        description = "lighthouse storage";
-
-        what = "/dev/disk/by-label/nvme";
-        where = lighthouse.datadir;
-        options = "subvolid=261,noatime";
-        type = "btrfs";
-
-        wantedBy = ["multi-user.target"];
-      };
-      # Addons
-      addons = {
-        enable = true;
-        description = "addons storage";
-
-        what = "/dev/disk/by-label/nvme";
-        where = "/var/mnt/addons";
-        options = "subvolid=263,noatime";
-        type = "btrfs";
-
-        wantedBy = ["multi-user.target"];
-      };
     };
   };
 
