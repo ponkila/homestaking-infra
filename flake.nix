@@ -108,6 +108,7 @@
           // (with flake.nixosConfigurations; {
             "dinar-ephemeral-alpha" = dinar-ephemeral-alpha.config.system.build.kexecTree;
             "dinar-ephemeral-beta" = dinar-ephemeral-beta.config.system.build.kexecTree;
+            "hetzner-ephemeral-alpha" = hetzner-ephemeral-alpha.config.system.build.kexecTree;
             "ponkila-ephemeral-beta" = ponkila-ephemeral-beta.config.system.build.kexecTree;
             "ponkila-ephemeral-gamma" = ponkila-ephemeral-gamma.config.system.build.kexecTree;
           });
@@ -160,6 +161,23 @@
           ];
         };
 
+        hetzner-ephemeral-alpha = {
+          system = "x86_64-linux";
+          specialArgs = {inherit inputs outputs;};
+          modules = [
+            ./nixosConfigurations/hetzner-ephemeral-alpha
+            nixobolus.nixosModules.kexecTree
+            nixobolus.nixosModules.homestakeros
+            sops-nix.nixosModules.sops
+            {
+              nixpkgs.overlays = [
+                nixobolus.overlays.default
+              ];
+              boot.loader.grub.enable = false;
+            }
+          ];
+        };
+
         dinar-ephemeral-alpha = {
           system = "x86_64-linux";
           specialArgs = {inherit inputs outputs;};
@@ -199,6 +217,7 @@
           {
             "dinar-ephemeral-alpha" = nixosSystem dinar-ephemeral-alpha;
             "dinar-ephemeral-beta" = nixosSystem dinar-ephemeral-beta;
+            "hetzner-ephemeral-alpha" = nixosSystem hetzner-ephemeral-alpha;
             "ponkila-ephemeral-beta" = nixosSystem ponkila-ephemeral-beta;
           }
           // (with nixpkgs-stable.lib; {
