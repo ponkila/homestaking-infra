@@ -120,6 +120,8 @@ in {
 
     wantedBy = ["multi-user.target"];
   };
+  networking.firewall.allowedTCPPorts = [50001];
+  networking.firewall.allowedUDPPorts = [50001];
 
   # Secrets
   sops = {
@@ -128,6 +130,7 @@ in {
       owner = "netdata";
       group = "netdata";
     };
+    secrets."nix-serve/secretKeyFile" = {};
     secrets."ssvnode/password" = {};
     secrets."ssvnode/privateKey" = {};
     secrets."ssvnode/publicKey" = {};
@@ -143,6 +146,14 @@ in {
     configDir = {
       "health_alarm_notify.conf" = config.sops.secrets."netdata/health_alarm_notify.conf".path;
     };
+  };
+
+  services.nix-serve = {
+    enable = true;
+    openFirewall = true;
+    port = 5000;
+    bindAddress = "192.168.100.10";
+    secretKeyFile = config.sops.secrets."nix-serve/secretKeyFile".path;
   };
 
   system.stateVersion = "23.05";
