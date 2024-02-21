@@ -8,10 +8,12 @@
     extra-substituters = [
       "https://cache.nixos.org"
       "https://nix-community.cachix.org"
+      "http://192.168.100.10:5000"
     ];
     extra-trusted-public-keys = [
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "192.168.100.10:0qiW05TfoEi8DCkNqeKlbXvnKfMi8bA4fiyTKSYY3P8="
     ];
   };
 
