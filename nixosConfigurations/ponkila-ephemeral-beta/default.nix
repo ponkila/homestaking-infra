@@ -147,6 +147,7 @@ in {
 
   services.nix-serve = {
     enable = true;
+    package = pkgs.nix-serve-ng;
     openFirewall = true;
     port = 5000;
     bindAddress = "192.168.100.10";
