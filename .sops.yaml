@@ -2,7 +2,14 @@ keys:
   - &juuso 8F84B8738E67A3453F05D29BC2DC6A67CB7F891F
   - &jesse 773DC99EDAF29D356155DC91269CF32D790D1789
   - &ponkila-ephemeral-beta age1rahna5rce9mj0js0p7dgt6wseqyzxjawva82tfdelzuvmngr5fdqa2geuy
+  - &hetzner-ephemeral-alpha age12jm0kcs6vxffpr5k4gn899s05rhrvtw6fnm0m45ralck5sp8hyrs6qg0en
 creation_rules:
+  - path_regex: nixosConfigurations/hetzner-ephemeral-alpha/secrets/[^/]+\.yaml$
+    key_groups:
+      - pgp:
+        - *juuso
+        age:
+        - *hetzner-ephemeral-alpha
   - path_regex: nixosConfigurations/ponkila-ephemeral-beta/secrets/[^/]+\.yaml$
     key_groups:
       - pgp:

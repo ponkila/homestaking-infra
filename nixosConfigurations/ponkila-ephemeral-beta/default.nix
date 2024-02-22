@@ -77,20 +77,82 @@ in {
       privateKeyFile = config.sops.secrets."ssvnode/privateKey".path;
       privateKeyPasswordFile = config.sops.secrets."ssvnode/password".path;
     };
+
+    mounts = {
+      bitcoin = {
+        enable = true;
+        description = "bitcoin storage";
+
+        what = "/dev/mapper/samsung-bitcoin";
+        where = "/var/mnt/bitcoin";
+        type = "xfs";
+
+        before = ["bitcoind-mainnet.service"];
+        wantedBy = ["multi-user.target"];
+      };
+    };
   };
+
+  services.bitcoind."mainnet" = {
+    enable = true;
+    prune = "disable";
+    dataDir = "/var/mnt/bitcoin/bitcoind";
+    extraCmdlineOptions = [
+      "-server=1"
+      "-txindex=0"
+      "-rpccookiefile=/var/mnt/bitcoin/bitcoind/.cookie"
+    ];
+  };
+
+  systemd.services.electrs = {
+    enable = true;
+
+    description = "electrum rpc";
+    requires = ["wg-quick-wg0.service" "bitcoind-mainnet.service"];
+    after = ["wg-quick-wg0.service" "bitcoind-mainnet.service"];
+
+    script = ''      ${pkgs.electrs}/bin/electrs \
+            --db-dir /var/mnt/bitcoin/electrs/db \
+            --cookie-file /var/mnt/bitcoin/bitcoind/.cookie \
+            --network bitcoin \
+            --electrum-rpc-addr 192.168.100.10:50001
+    '';
+
+    wantedBy = ["multi-user.target"];
+  };
+  networking.firewall.allowedTCPPorts = [50001];
+  networking.firewall.allowedUDPPorts = [50001];
 
   # Secrets
   sops = {
     defaultSopsFile = ./secrets/default.yaml;
-    secrets."wireguard/wg0" = {};
+    secrets."netdata/health_alarm_notify.conf" = {
+      owner = "netdata";
+      group = "netdata";
+    };
+    secrets."nix-serve/secretKeyFile" = {};
     secrets."ssvnode/password" = {};
-    secrets."ssvnode/publicKey" = {};
     secrets."ssvnode/privateKey" = {};
+    secrets."ssvnode/publicKey" = {};
+    secrets."wireguard/wg0" = {};
     age.sshKeyPaths = [sshKeysPath];
   };
 
-  # Enable an ONC RPC directory service used by NFS
-  services.rpcbind.enable = true;
+  services.netdata = {
+    enable = true;
+    configDir = {
+      "health_alarm_notify.conf" = config.sops.secrets."netdata/health_alarm_notify.conf".path;
+    };
+  };
+
+  services.nix-serve = {
+    enable = true;
+    package = pkgs.nix-serve-ng;
+    openFirewall = true;
+    port = 5000;
+    bindAddress = "192.168.100.10";
+    secretKeyFile = config.sops.secrets."nix-serve/secretKeyFile".path;
+  };
 
   system.stateVersion = "23.05";
 }
