@@ -138,9 +138,6 @@ in {
     age.sshKeyPaths = [sshKeysPath];
   };
 
-  # Enable an ONC RPC directory service used by NFS
-  services.rpcbind.enable = true;
-
   services.netdata = {
     enable = true;
     configDir = {

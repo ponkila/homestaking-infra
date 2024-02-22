@@ -20,6 +20,7 @@ in {
     "virtio_pci"
     "virtio_net"
 
+    "dm_mod"
     "btrfs"
   ];
   # Workaround for https://github.com/Mic92/sops-nix/issues/24
@@ -300,6 +301,8 @@ in {
       }
     '';
   };
+  systemd.services.nginx.requires = ["wg-quick-wg0.service"];
+  systemd.services.nginx.after = ["wg-quick-wg0.service"];
 
   homestakeros = {
     # Localization options
