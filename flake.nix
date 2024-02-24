@@ -20,6 +20,7 @@
   inputs = {
     devenv.url = "github:cachix/devenv";
     flake-parts.url = "github:hercules-ci/flake-parts";
+    nixie.url = "git+ssh://git@github.com/majbacka-labs/nixie";
     nixobolus.url = "github:ponkila/nixobolus";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-23.05";
@@ -30,6 +31,7 @@
   outputs = {
     self,
     flake-parts,
+    nixie,
     nixobolus,
     nixpkgs,
     nixpkgs-stable,
@@ -163,6 +165,22 @@
           ];
         };
 
+        pxe-persistent-alpha = {
+          system = "x86_64-linux";
+          specialArgs = {inherit inputs outputs;};
+          modules = [
+            ./nixosConfigurations/pxe-persistent-alpha
+            nixie.nixosModules.nixie
+            nixobolus.nixosModules.homestakeros
+            sops-nix.nixosModules.sops
+            {
+              nixpkgs.overlays = [
+                nixobolus.overlays.default
+              ];
+            }
+          ];
+        };
+
         hetzner-ephemeral-alpha = {
           system = "x86_64-linux";
           specialArgs = {inherit inputs outputs;};
@@ -221,6 +239,7 @@
             "dinar-ephemeral-beta" = nixosSystem dinar-ephemeral-beta;
             "hetzner-ephemeral-alpha" = nixosSystem hetzner-ephemeral-alpha;
             "ponkila-ephemeral-beta" = nixosSystem ponkila-ephemeral-beta;
+            "pxe-persistent-alpha" = nixosSystem pxe-persistent-alpha;
           }
           // (with nixpkgs-stable.lib; {
             "ponkila-ephemeral-gamma" = nixosSystem ponkila-ephemeral-gamma;
