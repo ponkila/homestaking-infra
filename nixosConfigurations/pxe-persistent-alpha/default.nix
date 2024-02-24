@@ -11,7 +11,24 @@ in {
   boot.loader.grub.enable = true;
   boot.loader.grub.device = "/dev/sda";
   boot.loader.grub.useOSProber = true;
-  services.qemuGuest.enable = true;
+
+  # Qemu
+  services.qemuGuest = {
+    enable = true;
+    package =
+      (pkgs.qemu_kvm.override {
+        alsaSupport = false;
+        pulseSupport = false;
+        pipewireSupport = false;
+        jackSupport = false;
+
+        gtkSupport = false;
+        sdlSupport = false;
+        openGLSupport = false;
+        virglSupport = false;
+      })
+      .ga;
+  };
 
   nixie = {
     enable = true;
