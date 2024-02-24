@@ -12,6 +12,11 @@ in {
   boot.loader.grub.device = "/dev/sda";
   boot.loader.grub.useOSProber = true;
 
+  # Support for cross compilation
+  boot.binfmt.emulatedSystems = [
+    "aarch64-linux"
+  ];
+
   # Qemu
   services.qemuGuest = {
     enable = true;
