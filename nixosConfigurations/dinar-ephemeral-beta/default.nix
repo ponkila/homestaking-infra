@@ -76,7 +76,22 @@ in {
   };
 
   # Tommi's toybox
-  services.qemuGuest.enable = true;
+  services.qemuGuest = {
+    enable = true;
+    package =
+      (pkgs.qemu_kvm.override {
+        alsaSupport = false;
+        pulseSupport = false;
+        pipewireSupport = false;
+        jackSupport = false;
+
+        gtkSupport = false;
+        sdlSupport = false;
+        openGLSupport = false;
+        virglSupport = false;
+      })
+      .ga;
+  };
   environment.systemPackages = with pkgs; [
     parted
   ];

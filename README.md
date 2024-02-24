@@ -24,6 +24,8 @@ We are currently working on [HomestakerOS](https://github.com/ponkila/Homestaker
 |-|-|-|-|
 dinar-ephemeral-alpha | x86-64 | kexecTree | Lighthouse + Erigon
 dinar-ephemeral-beta | x86-64 | kexecTree | Lighthouse + Erigon
+dinar-persistent-gamma | x86-64 | kexecTree | Nixie
+hetzner-ephemeral-alpha | x86-64 | kexecTree | Blutgang + Threshold.network
 ponkila-ephemeral-beta | x86-64 | kexecTree | Lighthouse + Erigon
 ponkila-ephemeral-gamma | aarch64 | kexecTree | Raspberry Pi 4
 
