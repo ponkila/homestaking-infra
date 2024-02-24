@@ -96,5 +96,19 @@ in {
     parted
   ];
 
+  security.audit = {
+    enable = true;
+    rules = ["-a exit,always -F arch=b64 -S execve"];
+  };
+  security.auditd.enable = true;
+
+  services.SystemdJournal2Gelf = {
+    enable = true;
+    graylogServer = "192.168.250.15:12201";
+    extraOptions = "--follow";
+  };
+
+  services.getty.autologinUser = "core";
+
   system.stateVersion = "23.05";
 }
