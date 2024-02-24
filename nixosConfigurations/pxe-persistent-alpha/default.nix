@@ -78,7 +78,7 @@ in {
           clients = [
             {
               menu = "dinar-alpha";
-              mac = "bc:24:11:00:2f:ff";
+              mac = "bc:24:11:d0:6b:fd";
               address = "192.168.240.89";
             }
           ];
