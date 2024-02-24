@@ -167,11 +167,11 @@
           ];
         };
 
-        pxe-persistent-alpha = {
+        dinar-persistent-gamma = {
           system = "x86_64-linux";
           specialArgs = {inherit inputs outputs;};
           modules = [
-            ./nixosConfigurations/pxe-persistent-alpha
+            ./nixosConfigurations/dinar-persistent-gamma
             nixie.nixosModules.nixie
             nixobolus.nixosModules.homestakeros
             sops-nix.nixosModules.sops
@@ -239,9 +239,9 @@
           {
             "dinar-ephemeral-alpha" = nixosSystem dinar-ephemeral-alpha;
             "dinar-ephemeral-beta" = nixosSystem dinar-ephemeral-beta;
+            "dinar-persistent-gamma" = nixosSystem dinar-persistent-gamma;
             "hetzner-ephemeral-alpha" = nixosSystem hetzner-ephemeral-alpha;
             "ponkila-ephemeral-beta" = nixosSystem ponkila-ephemeral-beta;
-            "pxe-persistent-alpha" = nixosSystem pxe-persistent-alpha;
           }
           // (with nixpkgs-stable.lib; {
             "ponkila-ephemeral-gamma" = nixosSystem ponkila-ephemeral-gamma;

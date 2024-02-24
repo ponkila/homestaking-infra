@@ -92,7 +92,7 @@ in {
   homestakeros = {
     # Localization options
     localization = {
-      hostname = "pxe-persistent-alpha";
+      hostname = "dinar-persistent-gamma";
       timezone = "Europe/Helsinki";
     };
 
