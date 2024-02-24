@@ -115,7 +115,18 @@ in {
   sops = {
     defaultSopsFile = ./secrets/default.yaml;
     secrets."wireguard/wg0" = {};
+    secrets."nix-serve/secretKeyFile" = {};
     age.sshKeyPaths = [sshKeysPath];
+  };
+
+  # Binary cache
+  services.nix-serve = {
+    enable = true;
+    package = pkgs.nix-serve-ng;
+    openFirewall = true;
+    port = 5000;
+    bindAddress = "192.168.100.5";
+    secretKeyFile = config.sops.secrets."nix-serve/secretKeyFile".path;
   };
 
   system.stateVersion = "23.11";
