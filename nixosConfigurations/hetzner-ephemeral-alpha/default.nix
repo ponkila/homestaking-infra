@@ -90,7 +90,13 @@ in {
 
       [dinar-ephemeral-alpha]
       url = "http://192.168.100.31:8545"
-      ws_url = "ws://192.168.100.31:8545"
+      ws_url = "ws://192.168.100.31:8546"
+      max_consecutive = 5
+      max_per_second = 0
+
+      [majbacka-persistent-alpha]
+      url = "http://192.168.100.21:8545"
+      ws_url = "ws://192.168.100.21:8546"
       max_consecutive = 5
       max_per_second = 0
     '';
