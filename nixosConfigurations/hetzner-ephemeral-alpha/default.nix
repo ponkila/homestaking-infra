@@ -41,13 +41,11 @@ in {
       [blutgang]
       # Clear the cache DB on startup
       do_clear = true
-      # Where to bind blutgang to
       address = "192.168.100.40:8545"
       # Moving average length for the latency
       ma_length = 10
       # Sort RPCs by latency on startup. Recommended to leave on.
       sort_on_startup = true
-      # Enable health checking
       health_check = true
       # Acceptable time to wait for a response in ms
       ttl = 300
@@ -59,20 +57,15 @@ in {
       # Note: the admin namespace contains volatile functions and
       # should not be exposed publicly.
       [admin]
-      # Enable the admin namespace
-      enabled = false
-      # Address for the admin RPC
+      enabled = true
       address = "127.0.0.1:5715"
-      # Only allow read-only methods
-      # Recommended `true` unless you 100% need write methods
-      readonly = true
+      readonly = false
       # Enable the use of JWT for auth
       # Should be on if exposing to the internet
       jwt = false
       # jwt token
       key = ""
 
-      # Sled config
       # Sled is the database we use for our cache, for more info check their docs
       [sled]
       # Path to db
@@ -92,16 +85,14 @@ in {
       [ponkila-ephemeral-beta]
       url = "http://192.168.100.10:8545"
       ws_url = "ws://192.168.100.10:8546"
-      # The maximum ammount of time we can use this rpc in a row.
       max_consecutive = 5
-      # Max ammount of querries per second. Doesn't do anything for now.
       max_per_second = 0
 
       [dinar-ephemeral-alpha]
       url = "http://192.168.100.31:8545"
       ws_url = "ws://192.168.100.31:8545"
       max_consecutive = 5
-      max_per_second 0
+      max_per_second = 0
     '';
   };
 
