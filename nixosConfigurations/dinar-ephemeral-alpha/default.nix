@@ -75,6 +75,36 @@ in {
     };
   };
 
+  services.bitcoind."mainnet" = {
+    enable = true;
+    prune = "disable";
+    dataDir = "/mnt/eth/bitcoin/bitcoind";
+    extraCmdlineOptions = [
+      "-server=1"
+      "-txindex=0"
+      "-rpccookiefile=/mnt/eth/bitcoin/bitcoind/.cookie"
+    ];
+  };
+
+  systemd.services.electrs = {
+    enable = true;
+
+    description = "electrum rpc";
+    requires = ["wg-quick-wg0.service" "bitcoind-mainnet.service"];
+    after = ["wg-quick-wg0.service" "bitcoind-mainnet.service"];
+
+    script = ''      ${pkgs.electrs}/bin/electrs \
+            --db-dir /mnt/eth/bitcoin/electrs/db \
+            --cookie-file /mnt/eth/bitcoin/bitcoind/.cookie \
+            --network bitcoin \
+            --electrum-rpc-addr 192.168.100.31:50001
+    '';
+
+    wantedBy = ["multi-user.target"];
+  };
+  networking.firewall.allowedTCPPorts = [50001];
+  networking.firewall.allowedUDPPorts = [50001];
+
   # Tommi's toybox
   services.qemuGuest = {
     enable = true;
