@@ -95,7 +95,7 @@ in {
       max_per_second = 0
 
       [dinar-ephemeral-beta]
-      url = "http://192.168.100:30:8545"
+      url = "http://192.168.100.30:8545"
       ws_url = "ws://192.168.100.30:8546"
       max_consecutive = 5
       max_per_second = 0
