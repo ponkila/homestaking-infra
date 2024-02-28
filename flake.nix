@@ -22,7 +22,7 @@
   inputs = {
     devenv.url = "github:cachix/devenv";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    nixie.url = "git+ssh://git@github.com/majbacka-labs/nixie";
+    nixie.url = "git+ssh://git@github.com/majbacka-labs/nixie\?ref=develop3";
     nixobolus.url = "github:ponkila/nixobolus";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-23.05";
