@@ -63,6 +63,7 @@ in {
           flakeUrl = "github:ponkila/homestaking-infra";
           hosts = ["dinar-ephemeral-alpha"];
           buildRequests = true;
+          timeout = 1;
         }
       ];
     };
