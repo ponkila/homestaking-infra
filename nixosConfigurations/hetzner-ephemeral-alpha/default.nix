@@ -32,110 +32,46 @@ in {
   };
 
   environment.systemPackages = with pkgs; [
-    blutgang
     keep-core
   ];
 
-  environment.etc."blutgang.toml" = {
+  environment.etc."Caddyfile" = {
     text = ''
-      [blutgang]
-      # Clear the cache DB on startup
-      do_clear = true
-      address = "192.168.100.40:8545"
-      # Moving average length for the latency
-      ma_length = 10
-      # Sort RPCs by latency on startup. Recommended to leave on.
-      sort_on_startup = true
-      health_check = true
-      # Acceptable time to wait for a response in ms
-      ttl = 300
-      # How many times to retry a request before giving up
-      max_retries = 32
-      # Time between health checks in ms
-      health_check_ttl = 12000
+       {
+        auto_https off
+        servers {
+          metrics
+        }
+        debug True
+      }
 
-      # Note: the admin namespace contains volatile functions and
-      # should not be exposed publicly.
-      [admin]
-      enabled = true
-      address = "127.0.0.1:5715"
-      readonly = false
-      # Enable the use of JWT for auth
-      # Should be on if exposing to the internet
-      jwt = false
-      # jwt token
-      key = ""
+      http://192.168.100.40:8545 {
 
-      # Sled is the database we use for our cache, for more info check their docs
-      [sled]
-      # Path to db
-      db_path = "/var/mnt/blutgang"
-      # sled mode. Can be HighThroughput/LowSpace
-      mode = "HighThroughput"
-      # Cache size in bytes. Doesn't matter too much as you OS should also be caching.
-      cache_capacity = 1000000000
-      # Use zstd compression. Reduces size 60-70%,
-      # and increases CPU and latency by around 10% for db writes and 2% for reads
-      compression = true
-      # Print DB profile when dropped. Doesn't do anything for now.
-      print_profile = false
-      # Frequency of flushes in ms
-      flush_every_ms = 24000
+        reverse_proxy {
+          to 192.168.100.10:8545 192.168.100.21:8545 192.168.100.30:8545 192.168.100.31:8545
 
-      [ponkila-ephemeral-beta]
-      url = "http://192.168.100.10:8545"
-      ws_url = "ws://192.168.100.10:8546"
-      max_consecutive = 5
-      max_per_second = 0
+          health_uri /eth/v1/node/syncing
+          health_port 5052
+          health_interval 11s
+          health_body `"is_syncing":false,"is_optimistic":false,"el_offline":false`
 
-      [dinar-ephemeral-alpha]
-      url = "http://192.168.100.31:8545"
-      ws_url = "ws://192.168.100.31:8546"
-      max_consecutive = 5
-      max_per_second = 0
-
-      [dinar-ephemeral-beta]
-      url = "http://192.168.100.30:8545"
-      ws_url = "ws://192.168.100.30:8546"
-      max_consecutive = 5
-      max_per_second = 0
-
-      [majbacka-persistent-alpha]
-      url = "http://192.168.100.21:8545"
-      ws_url = "ws://192.168.100.21:8546"
-      max_consecutive = 5
-      max_per_second = 0
+          fail_duration 30s
+          unhealthy_latency 300ms
+        }
+      }
     '';
   };
-
-  systemd.services.blutgang = {
+  services.caddy = {
     enable = true;
-
-    description = "blutgang ethereum rpc proxy";
-    requires = ["wg-quick-wg0.service"];
-    after = ["wg-quick-wg0.service"];
-
-    serviceConfig = {
-      Restart = "always";
-      RestartSec = "5s";
-      User = "core";
-      Group = "core";
-      Type = "simple";
-    };
-
-    script = ''      /var/mnt/blutgang-0.3.0/bin/blutgang \
-            -c /etc/blutgang.toml
-    '';
-
-    wantedBy = ["multi-user.target"];
+    configFile = "/etc/Caddyfile";
   };
 
   systemd.services.keep-network = {
     enable = true;
 
     description = "keep-network bridge service";
-    requires = ["blutgang.service" "nginx.service"];
-    after = ["blutgang.service" "nginx.service"];
+    requires = ["caddy.service" "nginx.service"];
+    after = ["caddy.service" "nginx.service"];
 
     serviceConfig = {
       EnvironmentFile = ''${config.sops.secrets."keep-network/env".path}'';
@@ -162,6 +98,15 @@ in {
     config = ''
       events {
         worker_connections 1024;
+      }
+
+      http {
+        server {
+          listen 8080;
+          location = /healthz {
+            stub_status;
+          }
+        }
       }
 
       stream {
@@ -275,6 +220,55 @@ in {
     enable = true;
     configDir = {
       "health_alarm_notify.conf" = config.sops.secrets."netdata/health_alarm_notify.conf".path;
+      "go.d/prometheus.conf" = pkgs.writeText "go.d/prometheus.conf" ''
+        jobs:
+        - name: keep-core
+          url: http://127.0.0.1:9601/metrics
+        - name: caddy
+          url: http://127.0.0.1:2019/metrics
+      '';
+      "health.d/btc_connectivity.conf" = pkgs.writeText "health.d/btc_connectivity.conf" ''
+         alarm: juuso: btc_connectivity
+            on: prometheus_keep-core.btc_connectivity
+        lookup: min -10s
+         every: 10s
+          crit: $this == 0
+      '';
+      "health.d/eth_connectivity.conf" = pkgs.writeText "health.d/eth_connectivity.conf" ''
+         alarm: juuso: eth_connectivity
+        lookup: min -10s
+            on: prometheus_keep-core.eth_connectivity
+         every: 10s
+          crit: $this == 0
+      '';
+      "health.d/upstream_192.168.100.10.conf" = pkgs.writeText "health.d/upstream_192.168.100.10.conf" ''
+         alarm: juuso: healthy-upstream_192.168.100.10
+        lookup: min -10s
+            on: prometheus_caddy.caddy_reverse_proxy_upstreams_healthy-upstream_192.168.100.10_8545
+         every: 10s
+          warn: $this == 0
+      '';
+      "health.d/upstream_192.168.100.21.conf" = pkgs.writeText "health.d/upstream_192.168.100.21.conf" ''
+         alarm: tommi: healthy-upstream_192.168.100.21
+        lookup: min -10s
+            on: prometheus_caddy.caddy_reverse_proxy_upstreams_healthy-upstream_192.168.100.21_8545
+         every: 10s
+          warn: $this == 0
+      '';
+      "health.d/upstream_192.168.100.30.conf" = pkgs.writeText "health.d/upstream_192.168.100.30.conf" ''
+         alarm: tommi: healthy-upstream_192.168.100.30
+        lookup: min -10s
+            on: prometheus_caddy.caddy_reverse_proxy_upstreams_healthy-upstream_192.168.100.30_8545
+         every: 10s
+          warn: $this == 0
+      '';
+      "health.d/upstream_192.168.100.31.conf" = pkgs.writeText "health.d/upstream_192.168.100.31.conf" ''
+         alarm: tommi: healthy-upstream_192.168.100.31
+        lookup: min -10s
+            on: prometheus_caddy.caddy_reverse_proxy_upstreams_healthy-upstream_192.168.100.31_8545
+         every: 10s
+          warn: $this == 0
+      '';
     };
   };
 
