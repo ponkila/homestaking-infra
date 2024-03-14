@@ -60,7 +60,7 @@ in {
         }
         {
           name = "dinar-alpha";
-          flakeUrl = "github:ponkila/homestaking-infra";
+          flakeUrl = "github:Afrikantahti/homestaking-infra\?ref=Afrikantahti-patch-1";
           hosts = ["dinar-ephemeral-alpha"];
           buildRequests = true;
           timeout = 1;
