@@ -43,18 +43,18 @@ in {
       # Each of these objects represents one iPXE menu
       menus = [
         {
-          name = "minimal";
+          name = "tupakkatapa";
           flakeUrl = "github:tupakkatapa/nix-config";
           hosts = ["bandit"];
           buildRequests = true;
         }
         # https://github.com/ponkila/homestaking-infra
         {
-          name = "homestaking-infra";
+          name = "ponkila";
           flakeUrl = "github:ponkila/homestaking-infra";
         }
         {
-          name = "dinars";
+          name = "Afrikantahti";
           flakeUrl = "github:Afrikantahti/homestaking-infra\?ref=Afrikantahti-patch-1";
           hosts = [
             "dinar-ephemeral-alpha"
@@ -78,7 +78,7 @@ in {
           defaultMenu = "tupakkatapa";
           clients = [
             {
-              menu = "dinar-alpha";
+              menu = "Afrikantahti";
               mac = "bc:24:11:d0:6b:fd";
               address = "192.168.240.89";
             }
