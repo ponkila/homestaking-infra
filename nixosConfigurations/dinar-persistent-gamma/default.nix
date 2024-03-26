@@ -52,11 +52,6 @@ in {
         {
           name = "homestaking-infra";
           flakeUrl = "github:ponkila/homestaking-infra";
-          hosts = [
-            "ponkila-ephemeral-beta"
-            "hetzner-ephemeral-alpha"
-          ];
-          buildRequests = true;
         }
         {
           name = "dinars";
