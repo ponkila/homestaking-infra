@@ -60,6 +60,7 @@ in {
             "dinar-ephemeral-alpha"
             "dinar-ephemeral-beta"
           ];
+          default = "dinar-ephemeral-alpha";
           buildRequests = true;
           timeout = 1;
         }
@@ -74,6 +75,7 @@ in {
           serve = true;
           address = "192.168.240.88";
           interfaces = ["ens18"];
+          defaultMenu = "tupakkatapa";
           clients = [
             {
               menu = "dinar-alpha";
