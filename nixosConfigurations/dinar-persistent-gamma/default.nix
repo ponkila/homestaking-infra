@@ -59,9 +59,12 @@ in {
           buildRequests = true;
         }
         {
-          name = "dinar-alpha";
+          name = "dinars";
           flakeUrl = "github:Afrikantahti/homestaking-infra\?ref=Afrikantahti-patch-1";
-          hosts = ["dinar-ephemeral-alpha"];
+          hosts = [
+            "dinar-ephemeral-alpha"
+            "dinar-ephemeral-beta"
+          ];
           buildRequests = true;
           timeout = 1;
         }
