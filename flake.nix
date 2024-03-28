@@ -112,6 +112,7 @@
           }
           # Entrypoint aliases, accessible trough 'nix build'
           // (with flake.nixosConfigurations; {
+            "adhoc-ephemeral-alpha" = adhoc-ephemeral-alpha.config.system.build.kexecTree;
             "dinar-ephemeral-alpha" = dinar-ephemeral-alpha.config.system.build.kexecTree;
             "dinar-ephemeral-beta" = dinar-ephemeral-beta.config.system.build.kexecTree;
             "hetzner-ephemeral-alpha" = hetzner-ephemeral-alpha.config.system.build.kexecTree;
@@ -121,6 +122,23 @@
       };
       flake = let
         inherit (self) outputs;
+
+        adhoc-ephemeral-alpha = {
+          system = "x86_64-linux";
+          specialArgs = {inherit inputs outputs;};
+          modules = [
+            ./nixosConfigurations/adhoc-ephemeral-alpha
+            nixobolus.nixosModules.kexecTree
+            nixobolus.nixosModules.homestakeros
+            sops-nix.nixosModules.sops
+            {
+              nixpkgs.overlays = [
+                nixobolus.overlays.default
+              ];
+              boot.loader.grub.enable = false;
+            }
+          ];
+        };
 
         ponkila-ephemeral-beta = {
           system = "x86_64-linux";
@@ -237,6 +255,7 @@
         # NixOS configuration entrypoints
         nixosConfigurations = with nixpkgs.lib;
           {
+            "adhoc-ephemeral-alpha" = nixosSystem adhoc-ephemeral-alpha;
             "dinar-ephemeral-alpha" = nixosSystem dinar-ephemeral-alpha;
             "dinar-ephemeral-beta" = nixosSystem dinar-ephemeral-beta;
             "dinar-persistent-gamma" = nixosSystem dinar-persistent-gamma;
