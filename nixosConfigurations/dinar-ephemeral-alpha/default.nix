@@ -142,6 +142,8 @@ in {
     extraOptions = "--follow";
   };
 
+  services.netdata.enable = true;
+
   services.getty.autologinUser = "core";
 
   system.stateVersion = "23.05";
