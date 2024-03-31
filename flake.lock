@@ -709,18 +709,17 @@
         "nixpkgs-stable-patched": "nixpkgs-stable-patched"
       },
       "locked": {
-        "lastModified": 1710903743,
-        "narHash": "sha256-sE8Cd0iE8oON6eqGpDvxm59ZYI7+VruOkseketi/o0M=",
-        "ref": "develop3",
-        "rev": "3e6b75150a00d5c76ec0bf6d05b6df15d6654697",
-        "revCount": 23,
+        "lastModified": 1711815441,
+        "narHash": "sha256-5XiR5ddkgqCUKCQ3sutTtHpcd5pa/sqN1es3kLXl+3g=",
+        "ref": "refs/heads/main",
+        "rev": "00de30c2b894f078a485276b0469dc0c01ec2817",
+        "revCount": 13,
         "type": "git",
-        "url": "ssh://git@github.com/majbacka-labs/nixie"
+        "url": "ssh://git@github.com/majbacka-labs/nixie?=jesse/bugs"
       },
       "original": {
-        "ref": "develop3",
         "type": "git",
-        "url": "ssh://git@github.com/majbacka-labs/nixie"
+        "url": "ssh://git@github.com/majbacka-labs/nixie?=jesse/bugs"
       }
     },
     "nixobolus": {
