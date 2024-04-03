@@ -90,6 +90,16 @@ in {
         before = ["bitcoind-mainnet.service"];
         wantedBy = ["multi-user.target"];
       };
+      ethstorage = {
+        enable = true;
+        description = "ethstorage storage";
+
+        what = "/dev/mapper/kioxia-ethstorage";
+        where = "/var/mnt/ethstorage";
+        type = "xfs";
+
+        wantedBy = ["multi-user.target"];
+      };
     };
   };
 
@@ -135,6 +145,11 @@ in {
     secrets."ssvnode/privateKey" = {};
     secrets."ssvnode/publicKey" = {};
     secrets."wireguard/wg0" = {};
+    secrets."ethstorage/testnet/signer/PrivateKey" = {};
+    secrets."ethstorage/testnet/miner/PublicKey" = {};
+    secrets."ethstorage/testnet/rpc/el" = {};
+    secrets."ethstorage/testnet/rpc/cl" = {};
+
     age.sshKeyPaths = [sshKeysPath];
   };
 
@@ -152,6 +167,43 @@ in {
     port = 5000;
     bindAddress = "192.168.100.10";
     secretKeyFile = config.sops.secrets."nix-serve/secretKeyFile".path;
+  };
+
+  virtualisation.podman.enable = true;
+
+  systemd.services.ethstorage = {
+    path = ["/run/wrappers"];
+    enable = false;
+
+    description = "ethstorage testnet";
+    requires = ["network-online.target"];
+    after = ["network-online.target"];
+
+    serviceConfig = {
+      Type = "simple";
+    };
+
+    script = ''      ${pkgs.podman}/bin/podman \
+            --storage-opt "overlay.mount_program=${pkgs.fuse-overlayfs}/bin/fuse-overlayfs" run \
+            --replace \
+            --rm \
+            --rmi \
+            --name es-node \
+            --network=host \
+            --no-healthcheck \
+            -e ES_NODE_STORAGE_MINER="${config.sops.secrets."ethstorage/testnet/miner/PublicKey"}" \
+            -e ES_NODE_SIGNER_PRIVATE_KEY="${config.sops.secrets."ethstorage/testnet/signer/PrivateKey"}" \
+            -v /var/mnt/ethstorage/sepolia:/es-node/es-data:z \
+            -p 9545:9545 \
+            -p 9222:9222 \
+            -p 30305:30305/udp \
+            --entrypoint /es-node/run.sh \
+            ghcr.io/ethstorage/es-node:v0.1.12 \
+            --l1.rpc ${config.sops.secrets."ethstorage/testnet/rpc/el"} \
+            --l1.beacon ${config.sops.secrets."ethstorage/testnet/rpc/cl"}
+    '';
+
+    wantedBy = ["multi-user.target"];
   };
 
   system.stateVersion = "23.05";
