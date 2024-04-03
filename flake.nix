@@ -9,20 +9,17 @@
       "https://cache.nixos.org"
       "https://nix-community.cachix.org"
       "http://192.168.100.10:5000"
-      "http://192.168.100.5:5000"
     ];
     extra-trusted-public-keys = [
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       "192.168.100.10:0qiW05TfoEi8DCkNqeKlbXvnKfMi8bA4fiyTKSYY3P8="
-      "192.168.100.5:K6nxGYb6HZBE+RLJ7bNLtrpld4F/FSKEzgHTUNHQMtk="
     ];
   };
 
   inputs = {
     devenv.url = "github:cachix/devenv";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    nixie.url = "git+ssh://git@github.com/majbacka-labs/nixie\?ref=develop3";
     nixobolus.url = "github:ponkila/nixobolus";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-23.05";
@@ -33,7 +30,6 @@
   outputs = {
     self,
     flake-parts,
-    nixie,
     nixobolus,
     nixpkgs,
     nixpkgs-stable,
@@ -167,22 +163,6 @@
           ];
         };
 
-        dinar-persistent-gamma = {
-          system = "x86_64-linux";
-          specialArgs = {inherit inputs outputs;};
-          modules = [
-            ./nixosConfigurations/dinar-persistent-gamma
-            nixie.nixosModules.nixie
-            nixobolus.nixosModules.homestakeros
-            sops-nix.nixosModules.sops
-            {
-              nixpkgs.overlays = [
-                nixobolus.overlays.default
-              ];
-            }
-          ];
-        };
-
         hetzner-ephemeral-alpha = {
           system = "x86_64-linux";
           specialArgs = {inherit inputs outputs;};
@@ -239,7 +219,6 @@
           {
             "dinar-ephemeral-alpha" = nixosSystem dinar-ephemeral-alpha;
             "dinar-ephemeral-beta" = nixosSystem dinar-ephemeral-beta;
-            "dinar-persistent-gamma" = nixosSystem dinar-persistent-gamma;
             "hetzner-ephemeral-alpha" = nixosSystem hetzner-ephemeral-alpha;
             "ponkila-ephemeral-beta" = nixosSystem ponkila-ephemeral-beta;
           }
