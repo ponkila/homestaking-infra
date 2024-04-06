@@ -20,9 +20,11 @@
   inputs = {
     devenv.url = "github:cachix/devenv";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    nixobolus.url = "github:ponkila/nixobolus";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    homestakeros-base.inputs.nixpkgs.follows = "nixpkgs";
+    homestakeros-base.url = "github:ponkila/HomestakerOS/jesse/mv-module-here?dir=nixosModules/base";
+    homestakeros.url = "github:ponkila/HomestakerOS/jesse/mv-module-here";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-23.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     sops-nix.url = "github:Mic92/sops-nix";
   };
 
@@ -30,7 +32,8 @@
   outputs = {
     self,
     flake-parts,
-    nixobolus,
+    homestakeros-base,
+    homestakeros,
     nixpkgs,
     nixpkgs-stable,
     sops-nix,
@@ -54,7 +57,7 @@
         _module.args.pkgs = import inputs.nixpkgs {
           inherit system;
           overlays = [
-            nixobolus.overlays.default
+            homestakeros.overlays.default
           ];
           config = {};
         };
@@ -123,12 +126,12 @@
           specialArgs = {inherit inputs outputs;};
           modules = [
             ./nixosConfigurations/ponkila-ephemeral-beta
-            nixobolus.nixosModules.kexecTree
-            nixobolus.nixosModules.homestakeros
+            homestakeros-base.nixosModules.kexecTree
+            homestakeros.nixosModules.homestakeros
             sops-nix.nixosModules.sops
             {
               nixpkgs.overlays = [
-                nixobolus.overlays.default
+                homestakeros.overlays.default
               ];
               boot.loader.grub.enable = false;
             }
@@ -140,12 +143,12 @@
           specialArgs = {inherit inputs outputs;};
           modules = [
             ./nixosConfigurations/ponkila-ephemeral-gamma
-            nixobolus.nixosModules.kexecTree
-            nixobolus.nixosModules.homestakeros
+            homestakeros-base.nixosModules.kexecTree
+            homestakeros.nixosModules.homestakeros
             sops-nix.nixosModules.sops
             {
               nixpkgs.overlays = [
-                nixobolus.overlays.default
+                homestakeros.overlays.default
                 # Workaround for https://github.com/NixOS/nixpkgs/issues/154163
                 # This issue only happens with the isoImage format
                 (final: super: {
@@ -168,12 +171,12 @@
           specialArgs = {inherit inputs outputs;};
           modules = [
             ./nixosConfigurations/hetzner-ephemeral-alpha
-            nixobolus.nixosModules.kexecTree
-            nixobolus.nixosModules.homestakeros
+            homestakeros-base.nixosModules.kexecTree
+            homestakeros.nixosModules.homestakeros
             sops-nix.nixosModules.sops
             {
               nixpkgs.overlays = [
-                nixobolus.overlays.default
+                homestakeros.overlays.default
               ];
               boot.loader.grub.enable = false;
             }
@@ -185,12 +188,12 @@
           specialArgs = {inherit inputs outputs;};
           modules = [
             ./nixosConfigurations/dinar-ephemeral-alpha
-            nixobolus.nixosModules.kexecTree
-            nixobolus.nixosModules.homestakeros
+            homestakeros-base.nixosModules.kexecTree
+            homestakeros.nixosModules.homestakeros
             sops-nix.nixosModules.sops
             {
               nixpkgs.overlays = [
-                nixobolus.overlays.default
+                homestakeros.overlays.default
               ];
               boot.loader.grub.enable = false;
             }
@@ -202,12 +205,12 @@
           specialArgs = {inherit inputs outputs;};
           modules = [
             ./nixosConfigurations/dinar-ephemeral-beta
-            nixobolus.nixosModules.kexecTree
-            nixobolus.nixosModules.homestakeros
+            homestakeros-base.nixosModules.kexecTree
+            homestakeros.nixosModules.homestakeros
             sops-nix.nixosModules.sops
             {
               nixpkgs.overlays = [
-                nixobolus.overlays.default
+                homestakeros.overlays.default
               ];
               boot.loader.grub.enable = false;
             }
