@@ -734,19 +734,19 @@
         "flake-parts": "flake-parts_3",
         "nixpkgs": "nixpkgs_6",
         "nixpkgs-stable": "nixpkgs-stable_5",
-        "ponkila": "ponkila"
+        "ponkila": "ponkila",
+        "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1712413220,
-        "narHash": "sha256-VJBHrK6StA51xZ0hQvo9O39cyXKCL6hGrYVYBDaByas=",
+        "lastModified": 1712443924,
+        "narHash": "sha256-y76r62FlaD5HPy6+aiqJRYfrqzF5uKhYokhqejaNw60=",
         "owner": "ponkila",
         "repo": "HomestakerOS",
-        "rev": "80c584a2c0c780273b9e740c12fc625075310892",
+        "rev": "d7a349f391749664bcb32aa586666f8bae47aa11",
         "type": "github"
       },
       "original": {
         "owner": "ponkila",
-        "ref": "jesse/mv-module-here",
         "repo": "HomestakerOS",
         "type": "github"
       }
@@ -759,17 +759,16 @@
       },
       "locked": {
         "dir": "nixosModules/base",
-        "lastModified": 1712413220,
-        "narHash": "sha256-VJBHrK6StA51xZ0hQvo9O39cyXKCL6hGrYVYBDaByas=",
+        "lastModified": 1712443924,
+        "narHash": "sha256-y76r62FlaD5HPy6+aiqJRYfrqzF5uKhYokhqejaNw60=",
         "owner": "ponkila",
         "repo": "HomestakerOS",
-        "rev": "80c584a2c0c780273b9e740c12fc625075310892",
+        "rev": "d7a349f391749664bcb32aa586666f8bae47aa11",
         "type": "github"
       },
       "original": {
         "dir": "nixosModules/base",
         "owner": "ponkila",
-        "ref": "jesse/mv-module-here",
         "repo": "HomestakerOS",
         "type": "github"
       }
@@ -1441,17 +1440,16 @@
       },
       "locked": {
         "dir": "nixosModules/base",
-        "lastModified": 1712410805,
-        "narHash": "sha256-SPUFA/qnCaiEIGoppT/E+CY6QDmuls7Dg7NTzzKdCPM=",
+        "lastModified": 1712442381,
+        "narHash": "sha256-N1DYj/YVK2PbxJCIaJqqxdaFirCps2eZAA50ZCwbR0w=",
         "owner": "ponkila",
         "repo": "HomestakerOS",
-        "rev": "e5c066326b498ac20e4152bb0f5b42ae056fd135",
+        "rev": "260f6c2408a37a8130c4f9441abba45a30bc152c",
         "type": "github"
       },
       "original": {
         "dir": "nixosModules/base",
         "owner": "ponkila",
-        "ref": "jesse/mv-module-here",
         "repo": "HomestakerOS",
         "type": "github"
       }
@@ -1716,6 +1714,27 @@
         "owner": "numtide",
         "repo": "treefmt-nix",
         "rev": "35791f76524086ab4b785a33e4abbedfda64bd22",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "treefmt-nix",
+        "type": "github"
+      }
+    },
+    "treefmt-nix_2": {
+      "inputs": {
+        "nixpkgs": [
+          "homestakeros",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1711963903,
+        "narHash": "sha256-N3QDhoaX+paWXHbEXZapqd1r95mdshxToGowtjtYkGI=",
+        "owner": "numtide",
+        "repo": "treefmt-nix",
+        "rev": "49dc4a92b02b8e68798abd99184f228243b6e3ac",
         "type": "github"
       },
       "original": {
