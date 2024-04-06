@@ -126,6 +126,7 @@
           specialArgs = {inherit inputs outputs;};
           modules = [
             ./nixosConfigurations/ponkila-ephemeral-beta
+            homestakeros-base.nixosModules.base
             homestakeros-base.nixosModules.kexecTree
             homestakeros.nixosModules.homestakeros
             sops-nix.nixosModules.sops
@@ -143,6 +144,7 @@
           specialArgs = {inherit inputs outputs;};
           modules = [
             ./nixosConfigurations/ponkila-ephemeral-gamma
+            homestakeros-base.nixosModules.base
             homestakeros-base.nixosModules.kexecTree
             homestakeros.nixosModules.homestakeros
             sops-nix.nixosModules.sops
@@ -171,6 +173,7 @@
           specialArgs = {inherit inputs outputs;};
           modules = [
             ./nixosConfigurations/hetzner-ephemeral-alpha
+            homestakeros-base.nixosModules.base
             homestakeros-base.nixosModules.kexecTree
             homestakeros.nixosModules.homestakeros
             sops-nix.nixosModules.sops
@@ -188,6 +191,7 @@
           specialArgs = {inherit inputs outputs;};
           modules = [
             ./nixosConfigurations/dinar-ephemeral-alpha
+            homestakeros-base.nixosModules.base
             homestakeros-base.nixosModules.kexecTree
             homestakeros.nixosModules.homestakeros
             sops-nix.nixosModules.sops
@@ -205,6 +209,7 @@
           specialArgs = {inherit inputs outputs;};
           modules = [
             ./nixosConfigurations/dinar-ephemeral-beta
+            homestakeros-base.nixosModules.base
             homestakeros-base.nixosModules.kexecTree
             homestakeros.nixosModules.homestakeros
             sops-nix.nixosModules.sops
