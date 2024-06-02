@@ -80,6 +80,7 @@
           devenv.shells = {
             default = {
               packages = with pkgs; [
+                jq
                 sops
                 ssh-to-age
                 self'.packages.init-qemu
@@ -101,6 +102,7 @@
 
                   nsq         : Get and update the nix-store queries
                   init-qemu   : Use QEMU to boot up a host
+                  lens        : Update web UI assets
 
                 INFO
               '';
@@ -110,6 +112,10 @@
               };
               # Workaround for https://github.com/cachix/devenv/issues/760
               containers = pkgs.lib.mkForce { };
+              scripts.lens.exec = ''
+                nix eval --no-warn-dirty --json github:ponkila/homestakeros#schema | jq > nixosModules/homestakeros/options.json \
+                && nix run --no-warn-dirty github:ponkila/homestakeros#update-json
+              '';
             };
           };
 
