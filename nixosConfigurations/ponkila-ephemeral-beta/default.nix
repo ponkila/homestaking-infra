@@ -1,17 +1,17 @@
-{
-  pkgs,
-  config,
-  inputs,
-  lib,
-  ...
-}: let
+{ pkgs
+, config
+, lib
+, ...
+}:
+let
   # General
   infra.ip = "192.168.100.10";
   lighthouse.datadir = "/var/mnt/xfs/lighthouse";
   erigon.datadir = "/var/mnt/xfs/erigon";
   sshKeysPath = "/var/mnt/xfs/secrets/ssh/id_ed25519";
-in {
-  boot.initrd.availableKernelModules = ["xfs" "dm_mod" "dm-raid" "dm_integrity" "raid0"];
+in
+{
+  boot.initrd.availableKernelModules = [ "xfs" "dm_mod" "dm-raid" "dm_integrity" "raid0" ];
   # Workaround for https://github.com/Mic92/sops-nix/issues/24
   fileSystems."/var/mnt/xfs" = lib.mkImageMediaOverride {
     fsType = "xfs";
@@ -87,8 +87,8 @@ in {
         where = "/var/mnt/bitcoin";
         type = "xfs";
 
-        before = ["bitcoind-mainnet.service"];
-        wantedBy = ["multi-user.target"];
+        before = [ "bitcoind-mainnet.service" ];
+        wantedBy = [ "multi-user.target" ];
       };
     };
   };
@@ -108,8 +108,8 @@ in {
     enable = true;
 
     description = "electrum rpc";
-    requires = ["wg-quick-wg0.service" "bitcoind-mainnet.service"];
-    after = ["wg-quick-wg0.service" "bitcoind-mainnet.service"];
+    requires = [ "wg-quick-wg0.service" "bitcoind-mainnet.service" ];
+    after = [ "wg-quick-wg0.service" "bitcoind-mainnet.service" ];
 
     script = ''      ${pkgs.electrs}/bin/electrs \
             --db-dir /var/mnt/bitcoin/electrs/db \
@@ -118,10 +118,10 @@ in {
             --electrum-rpc-addr 192.168.100.10:50001
     '';
 
-    wantedBy = ["multi-user.target"];
+    wantedBy = [ "multi-user.target" ];
   };
-  networking.firewall.allowedTCPPorts = [50001];
-  networking.firewall.allowedUDPPorts = [50001];
+  networking.firewall.allowedTCPPorts = [ 50001 ];
+  networking.firewall.allowedUDPPorts = [ 50001 ];
 
   # Secrets
   sops = {
@@ -130,12 +130,12 @@ in {
       owner = "netdata";
       group = "netdata";
     };
-    secrets."nix-serve/secretKeyFile" = {};
-    secrets."ssvnode/password" = {};
-    secrets."ssvnode/privateKey" = {};
-    secrets."ssvnode/publicKey" = {};
-    secrets."wireguard/wg0" = {};
-    age.sshKeyPaths = [sshKeysPath];
+    secrets."nix-serve/secretKeyFile" = { };
+    secrets."ssvnode/password" = { };
+    secrets."ssvnode/privateKey" = { };
+    secrets."ssvnode/publicKey" = { };
+    secrets."wireguard/wg0" = { };
+    age.sshKeyPaths = [ sshKeysPath ];
   };
 
   services.netdata = {

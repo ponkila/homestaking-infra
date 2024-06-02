@@ -1,6 +1,6 @@
-{
-  pkgs,
-  lib,
+{ pkgs
+, lib
+,
 }:
 pkgs.stdenv.mkDerivation rec {
   name = "nsq";
@@ -12,7 +12,7 @@ pkgs.stdenv.mkDerivation rec {
     nix
   ];
 
-  nativeBuildInputs = [pkgs.makeWrapper];
+  nativeBuildInputs = [ pkgs.makeWrapper ];
   installPhase = ''
     mkdir -p $out/bin
     cp $src/${name}.sh $out/bin/${name}

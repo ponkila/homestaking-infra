@@ -1,13 +1,9 @@
-{
-  pkgs,
-  config,
-  inputs,
-  lib,
-  ...
-}: let
+{ pkgs, ... }:
+let
   # General
   infra.ip = "192.168.100.31";
-in {
+in
+{
   homestakeros = {
     # Localization options
     localization = {
@@ -75,7 +71,7 @@ in {
       where = "/mnt/eth";
       type = "ext4";
 
-      wantedBy = ["multi-user.target"];
+      wantedBy = [ "multi-user.target" ];
     };
   };
 
@@ -94,8 +90,8 @@ in {
     enable = true;
 
     description = "electrum rpc";
-    requires = ["wg-quick-wg0.service" "bitcoind-mainnet.service"];
-    after = ["wg-quick-wg0.service" "bitcoind-mainnet.service"];
+    requires = [ "wg-quick-wg0.service" "bitcoind-mainnet.service" ];
+    after = [ "wg-quick-wg0.service" "bitcoind-mainnet.service" ];
 
     script = ''      ${pkgs.electrs}/bin/electrs \
             --db-dir /mnt/eth/bitcoin/electrs/db \
@@ -104,10 +100,10 @@ in {
             --electrum-rpc-addr 192.168.100.31:50001
     '';
 
-    wantedBy = ["multi-user.target"];
+    wantedBy = [ "multi-user.target" ];
   };
-  networking.firewall.allowedTCPPorts = [50001];
-  networking.firewall.allowedUDPPorts = [50001];
+  networking.firewall.allowedTCPPorts = [ 50001 ];
+  networking.firewall.allowedUDPPorts = [ 50001 ];
 
   # Tommi's toybox
   services.qemuGuest = {
@@ -123,8 +119,7 @@ in {
         sdlSupport = false;
         openGLSupport = false;
         virglSupport = false;
-      })
-      .ga;
+      }).ga;
   };
   environment.systemPackages = with pkgs; [
     parted
@@ -132,7 +127,7 @@ in {
 
   security.audit = {
     enable = true;
-    rules = ["-a exit,always -F arch=b64 -S execve"];
+    rules = [ "-a exit,always -F arch=b64 -S execve" ];
   };
   security.auditd.enable = true;
 

@@ -1,15 +1,13 @@
-{
-  pkgs,
-  config,
-  inputs,
-  outputs,
-  lib,
-  ...
-}: let
+{ pkgs
+, config
+, lib
+, ...
+}:
+let
   # General
   sshKeysPath = "/var/mnt/secrets/ssh/id_ed25519";
-  ponkila-ephemeral-beta = outputs.nixosConfigurations.ponkila-ephemeral-beta.config.homestakeros;
-in {
+in
+{
   boot.initrd.availableKernelModules = [
     "virtio"
     "virtio_rng"
@@ -27,7 +25,7 @@ in {
   fileSystems."/var/mnt/secrets" = lib.mkImageMediaOverride {
     fsType = "btrfs";
     device = "/dev/sda";
-    options = ["subvolid=256"];
+    options = [ "subvolid=256" ];
     neededForBoot = true;
   };
 
@@ -70,8 +68,8 @@ in {
     enable = true;
 
     description = "keep-network bridge service";
-    requires = ["caddy.service" "nginx.service"];
-    after = ["caddy.service" "nginx.service"];
+    requires = [ "caddy.service" "nginx.service" ];
+    after = [ "caddy.service" "nginx.service" ];
 
     serviceConfig = {
       EnvironmentFile = ''${config.sops.secrets."keep-network/env".path}'';
@@ -90,7 +88,7 @@ in {
             --storage.dir /var/mnt/keep-network
     '';
 
-    wantedBy = ["multi-user.target"];
+    wantedBy = [ "multi-user.target" ];
   };
 
   services.nginx = {
@@ -124,8 +122,8 @@ in {
       }
     '';
   };
-  systemd.services.nginx.requires = ["wg-quick-wg0.service"];
-  systemd.services.nginx.after = ["wg-quick-wg0.service"];
+  systemd.services.nginx.requires = [ "wg-quick-wg0.service" ];
+  systemd.services.nginx.after = [ "wg-quick-wg0.service" ];
 
   homestakeros = {
     # Localization options
@@ -163,7 +161,7 @@ in {
         type = "btrfs";
         options = "subvolid=257";
 
-        wantedBy = ["multi-user.target"];
+        wantedBy = [ "multi-user.target" ];
       };
       keep-network = {
         enable = true;
@@ -174,7 +172,7 @@ in {
         type = "btrfs";
         options = "subvolid=258";
 
-        wantedBy = ["multi-user.target"];
+        wantedBy = [ "multi-user.target" ];
       };
     };
   };
@@ -182,7 +180,7 @@ in {
   # Secrets
   sops = {
     defaultSopsFile = ./secrets/default.yaml;
-    secrets."wireguard/wg0" = {};
+    secrets."wireguard/wg0" = { };
     secrets."keep-network/env" = {
       owner = "core";
       group = "core";
@@ -195,7 +193,7 @@ in {
       owner = "netdata";
       group = "netdata";
     };
-    age.sshKeyPaths = [sshKeysPath];
+    age.sshKeyPaths = [ sshKeysPath ];
   };
 
   networking.firewall = {

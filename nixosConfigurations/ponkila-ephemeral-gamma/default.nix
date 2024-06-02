@@ -1,10 +1,4 @@
-{
-  pkgs,
-  config,
-  inputs,
-  lib,
-  ...
-}: {
+{ pkgs, ... }: {
   homestakeros = {
     # Localization options
     localization = {

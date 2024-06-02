@@ -1,13 +1,9 @@
-{
-  pkgs,
-  config,
-  inputs,
-  lib,
-  ...
-}: let
+{ pkgs, ... }:
+let
   # General
   infra.ip = "192.168.100.32";
-in {
+in
+{
   homestakeros = {
     # Localization options
     localization = {
@@ -71,7 +67,7 @@ in {
       where = "/mnt/eth";
       type = "ext4";
 
-      wantedBy = ["multi-user.target"];
+      wantedBy = [ "multi-user.target" ];
     };
   };
 
@@ -89,8 +85,7 @@ in {
         sdlSupport = false;
         openGLSupport = false;
         virglSupport = false;
-      })
-      .ga;
+      }).ga;
   };
   environment.systemPackages = with pkgs; [
     parted
