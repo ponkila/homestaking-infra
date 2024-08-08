@@ -30,7 +30,6 @@ in
   };
 
   environment.systemPackages = with pkgs; [
-    keep-core
   ];
 
   environment.etc."Caddyfile" = {

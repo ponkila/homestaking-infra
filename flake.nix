@@ -8,19 +8,19 @@
     extra-substituters = [
       "https://cache.nixos.org"
       "https://nix-community.cachix.org"
-      "http://192.168.100.10:5000"
     ];
     extra-trusted-public-keys = [
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      "192.168.100.10:0qiW05TfoEi8DCkNqeKlbXvnKfMi8bA4fiyTKSYY3P8="
     ];
   };
 
   inputs = {
     devenv.url = "github:cachix/devenv";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    nixobolus.url = "github:ponkila/nixobolus";
+    homestakeros-base.inputs.nixpkgs.follows = "nixpkgs";
+    homestakeros-base.url = "github:ponkila/HomestakerOS?dir=nixosModules/base";
+    homestakeros.url = "github:ponkila/HomestakerOS";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-23.05";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     sops-nix.url = "github:Mic92/sops-nix";
@@ -29,17 +29,9 @@
   };
 
   # Add the inputs declared above to the argument attribute set
-  outputs =
-    { self
-    , flake-parts
-    , nixobolus
-    , nixpkgs
-    , nixpkgs-stable
-    , sops-nix
-    , ...
-    } @ inputs:
-    flake-parts.lib.mkFlake { inherit inputs; } rec {
-      systems = nixpkgs.lib.systems.flakeExposed;
+  outputs = { self, ... }@inputs:
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } rec {
+      systems = inputs.nixpkgs.lib.systems.flakeExposed;
       imports = [
         inputs.devenv.flakeModule
         inputs.treefmt-nix.flakeModule
@@ -57,7 +49,7 @@
           _module.args.pkgs = import inputs.nixpkgs {
             inherit system;
             overlays = [
-              nixobolus.overlays.default
+              inputs.homestakeros.overlays.default
             ];
             config = { };
           };
@@ -143,12 +135,14 @@
             specialArgs = { inherit inputs outputs; };
             modules = [
               ./nixosConfigurations/ponkila-ephemeral-beta
-              nixobolus.nixosModules.kexecTree
-              nixobolus.nixosModules.homestakeros
-              sops-nix.nixosModules.sops
+              inputs.homestakeros-base.nixosModules.base
+              inputs.homestakeros-base.nixosModules.kexecTree
+              inputs.homestakeros.nixosModules.homestakeros
+
+              inputs.sops-nix.nixosModules.sops
               {
                 nixpkgs.overlays = [
-                  nixobolus.overlays.default
+                  inputs.homestakeros.overlays.default
                 ];
                 boot.loader.grub.enable = false;
               }
@@ -160,12 +154,13 @@
             specialArgs = { inherit inputs outputs; };
             modules = [
               ./nixosConfigurations/ponkila-ephemeral-gamma
-              nixobolus.nixosModules.kexecTree
-              nixobolus.nixosModules.homestakeros
-              sops-nix.nixosModules.sops
+              inputs.homestakeros-base.nixosModules.base
+              inputs.homestakeros-base.nixosModules.kexecTree
+              inputs.homestakeros.nixosModules.homestakeros
+              inputs.sops-nix.nixosModules.sops
               {
                 nixpkgs.overlays = [
-                  nixobolus.overlays.default
+                  inputs.homestakeros.overlays.default
                   # Workaround for https://github.com/NixOS/nixpkgs/issues/154163
                   # This issue only happens with the isoImage format
                   (_final: super: {
@@ -188,12 +183,13 @@
             specialArgs = { inherit inputs outputs; };
             modules = [
               ./nixosConfigurations/hetzner-ephemeral-alpha
-              nixobolus.nixosModules.kexecTree
-              nixobolus.nixosModules.homestakeros
-              sops-nix.nixosModules.sops
+              inputs.homestakeros-base.nixosModules.base
+              inputs.homestakeros-base.nixosModules.kexecTree
+              inputs.homestakeros.nixosModules.homestakeros
+              inputs.sops-nix.nixosModules.sops
               {
                 nixpkgs.overlays = [
-                  nixobolus.overlays.default
+                  inputs.homestakeros.overlays.default
                 ];
                 boot.loader.grub.enable = false;
               }
@@ -205,12 +201,13 @@
             specialArgs = { inherit inputs outputs; };
             modules = [
               ./nixosConfigurations/dinar-ephemeral-alpha
-              nixobolus.nixosModules.kexecTree
-              nixobolus.nixosModules.homestakeros
-              sops-nix.nixosModules.sops
+              inputs.homestakeros-base.nixosModules.base
+              inputs.homestakeros-base.nixosModules.kexecTree
+              inputs.homestakeros.nixosModules.homestakeros
+              inputs.sops-nix.nixosModules.sops
               {
                 nixpkgs.overlays = [
-                  nixobolus.overlays.default
+                  inputs.homestakeros.overlays.default
                 ];
                 boot.loader.grub.enable = false;
               }
@@ -222,12 +219,13 @@
             specialArgs = { inherit inputs outputs; };
             modules = [
               ./nixosConfigurations/dinar-ephemeral-beta
-              nixobolus.nixosModules.kexecTree
-              nixobolus.nixosModules.homestakeros
-              sops-nix.nixosModules.sops
+              inputs.homestakeros-base.nixosModules.base
+              inputs.homestakeros-base.nixosModules.kexecTree
+              inputs.homestakeros.nixosModules.homestakeros
+              inputs.sops-nix.nixosModules.sops
               {
                 nixpkgs.overlays = [
-                  nixobolus.overlays.default
+                  inputs.homestakeros.overlays.default
                 ];
                 boot.loader.grub.enable = false;
               }
@@ -236,14 +234,14 @@
         in
         {
           # NixOS configuration entrypoints
-          nixosConfigurations = with nixpkgs.lib;
+          nixosConfigurations = with inputs.nixpkgs.lib;
             {
               "dinar-ephemeral-alpha" = nixosSystem dinar-ephemeral-alpha;
               "dinar-ephemeral-beta" = nixosSystem dinar-ephemeral-beta;
               "hetzner-ephemeral-alpha" = nixosSystem hetzner-ephemeral-alpha;
               "ponkila-ephemeral-beta" = nixosSystem ponkila-ephemeral-beta;
             }
-            // (with nixpkgs-stable.lib; {
+            // (with inputs.nixpkgs-stable.lib; {
               "ponkila-ephemeral-gamma" = nixosSystem ponkila-ephemeral-gamma;
             });
         };
