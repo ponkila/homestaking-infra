@@ -21,8 +21,7 @@
     homestakeros-base.inputs.nixpkgs.follows = "nixpkgs";
     homestakeros-base.url = "github:ponkila/HomestakerOS?dir=nixosModules/base";
     homestakeros.url = "github:ponkila/HomestakerOS";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-23.05";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/24.05";
     sops-nix.url = "github:Mic92/sops-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.url = "github:numtide/treefmt-nix";
@@ -150,35 +149,6 @@
             ];
           };
 
-          ponkila-ephemeral-gamma = {
-            system = "aarch64-linux";
-            specialArgs = { inherit inputs outputs; };
-            modules = [
-              ./nixosConfigurations/ponkila-ephemeral-gamma
-              inputs.homestakeros-base.nixosModules.base
-              inputs.homestakeros-base.nixosModules.kexecTree
-              inputs.homestakeros.nixosModules.homestakeros
-              inputs.sops-nix.nixosModules.sops
-              {
-                nixpkgs.overlays = [
-                  inputs.homestakeros.overlays.default
-                  # Workaround for https://github.com/NixOS/nixpkgs/issues/154163
-                  # This issue only happens with the isoImage format
-                  (_final: super: {
-                    makeModulesClosure = x:
-                      super.makeModulesClosure (x // { allowMissing = true; });
-                  })
-                ];
-                # Bootloader for RaspberryPi 4
-                boot.loader.raspberryPi = {
-                  enable = true;
-                  version = 4;
-                };
-                boot.loader.grub.enable = false;
-              }
-            ];
-          };
-
           kaakkuri-ephemeral-alpha = {
             system = "x86_64-linux";
             specialArgs = { inherit inputs outputs; };
@@ -196,7 +166,6 @@
               }
             ];
           };
-
 
           hetzner-ephemeral-alpha = {
             system = "x86_64-linux";
@@ -254,17 +223,13 @@
         in
         {
           # NixOS configuration entrypoints
-          nixosConfigurations = with inputs.nixpkgs.lib;
-            {
-              "dinar-ephemeral-alpha" = nixosSystem dinar-ephemeral-alpha;
-              "dinar-ephemeral-beta" = nixosSystem dinar-ephemeral-beta;
-              "hetzner-ephemeral-alpha" = nixosSystem hetzner-ephemeral-alpha;
-              "kaakkuri-ephemeral-alpha" = nixosSystem kaakkuri-ephemeral-alpha;
-              "ponkila-ephemeral-beta" = nixosSystem ponkila-ephemeral-beta;
-            }
-            // (with inputs.nixpkgs-stable.lib; {
-              "ponkila-ephemeral-gamma" = nixosSystem ponkila-ephemeral-gamma;
-            });
+          nixosConfigurations = with inputs.nixpkgs.lib; {
+            "dinar-ephemeral-alpha" = nixosSystem dinar-ephemeral-alpha;
+            "dinar-ephemeral-beta" = nixosSystem dinar-ephemeral-beta;
+            "hetzner-ephemeral-alpha" = nixosSystem hetzner-ephemeral-alpha;
+            "kaakkuri-ephemeral-alpha" = nixosSystem kaakkuri-ephemeral-alpha;
+            "ponkila-ephemeral-beta" = nixosSystem ponkila-ephemeral-beta;
+          };
         };
     };
 }

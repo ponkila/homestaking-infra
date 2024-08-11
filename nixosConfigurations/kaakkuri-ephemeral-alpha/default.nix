@@ -1,4 +1,5 @@
 { lib
+, config
 , pkgs
 , ...
 }:
@@ -73,7 +74,6 @@ in
       --ws --ws.api="engine,eth,web3,net,debug" \
       --http.corsdomain "*" \
       --holesky \
-      --syncmode=full \
       --authrpc.jwtsecret=/var/mnt/ssd/ethereum/holesky/jwt.hex
     '';
 
@@ -83,11 +83,58 @@ in
   networking.firewall.allowedTCPPorts = [
     9001
     30303
+    50001
   ];
   networking.firewall.allowedUDPPorts = [
     9001
     30303
+    50001
   ];
+
+  services.bitcoind."mainnet" = {
+    enable = true;
+    prune = "disable";
+    dataDir = "/var/mnt/ssd/bitcoin/bitcoind";
+    extraCmdlineOptions = [
+      "-server=1"
+      "-txindex=0"
+      "-rpccookiefile=/var/mnt/ssd/bitcoin/bitcoind/.cookie"
+    ];
+  };
+
+  systemd.services.electrs = {
+    enable = true;
+
+    description = "electrum rpc";
+    requires = [ "wg-quick-wg0.service" "bitcoind-mainnet.service" ];
+    after = [ "wg-quick-wg0.service" "bitcoind-mainnet.service" ];
+
+    script = ''${pkgs.electrs}/bin/electrs \
+      --db-dir /var/mnt/ssd/bitcoin/electrs/db \
+      --cookie-file /var/mnt/ssd/bitcoin/bitcoind/.cookie \
+      --network bitcoin \
+      --electrum-rpc-addr 192.168.100.50:50001
+    '';
+
+    wantedBy = [ "multi-user.target" ];
+  };
+
+  services.netdata = {
+    enable = true;
+    configDir = {
+      "health_alarm_notify.conf" = config.sops.secrets."netdata/health_alarm_notify.conf".path;
+    };
+  };
+
+  sops = {
+    defaultSopsFile = ./secrets/default.yaml;
+    secrets."netdata/health_alarm_notify.conf" = {
+      owner = "netdata";
+      group = "netdata";
+    };
+    age.sshKeyPaths = [ sshKeysPath ];
+  };
+
 
   system.stateVersion = "24.05";
 }
