@@ -324,6 +324,9 @@ in
     };
   };
 
+  # Hetzner console access
+  services.getty.autologinUser = "core";
+
   wirenix = {
     enable = true;
     peerName = "node1"; # defaults to hostname otherwise
@@ -335,3 +338,4 @@ in
 
   system.stateVersion = "24.05";
 }
+
