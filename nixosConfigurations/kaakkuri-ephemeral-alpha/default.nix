@@ -71,9 +71,10 @@ in
 
     script = ''${pkgs.geth}/bin/geth \
       --datadir /var/mnt/ssd/ethereum/holesky/geth \
-      --http --http.api="engine,eth,web3,net,debug" \
+      --http --http.addr 192.168.100.50 --http.api="engine,eth,web3,net,debug" --http.port 8545 \
       --ws --ws.api="engine,eth,web3,net,debug" \
       --http.corsdomain "*" \
+      --http.vhosts "*" \
       --holesky \
       --authrpc.jwtsecret=/var/mnt/ssd/ethereum/holesky/jwt.hex
     '';
@@ -113,16 +114,22 @@ in
   };
 
   networking.firewall.allowedTCPPorts = [
-    13001
-    30303
-    50001
-    9001
+    # NAT routes
+    13001 # SSV
+    30303 # geth discovery
+    9001 # lighthouse discovery
+
+    # Internal
+    50001 # electrs
+    8545 # holesky RPC
   ];
   networking.firewall.allowedUDPPorts = [
     12001
     30303
-    50001
     9001
+
+    50001
+    8545
   ];
 
   services.bitcoind."mainnet" = {
