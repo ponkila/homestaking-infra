@@ -55,7 +55,8 @@ in
       --execution-jwt /var/mnt/ssd/ethereum/holesky/jwt.hex \
       --checkpoint-sync-url https://holesky.beaconstate.ethstaker.cc/ \
       --http \
-      --datadir /var/mnt/ssd/ethereum/holesky/lighthouse
+      --datadir /var/mnt/ssd/ethereum/holesky/lighthouse \
+      --builder http://127.0.0.1:18550
     '';
 
     wantedBy = [ "multi-user.target" ];
@@ -75,6 +76,23 @@ in
       --http.corsdomain "*" \
       --holesky \
       --authrpc.jwtsecret=/var/mnt/ssd/ethereum/holesky/jwt.hex
+    '';
+
+    wantedBy = [ "multi-user.target" ];
+  };
+
+  systemd.services.mev-boost = {
+    enable = true;
+
+    description = "holesky mev";
+    requires = [ "wg-quick-wg0.service" ];
+    after = [ "wg-quick-wg0.service" ];
+
+    script = ''${pkgs.mev-boost}/bin/mev-boost \
+      -holesky \
+      -addr 0.0.0.0:18550 \
+      -relay-check \
+      -relays "https://0xafa4c6985aa049fb79dd37010438cfebeb0f2bd42b115b89dd678dab0670c1de38da0c4e9138c9290a398ecd9a0b3110@boost-relay-holesky.flashbots.net"
     '';
 
     wantedBy = [ "multi-user.target" ];
