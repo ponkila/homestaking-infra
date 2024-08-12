@@ -119,7 +119,7 @@ in
     requires = [ "wg-quick-wg0.service" ];
     after = [ "wg-quick-wg0.service" ];
 
-    script = ''${pkgs.besy}/bin/besu \
+    script = ''${pkgs.besu}/bin/besu \
       --network=holesky \
       --rpc-http-enabled=true \
       --rpc-http-host=127.0.0.1 \

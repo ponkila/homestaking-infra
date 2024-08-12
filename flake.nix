@@ -129,7 +129,6 @@
               "hetzner-ephemeral-alpha" = hetzner-ephemeral-alpha.config.system.build.kexecTree;
               "kaakkuri-ephemeral-alpha" = kaakkuri-ephemeral-alpha.config.system.build.kexecTree;
               "ponkila-ephemeral-beta" = ponkila-ephemeral-beta.config.system.build.kexecTree;
-              "ponkila-ephemeral-gamma" = ponkila-ephemeral-gamma.config.system.build.kexecTree;
             });
         };
       flake =
