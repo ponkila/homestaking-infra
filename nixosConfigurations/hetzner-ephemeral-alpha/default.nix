@@ -77,12 +77,38 @@ in
       Type = "simple";
     };
 
-    script = ''      /var/mnt/keep-core/keep-client \
-            start \
-            --ethereum.url ws://192.168.100.40:8545 \
-            --ethereum.keyFile /run/secrets/keep-network/operator-key \
-            --bitcoin.electrum.url tcp://192.168.100.40:50001 \
-            --storage.dir /var/mnt/keep-network
+    script = ''/var/mnt/keep-network/v2.1.0/keep-client start \
+      --ethereum.url ws://192.168.100.40:8545 \
+      --ethereum.keyFile /run/secrets/keep-network/operator-key \
+      --bitcoin.electrum.url tcp://192.168.100.40:50001 \
+      --storage.dir /var/mnt/keep-network
+    '';
+
+    wantedBy = [ "multi-user.target" ];
+  };
+
+  systemd.services.ssv-dkg-holesky = {
+    enable = false;
+
+    description = "ssv-dkg holesky";
+
+    serviceConfig = {
+      Restart = "always";
+      RestartSec = "5s";
+    };
+
+    script = ''nix run github:jhvst/nix-community/jhvst/ssv-dkg#ssv-dkg -- start-operator \
+      --privKey /var/mnt/ssv-dkg/privateKey \
+      --privKeyPassword /var/mnt/ssv-dkg/password \
+      --operatorID 881 \
+      --port 3030 \
+      --logLevel info \
+      --logFormat json \
+      --logLevelFormat capitalColor \
+      --logFilePath /var/mnt/ssv-dkg/debug.log \
+      --outputPath /var/mnt/ssv-dkg \
+      --serverTLSCertPath /var/mnt/ssv-dkg/tls.crt \
+      --serverTLSKeyPath /var/mnt/ssv-dkg/tls.key
     '';
 
     wantedBy = [ "multi-user.target" ];
@@ -149,17 +175,6 @@ in
     };
 
     mounts = {
-      blutgang = {
-        enable = true;
-        description = "blutgang store";
-
-        what = "/dev/sda";
-        where = "/var/mnt/blutgang";
-        type = "btrfs";
-        options = "subvolid=257";
-
-        wantedBy = [ "multi-user.target" ];
-      };
       keep-network = {
         enable = true;
         description = "keep-network store";
@@ -168,6 +183,16 @@ in
         where = "/var/mnt/keep-network";
         type = "btrfs";
         options = "subvolid=258";
+
+        wantedBy = [ "multi-user.target" ];
+      };
+      ssv-dkg = {
+        enable = true;
+
+        what = "/dev/sda";
+        where = "/var/mnt/ssv-dkg";
+        type = "btrfs";
+        options = "subvolid=259";
 
         wantedBy = [ "multi-user.target" ];
       };
@@ -196,6 +221,9 @@ in
       owner = "netdata";
       group = "netdata";
     };
+    secrets."holesky/ssvnode/password" = { };
+    secrets."holesky/ssvnode/privateKey" = { };
+    secrets."holesky/ssvnode/publicKey" = { };
     age.sshKeyPaths = [ sshKeysPath ];
   };
 
@@ -223,6 +251,8 @@ in
         # https://docs.threshold.network/staking-and-running-a-node/tbtc-v2-node-setup/network-configuration
         3919
         9601
+        # https://docs.ssv.network/operator-user-guides/operator-node/enabling-dkg
+        3030
       ];
       interfaces."wg0" = {
         allowedTCPPorts = [
