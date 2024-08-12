@@ -102,11 +102,41 @@ in
     requires = [ "wg-quick-wg0.service" "bitcoind-mainnet.service" ];
     after = [ "wg-quick-wg0.service" "bitcoind-mainnet.service" ];
 
-    script = ''      ${pkgs.electrs}/bin/electrs \
-            --db-dir /var/mnt/bitcoin/electrs/db \
-            --cookie-file /var/mnt/bitcoin/bitcoind/.cookie \
-            --network bitcoin \
-            --electrum-rpc-addr 192.168.100.10:50001
+    script = ''${pkgs.electrs}/bin/electrs \
+      --db-dir /var/mnt/bitcoin/electrs/db \
+      --cookie-file /var/mnt/bitcoin/bitcoind/.cookie \
+      --network bitcoin \
+      --electrum-rpc-addr 192.168.100.10:50001
+    '';
+
+    wantedBy = [ "multi-user.target" ];
+  };
+
+  systemd.services.besu-holesky = {
+    enable = true;
+
+    description = "holesky el";
+    requires = [ "wg-quick-wg0.service" ];
+    after = [ "wg-quick-wg0.service" ];
+
+    script = ''${pkgs.besy}/bin/besu \
+      --network=holesky \
+      --rpc-http-enabled=true \
+      --rpc-http-host=127.0.0.1 \
+      --rpc-http-cors-origins="*" \
+      --rpc-ws-enabled=true \
+      --rpc-ws-host=127.0.0.1 \
+      --host-allowlist="*" \
+      --engine-host-allowlist="*" \
+      --engine-rpc-enabled \
+      --engine-jwt-secret=${config.age.secrets."holesky-jwt".path} \
+      --data-path=/var/mnt/xfs/besu/holesky \
+      --nat-method=upnp \
+      --p2p-port=30342 \
+      --sync-mode=SNAP \
+      --engine-rpc-port=8424 \
+      --rpc-http-port=8542 \
+      --rpc-ws-port=8543
     '';
 
     wantedBy = [ "multi-user.target" ];
@@ -131,7 +161,6 @@ in
 
     wantedBy = [ "multi-user.target" ];
   };
-
 
   networking.firewall.allowedTCPPorts = [ 50001 30303 30342 9424 ];
   networking.firewall.allowedUDPPorts = [ 50001 30303 30342 9424 ];
