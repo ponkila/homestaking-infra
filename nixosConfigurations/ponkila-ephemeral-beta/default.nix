@@ -7,7 +7,6 @@ let
   # General
   infra.ip = "192.168.100.10";
   lighthouse.datadir = "/var/mnt/xfs/lighthouse";
-  erigon.datadir = "/var/mnt/xfs/erigon";
   sshKeysPath = "/var/mnt/xfs/secrets/ssh/id_ed25519";
 in
 {
@@ -45,14 +44,6 @@ in
       configFile = config.sops.secrets."wireguard/wg0".path;
     };
 
-    # Erigon options
-    execution.erigon = {
-      enable = true;
-      endpoint = "http://${infra.ip}:8551";
-      dataDir = erigon.datadir;
-      jwtSecretFile = "/var/mnt/xfs/erigon/jwt.hex";
-    };
-
     # Lighthouse options
     consensus.lighthouse = {
       enable = true;
@@ -64,7 +55,7 @@ in
         historyLength = 256;
         maxDatabaseSize = 16;
       };
-      jwtSecretFile = "/var/mnt/xfs/lighthouse/jwt.hex";
+      jwtSecretFile = config.age.secrets."mainnet-jwt".path;
     };
 
     # Addons
@@ -120,10 +111,48 @@ in
 
     wantedBy = [ "multi-user.target" ];
   };
-  networking.firewall.allowedTCPPorts = [ 50001 ];
-  networking.firewall.allowedUDPPorts = [ 50001 ];
+
+  systemd.services.lighthouse-holesky = {
+    enable = true;
+
+    description = "holesky cl";
+    requires = [ "wg-quick-wg0.service" ];
+    after = [ "wg-quick-wg0.service" ];
+
+    script = ''${pkgs.lighthouse}/bin/lighthouse bn \
+      --network holesky \
+      --execution-endpoint http://localhost:8424 \
+      --execution-jwt ${config.age.secrets."holesky-jwt".path} \
+      --checkpoint-sync-url https://holesky.beaconstate.ethstaker.cc/ \
+      --http \
+      --datadir /var/mnt/xfs/lighthouse/holesky \
+      --port 9424
+    '';
+
+    wantedBy = [ "multi-user.target" ];
+  };
+
+
+  networking.firewall.allowedTCPPorts = [ 50001 30303 30342 9424 ];
+  networking.firewall.allowedUDPPorts = [ 50001 30303 30342 9424 ];
 
   # Secrets
+  age = {
+    rekey = {
+      agePlugins = [ pkgs.age-plugin-fido2-hmac ];
+      hostPubkey = "age1rahna5rce9mj0js0p7dgt6wseqyzxjawva82tfdelzuvmngr5fdqa2geuy";
+    };
+    secrets = {
+      mainnet-jwt = {
+        rekeyFile = ./secrets/agenix/mainnet-jwt.age;
+        generator.script = "hex";
+      };
+      holesky-jwt = {
+        rekeyFile = ./secrets/agenix/holesky-jwt.age;
+        generator.script = "hex";
+      };
+    };
+  };
   sops = {
     defaultSopsFile = ./secrets/default.yaml;
     secrets."netdata/health_alarm_notify.conf" = {
@@ -145,14 +174,14 @@ in
     };
   };
 
-  services.nix-serve = {
+  wirenix = {
     enable = true;
-    package = pkgs.nix-serve-ng;
-    openFirewall = true;
-    port = 5000;
-    bindAddress = "192.168.100.10";
-    secretKeyFile = config.sops.secrets."nix-serve/secretKeyFile".path;
+    peerName = "node2"; # defaults to hostname otherwise
+    configurer = "networkd"; # defaults to "static", could also be "networkd"
+    keyProviders = [ "agenix-rekey" ]; # could also be ["agenix-rekey"] or ["acl" "agenix-rekey"]
+    secretsDir = ../../nixosModules/wirenix/agenix; # only if you're using agenix-rekey
+    aclConfig = import ../../nixosModules/wirenix/acl.nix;
   };
 
-  system.stateVersion = "23.05";
+  system.stateVersion = "24.05";
 }

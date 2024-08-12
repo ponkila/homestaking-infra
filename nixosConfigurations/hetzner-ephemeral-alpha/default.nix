@@ -29,9 +29,7 @@ in
     neededForBoot = true;
   };
 
-  environment.systemPackages = with pkgs; [
-  ];
-
+  environment.systemPackages = [ pkgs.wireguard-tools ];
   environment.etc."Caddyfile" = {
     text = ''
        {
@@ -177,6 +175,12 @@ in
   };
 
   # Secrets
+  age = {
+    rekey = {
+      agePlugins = [ pkgs.age-plugin-fido2-hmac ];
+      hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKfkQ9dHiYK8LUsjM06dHKI1z/Gh7IiG0rUH3sxj4Stc";
+    };
+  };
   sops = {
     defaultSopsFile = ./secrets/default.yaml;
     secrets."wireguard/wg0" = { };
@@ -195,22 +199,43 @@ in
     age.sshKeyPaths = [ sshKeysPath ];
   };
 
-  networking.firewall = {
-    allowedTCPPorts = [
-      # https://docs.threshold.network/staking-and-running-a-node/tbtc-v2-node-setup/network-configuration
-      3919
-      9601
-    ];
-    interfaces."wg0" = {
-      allowedTCPPorts = [
-        8545 # eth rpc: ws or http
-        50001 # bitcoin electrum rpc
-      ];
-      allowedUDPPorts = [
-        8545
-        50001
-      ];
+  systemd.network = {
+    enable = true;
+    networks = {
+      "10-wan" = {
+        address = [ "2a01:4f9:c011:a71d::1/64" ];
+        linkConfig.RequiredForOnline = "routable";
+        matchConfig.Name = "enp1s0";
+        networkConfig = {
+          DHCP = "ipv4";
+        };
+        routes = [
+          {
+            routeConfig.Gateway = "fe80::1";
+          }
+        ];
+      };
     };
+  };
+  networking = {
+    firewall = {
+      allowedTCPPorts = [
+        # https://docs.threshold.network/staking-and-running-a-node/tbtc-v2-node-setup/network-configuration
+        3919
+        9601
+      ];
+      interfaces."wg0" = {
+        allowedTCPPorts = [
+          8545 # eth rpc: ws or http
+          50001 # bitcoin electrum rpc
+        ];
+        allowedUDPPorts = [
+          8545
+          50001
+        ];
+      };
+    };
+    useDHCP = false;
   };
 
   services.netdata = {
@@ -269,5 +294,14 @@ in
     };
   };
 
-  system.stateVersion = "23.05";
+  wirenix = {
+    enable = true;
+    peerName = "node1"; # defaults to hostname otherwise
+    configurer = "networkd"; # defaults to "static", could also be "networkd"
+    keyProviders = [ "agenix-rekey" ]; # could also be ["agenix-rekey"] or ["acl" "agenix-rekey"]
+    secretsDir = ../../nixosModules/wirenix/agenix; # only if you're using agenix-rekey
+    aclConfig = import ../../nixosModules/wirenix/acl.nix;
+  };
+
+  system.stateVersion = "24.05";
 }
