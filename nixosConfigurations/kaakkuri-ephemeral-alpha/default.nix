@@ -80,15 +80,31 @@ in
     wantedBy = [ "multi-user.target" ];
   };
 
+  systemd.services.ssvnode = {
+    enable = true;
+
+    description = "holesky ssvnode";
+    requires = [ "wg-quick-wg0.service" ];
+    after = [ "wg-quick-wg0.service" ];
+
+    script = ''${pkgs.ssvnode}/bin/ssvnode start-node \
+      -c /var/mnt/ssd/ethereum/holesky/ssvnode/config.yaml
+    '';
+
+    wantedBy = [ "multi-user.target" ];
+  };
+
   networking.firewall.allowedTCPPorts = [
-    9001
+    13001
     30303
     50001
+    9001
   ];
   networking.firewall.allowedUDPPorts = [
-    9001
+    12001
     30303
     50001
+    9001
   ];
 
   services.bitcoind."mainnet" = {
@@ -132,6 +148,9 @@ in
       owner = "netdata";
       group = "netdata";
     };
+    secrets."holesky/ssvnode/password" = { };
+    secrets."holesky/ssvnode/privateKey" = { };
+    secrets."holesky/ssvnode/publicKey" = { };
     age.sshKeyPaths = [ sshKeysPath ];
   };
 
