@@ -261,6 +261,17 @@ in
     };
   };
 
+  systemd.tmpfiles.rules = [
+    "d /var/log/smartd 0755 netdata netdata -"
+  ];
+  services.smartd = {
+    enable = true;
+    extraOptions = [
+      "-A /var/log/smartd/"
+      "--interval=600"
+    ];
+  };
+
   wirenix = {
     enable = true;
     peerName = "node2"; # defaults to hostname otherwise

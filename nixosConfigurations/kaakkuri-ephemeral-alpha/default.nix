@@ -248,6 +248,16 @@ in
     };
   };
 
+  systemd.tmpfiles.rules = [
+    "d /var/log/smartd 0755 netdata netdata -"
+  ];
+  services.smartd = {
+    enable = true;
+    extraOptions = [
+      "-A /var/log/smartd/"
+      "--interval=600"
+    ];
+  };
 
   age = {
     generators.jwt = { pkgs, ... }: "${pkgs.openssl}/bin/openssl rand -hex 32";
