@@ -1,6 +1,8 @@
 { pkgs
 , config
 , lib
+, inputs
+, outputs
 , ...
 }:
 let
@@ -257,6 +259,8 @@ in
         jobs:
           - name: besu-holesky
             url: http://127.0.0.1:9542/metrics
+          - name: etcd
+            url: http://127.0.0.1:2379/metrics
       '';
     };
   };
@@ -280,6 +284,27 @@ in
     secretsDir = ../../nixosModules/wirenix/agenix; # only if you're using agenix-rekey
     aclConfig = import ../../nixosModules/wirenix/acl.nix;
   };
+
+  services.etcd =
+    let
+      fromString = inputs.clib.lib.network.ipv6.fromString;
+      self = map (x: x.address) (map fromString config.systemd.network.networks."50-simple".address);
+      clusterAddr = map (node: "${node.wirenix.peerName}=${toString (map (wg: "http://[${wg.address}]") (map fromString node.systemd.network.networks."50-simple".address))}:2380");
+      kaakkuri = clusterAddr [ outputs.nixosConfigurations."kaakkuri-ephemeral-alpha".config ];
+      node1 = clusterAddr [ outputs.nixosConfigurations."hetzner-ephemeral-alpha".config ];
+      node2 = clusterAddr [ outputs.nixosConfigurations."ponkila-ephemeral-beta".config ];
+    in
+    {
+      enable = true;
+      name = config.wirenix.peerName;
+      listenPeerUrls = map (x: "http://[${x}]:2380") self;
+      listenClientUrls = [ "http://localhost:2379" ] ++ (map (x: "http://[${x}]:2379") self);
+      initialClusterToken = "etcd-cluster-1";
+      initialClusterState = "new";
+      initialCluster = kaakkuri ++ node1 ++ node2;
+      dataDir = "/var/mnt/xfs/etcd";
+      openFirewall = true;
+    };
 
   system.stateVersion = "24.05";
 }

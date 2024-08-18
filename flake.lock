@@ -107,6 +107,21 @@
         "type": "github"
       }
     },
+    "clib": {
+      "locked": {
+        "lastModified": 1723337705,
+        "narHash": "sha256-znSU0DeNDPt7+LMAfFkvKloMaeQ6yl/U5SqV/ktl1vA=",
+        "owner": "nix-community",
+        "repo": "nixpkgs.lib",
+        "rev": "ace7856d327b618d3777e31b1f224b3ab57ed71a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nixpkgs.lib",
+        "type": "github"
+      }
+    },
     "darwin": {
       "inputs": {
         "nixpkgs": [
@@ -1473,6 +1488,7 @@
       "inputs": {
         "agenix": "agenix",
         "agenix-rekey": "agenix-rekey",
+        "clib": "clib",
         "devenv": "devenv",
         "flake-parts": "flake-parts",
         "homestakeros": "homestakeros",
