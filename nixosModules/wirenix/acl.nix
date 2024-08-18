@@ -4,10 +4,7 @@
     {
       name = "simple";
       endpoints = [
-        {
-          # No match mean match any
-          port = 51820;
-        }
+        { }
       ];
     }
   ];
@@ -23,7 +20,8 @@
       endpoints = [
         {
           # no match can be any
-          ip = "135.181.90.126";
+          port = 51820;
+          ip = "hetzner-ephemeral-alpha.ponkila.com";
         }
       ];
     }
@@ -37,7 +35,23 @@
       endpoints = [
         {
           # no match field means match all peers
+          port = 51821;
           ip = "nyt2.ponkila.com";
+        }
+      ];
+    }
+    {
+      name = "kaakkuri";
+      subnets = {
+        simple = {
+          listenPort = 51821;
+        };
+      };
+      endpoints = [
+        {
+          # no match field means match all peers
+          port = 51821;
+          ip = "eth.coditon.com";
         }
       ];
     }
@@ -46,6 +60,7 @@
     {
       a = [{ type = "subnet"; rule = "is"; value = "simple"; }];
       b = [{ type = "subnet"; rule = "is"; value = "simple"; }];
+      subnets = [ "simple" ];
     }
   ];
 }

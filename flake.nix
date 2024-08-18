@@ -133,6 +133,14 @@
       flake =
         let
           inherit (self) outputs;
+          jesse = {
+            identity = ./nixosModules/agenix-rekey/masterIdentities/jesse.hmac;
+            pubkey = "age1fm70hduvuy5mu5n9jhv7l4u6d9pqclj2ef9jq6w2ptpatjsm25ysdx3py9";
+          };
+          juuso = {
+            identity = ./nixosModules/agenix-rekey/masterIdentities/juuso.hmac;
+            pubkey = "age12lz3jyd2weej5c4mgmwlwsl0zmk2tdgvtflctgryx6gjcaf3yfsqgt7rnz";
+          };
 
           ponkila-ephemeral-beta = {
             system = "x86_64-linux";
@@ -176,17 +184,15 @@
               inputs.agenix-rekey.nixosModules.default
               inputs.agenix.nixosModules.default
               inputs.sops-nix.nixosModules.sops
+              inputs.wirenix.nixosModules.default
               {
                 nixpkgs.overlays = [
                   inputs.homestakeros.overlays.default
                 ];
                 boot.loader.grub.enable = false;
                 age.rekey = {
-                  localStorageDir = ./. + "/nixosConfigurations/kaakkuri-ephemeral-alpha/secrets/agenix-rekey";
-                  masterIdentities = [{
-                    identity = ./nixosModules/agenix-rekey/masterIdentities/juuso.hmac;
-                    pubkey = "age12lz3jyd2weej5c4mgmwlwsl0zmk2tdgvtflctgryx6gjcaf3yfsqgt7rnz";
-                  }];
+                  localStorageDir = ./nixosConfigurations/kaakkuri-ephemeral-alpha/secrets/agenix-rekey;
+                  masterIdentities = [ jesse juuso ];
                   storageMode = "local";
                 };
               }
