@@ -79,6 +79,16 @@
     "timezone": "Europe/Helsinki"
   },
   "mounts": {
+    "etcd": {
+      "enable": true,
+      "options": "subvolid=260",
+      "type": "btrfs",
+      "wantedBy": [
+        "multi-user.target"
+      ],
+      "what": "/dev/sda",
+      "where": "/var/mnt/etcd"
+    },
     "keep-network": {
       "description": "keep-network store",
       "enable": true,
