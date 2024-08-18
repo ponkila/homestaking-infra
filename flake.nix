@@ -124,7 +124,6 @@
             }
             # Entrypoint aliases, accessible trough 'nix build'
             // (with flake.nixosConfigurations; {
-              "dinar-ephemeral-alpha" = dinar-ephemeral-alpha.config.system.build.kexecTree;
               "dinar-ephemeral-beta" = dinar-ephemeral-beta.config.system.build.kexecTree;
               "hetzner-ephemeral-alpha" = hetzner-ephemeral-alpha.config.system.build.kexecTree;
               "kaakkuri-ephemeral-alpha" = kaakkuri-ephemeral-alpha.config.system.build.kexecTree;
@@ -224,36 +223,6 @@
             ];
           };
 
-          dinar-ephemeral-alpha = {
-            system = "x86_64-linux";
-            specialArgs = { inherit inputs outputs; };
-            modules = [
-              ./nixosConfigurations/dinar-ephemeral-alpha
-              inputs.homestakeros-base.nixosModules.base
-              inputs.homestakeros-base.nixosModules.kexecTree
-              inputs.homestakeros.nixosModules.homestakeros
-
-              inputs.agenix-rekey.nixosModules.default
-              inputs.agenix.nixosModules.default
-              inputs.sops-nix.nixosModules.sops
-              {
-                nixpkgs.overlays = [
-                  inputs.homestakeros.overlays.default
-                ];
-                boot.loader.grub.enable = false;
-                age.rekey = {
-                  localStorageDir = ./. + "/nixosConfigurations/dinar-ephemeral-alpha/secrets/agenix-rekey";
-                  masterIdentities = [{
-                    identity = ./nixosModules/agenix-rekey/masterIdentities/juuso.hmac;
-                    pubkey = "age12lz3jyd2weej5c4mgmwlwsl0zmk2tdgvtflctgryx6gjcaf3yfsqgt7rnz";
-                  }];
-                  storageMode = "local";
-                };
-
-              }
-            ];
-          };
-
           dinar-ephemeral-beta = {
             system = "x86_64-linux";
             specialArgs = { inherit inputs outputs; };
@@ -286,7 +255,6 @@
         {
           # NixOS configuration entrypoints
           nixosConfigurations = with inputs.nixpkgs.lib; {
-            "dinar-ephemeral-alpha" = nixosSystem dinar-ephemeral-alpha;
             "dinar-ephemeral-beta" = nixosSystem dinar-ephemeral-beta;
             "hetzner-ephemeral-alpha" = nixosSystem hetzner-ephemeral-alpha;
             "kaakkuri-ephemeral-alpha" = nixosSystem kaakkuri-ephemeral-alpha;
