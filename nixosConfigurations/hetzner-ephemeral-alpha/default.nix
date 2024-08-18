@@ -43,7 +43,7 @@ in
       http://192.168.100.40:8545 {
 
         reverse_proxy {
-          to 192.168.100.10:8546 192.168.100.21:8546 192.168.100.33:8546
+          to 192.168.100.10:8546 192.168.100.33:8546
 
           health_uri /eth/v1/node/syncing
           health_port 5052
@@ -254,6 +254,9 @@ in
         # https://docs.ssv.network/operator-user-guides/operator-node/enabling-dkg
         3030
       ];
+      allowedUDPPorts = [
+        51820
+      ];
       interfaces."wg0" = {
         allowedTCPPorts = [
           8545 # eth rpc: ws or http
@@ -274,41 +277,34 @@ in
       "health_alarm_notify.conf" = config.sops.secrets."netdata/health_alarm_notify.conf".path;
       "go.d/prometheus.conf" = pkgs.writeText "go.d/prometheus.conf" ''
         jobs:
-        - name: keep-core
-        url: http://127.0.0.1:9601/metrics
-        - name: caddy
-        url: http://127.0.0.1:2019/metrics
+          - name: keep-core
+            url: http://127.0.0.1:9601/metrics
+          - name: caddy
+            url: http://127.0.0.1:2019/metrics
       '';
       "health.d/btc_connectivity.conf" = pkgs.writeText "health.d/btc_connectivity.conf" ''
-        alarm: @juuso: btc_connectivity
+        alarm: juuso: btc_connectivity
         on: prometheus_keep-core.btc_connectivity
         lookup: min -10s
         every: 10s
         crit: $this == 0
       '';
       "health.d/eth_connectivity.conf" = pkgs.writeText "health.d/eth_connectivity.conf" ''
-        alarm: @juuso: eth_connectivity
+        alarm: juuso: eth_connectivity
         lookup: min -10s
         on: prometheus_keep-core.eth_connectivity
         every: 10s
         crit: $this == 0
       '';
       "health.d/upstream_192.168.100.10.conf" = pkgs.writeText "health.d/upstream_192.168.100.10.conf" ''
-        alarm: @juuso: healthy-upstream_192.168.100.10
+        alarm: juuso: healthy-upstream_192.168.100.10
         lookup: min -10s
         on: prometheus_caddy.caddy_reverse_proxy_upstreams_healthy-upstream_192.168.100.10_8546
         every: 10s
         warn: $this == 0
       '';
-      "health.d/upstream_192.168.100.21.conf" = pkgs.writeText "health.d/upstream_192.168.100.21.conf" ''
-        alarm: @tommi: healthy-upstream_192.168.100.21
-        lookup: min -10s
-        on: prometheus_caddy.caddy_reverse_proxy_upstreams_healthy-upstream_192.168.100.21_8546
-        every: 10s
-        warn: $this == 0
-      '';
       "health.d/upstream_192.168.100.33.conf" = pkgs.writeText "health.d/upstream_192.168.100.33.conf" ''
-        alarm: @tommi: healthy-upstream_192.168.100.33
+        alarm: tommi: healthy-upstream_192.168.100.33
         lookup: min -10s
         on: prometheus_caddy.caddy_reverse_proxy_upstreams_healthy-upstream_192.168.100.33_8546
         every: 10s
