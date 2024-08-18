@@ -112,6 +112,38 @@ in
     wantedBy = [ "multi-user.target" ];
   };
 
+  systemd.services.besu-mainnet = {
+    enable = true;
+
+    description = "mainnet el";
+    requires = [ "wg-quick-wg0.service" ];
+    after = [ "wg-quick-wg0.service" ];
+
+    script = ''${pkgs.besu}/bin/besu \
+      --network=mainnet \
+      --rpc-http-enabled=true \
+      --rpc-http-host=192.168.100.10 \
+      --rpc-http-cors-origins="*" \
+      --rpc-ws-enabled=true \
+      --rpc-ws-host=0.0.0.0 \
+      --host-allowlist="*" \
+      --engine-host-allowlist="*" \
+      --engine-rpc-enabled \
+      --engine-jwt-secret=${config.age.secrets."mainnet-jwt".path} \
+      --data-path=/var/mnt/xfs/besu/mainnet \
+      --nat-method=upnp \
+      --p2p-port=30303 \
+      --sync-mode=CHECKPOINT \
+      --engine-rpc-port=8551 \
+      --rpc-http-port=8545 \
+      --rpc-ws-port=8546 \
+      --rpc-ws-authentication-enabled=false
+    '';
+
+    wantedBy = [ "multi-user.target" ];
+  };
+
+
   systemd.services.besu-holesky = {
     enable = true;
 
@@ -136,7 +168,9 @@ in
       --sync-mode=SNAP \
       --engine-rpc-port=8424 \
       --rpc-http-port=8542 \
-      --rpc-ws-port=8543
+      --rpc-ws-port=8543 \
+      --metrics-enabled \
+      --metrics-port=9542
     '';
 
     wantedBy = [ "multi-user.target" ];
@@ -162,23 +196,42 @@ in
     wantedBy = [ "multi-user.target" ];
   };
 
-  networking.firewall.allowedTCPPorts = [ 50001 30303 30342 9424 ];
-  networking.firewall.allowedUDPPorts = [ 50001 30303 30342 9424 ];
+  systemd.network = {
+    enable = true;
+    networks = {
+      "10-wan" = {
+        linkConfig.RequiredForOnline = "routable";
+        matchConfig.Name = "enp193s0f0";
+        networkConfig = {
+          DHCP = "ipv4";
+          IPv6AcceptRA = true;
+        };
+      };
+    };
+  };
+  networking = {
+    firewall = {
+      allowedTCPPorts = [ 50001 30303 30342 9424 8546 ];
+      allowedUDPPorts = [ 50001 30303 30342 9424 8546 51821 ];
+    };
+    useDHCP = false;
+  };
 
   # Secrets
   age = {
+    generators.jwt = { pkgs, ... }: "${pkgs.openssl}/bin/openssl rand -hex 32";
     rekey = {
       agePlugins = [ pkgs.age-plugin-fido2-hmac ];
-      hostPubkey = "age1rahna5rce9mj0js0p7dgt6wseqyzxjawva82tfdelzuvmngr5fdqa2geuy";
+      hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPwLwYmyCmUJAi82j5py4rwNX9vpM7EVLo/NEMnZg74H";
     };
     secrets = {
       mainnet-jwt = {
         rekeyFile = ./secrets/agenix/mainnet-jwt.age;
-        generator.script = "hex";
+        generator.script = "jwt";
       };
       holesky-jwt = {
         rekeyFile = ./secrets/agenix/holesky-jwt.age;
-        generator.script = "hex";
+        generator.script = "jwt";
       };
     };
   };
@@ -200,6 +253,11 @@ in
     enable = true;
     configDir = {
       "health_alarm_notify.conf" = config.sops.secrets."netdata/health_alarm_notify.conf".path;
+      "go.d/prometheus.conf" = pkgs.writeText "go.d/prometheus.conf" ''
+        jobs:
+          - name: besu-holesky
+            url: http://127.0.0.1:9542/metrics
+      '';
     };
   };
 
