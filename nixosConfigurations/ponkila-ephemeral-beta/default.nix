@@ -287,7 +287,7 @@ in
 
   services.etcd =
     let
-      fromString = inputs.clib.lib.network.ipv6.fromString;
+      inherit (inputs.clib.lib.network.ipv6) fromString;
       self = map (x: x.address) (map fromString config.systemd.network.networks."50-simple".address);
       clusterAddr = map (node: "${node.wirenix.peerName}=${toString (map (wg: "http://[${wg.address}]") (map fromString node.systemd.network.networks."50-simple".address))}:2380");
       kaakkuri = clusterAddr [ outputs.nixosConfigurations."kaakkuri-ephemeral-alpha".config ];
