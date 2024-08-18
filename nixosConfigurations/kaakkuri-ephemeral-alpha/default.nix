@@ -176,6 +176,7 @@ in
         9001 # lighthouse discovery
 
         # Internal
+        50001 # electrs
         8545 # holesky RPC
       ];
       allowedUDPPorts = [
@@ -184,6 +185,7 @@ in
         51821
         9001
 
+        50001
         8545
       ];
     };
@@ -212,7 +214,8 @@ in
       --db-dir /var/mnt/ssd/bitcoin/electrs/db \
       --cookie-file /var/mnt/ssd/bitcoin/bitcoind/.cookie \
       --network bitcoin \
-      --electrum-rpc-addr 192.168.100.50:50001
+      --electrum-rpc-addr 192.168.100.50:50001 \
+      --monitoring-addr 127.0.0.1:4224
     '';
 
     wantedBy = [ "multi-user.target" ];
@@ -232,6 +235,8 @@ in
             url: http://127.0.0.1:6060/debug/metrics/prometheus
           - name: lighthouse
             url: http://127.0.0.1:5054/metrics
+          - name: electrs
+            url: http://127.0.0.1:4224/metrics
       '';
       "health.d/ssv_node_status" = pkgs.writeText "health.d/ssv_node_status.conf" ''
         alarm: jesse, juuso: ssv_node_status
