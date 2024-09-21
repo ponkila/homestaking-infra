@@ -163,7 +163,7 @@ in
         linkConfig.RequiredForOnline = "routable";
         matchConfig.Name = "enp6s0";
         networkConfig = {
-          DHCP = "ipv4";
+          DHCP = "no";
           IPv6AcceptRA = true;
         };
         address = [ "192.168.1.25/24" ]; # static IP
