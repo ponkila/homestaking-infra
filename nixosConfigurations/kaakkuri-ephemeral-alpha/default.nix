@@ -81,7 +81,8 @@ in
       --holesky \
       --authrpc.jwtsecret=${config.age.secrets."holesky-jwt".path} \
       --metrics \
-      --metrics.addr 127.0.0.1
+      --metrics.addr 127.0.0.1 \
+      --maxpeers 100
     '';
 
     wantedBy = [ "multi-user.target" ];
