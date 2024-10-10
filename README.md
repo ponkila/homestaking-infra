@@ -4,15 +4,15 @@ Ethereum home-staking infrastructure powered by Nix
 ## About
 Transparency is crucial for spreading knowledge among Ethereum infrastructures, benefiting new home-stakers and maintainers to improve their existing setup. With Nix, the entire configuration of the real, working infrastructure can be seen at glance. This is also extremely useful for those involved in the maintenance of these machines, as it provides a clear understanding of what's under the hood.
 
-We are currently working on [HomestakerOS](https://github.com/ponkila/HomestakerOS) and [Nixobolus](https://github.com/ponkila/nixobolus), which are designed to provide users with an easy way to configure, build and deploy this kind of infrastructure via WebUI.
+We are currently working on [HomestakerOS](https://github.com/ponkila/HomestakerOS), which is designed to provide users with an easy way to configure, build and deploy this kind of infrastructure via WebUI.
 
 ## Keypoints
 - Multiple NixOS configurations for running Ethereum nodes
-- Utilizes [nixobolus](https://github.com/ponkila/nixobolus) as a comprehensive module for all Ethereum-related components
+- Utilizes [HomestakerOS](https://github.com/ponkila/HomestakerOS)'s comprehensive module for all Ethereum-related components
 - Runs on RAM disk, providing significant performance benefits by reducing I/O operations
 - [Overlays](https://nixos.wiki/wiki/Overlays) offer a convenient way to manually update or modify packages, ideal for addressing issues with upstream sources
-- Deployment secrets using [sops-nix](https://github.com/Mic92/sops-nix) for secure handling of sensitive information
-- Offers `isoImage` or `kexecTree` output formats depending on the host configuration
+- Deployment secrets using [sops-nix](https://github.com/Mic92/sops-nix)/[agenix-rekey](https://github.com/oddlama/agenix-rekey) for secure handling of sensitive information
+- Uses [WireNix](https://git.sr.ht/~msalerno/wirenix) to create a mesh network between nodes, enabling secure connections
 
 ## Structure
 - `flake.nix`: Entrypoint for host configurations.
@@ -20,13 +20,12 @@ We are currently working on [HomestakerOS](https://github.com/ponkila/Homestaker
 - `packages`: Our custom packages, accessible trough `nix run`, etc.
 
 ## Hosts
-| Hostname | System | Format | Info
+| Hostname | System | Network(s) | Info
 |-|-|-|-|
-dinar-ephemeral-alpha | x86-64 | kexecTree | Lighthouse + Erigon
-dinar-ephemeral-beta | x86-64 | kexecTree | Lighthouse + Erigon
-hetzner-ephemeral-alpha | x86-64 | kexecTree | Blutgang + Threshold.network
-ponkila-ephemeral-beta | x86-64 | kexecTree | Lighthouse + Erigon
-ponkila-ephemeral-gamma | aarch64 | kexecTree | Raspberry Pi 4
+dinar-ephemeral-beta      | x86-64 | Mainnet | Lighthouse + Erigon
+hetzner-ephemeral-alpha   | x86-64 | Mainnet | Blutgang + Threshold.network
+kaakkuri-ephemeral-alpha  | x86-64 | Holesky | Lighthouse + Geth
+ponkila-ephemeral-beta    | x86-64 | Mainnet | Lighthouse + Erigon
 
 ## Building (no cross-compile)
 
