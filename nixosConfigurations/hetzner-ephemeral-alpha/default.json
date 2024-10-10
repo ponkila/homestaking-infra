@@ -79,16 +79,15 @@
     "timezone": "Europe/Helsinki"
   },
   "mounts": {
-    "blutgang": {
-      "description": "blutgang store",
+    "etcd": {
       "enable": true,
-      "options": "subvolid=257",
+      "options": "subvolid=260",
       "type": "btrfs",
       "wantedBy": [
         "multi-user.target"
       ],
       "what": "/dev/sda",
-      "where": "/var/mnt/blutgang"
+      "where": "/var/mnt/etcd"
     },
     "keep-network": {
       "description": "keep-network store",
@@ -100,6 +99,16 @@
       ],
       "what": "/dev/sda",
       "where": "/var/mnt/keep-network"
+    },
+    "ssv-dkg": {
+      "enable": true,
+      "options": "subvolid=259",
+      "type": "btrfs",
+      "wantedBy": [
+        "multi-user.target"
+      ],
+      "what": "/dev/sda",
+      "where": "/var/mnt/ssv-dkg"
     }
   },
   "ssh": {

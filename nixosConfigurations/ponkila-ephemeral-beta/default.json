@@ -16,7 +16,7 @@
       "enable": true,
       "endpoint": "http://192.168.100.10:5052",
       "execEndpoint": "http://192.168.100.10:8551",
-      "jwtSecretFile": "/var/mnt/xfs/lighthouse/jwt.hex",
+      "jwtSecretFile": "/run/agenix/mainnet-jwt",
       "slasher": {
         "enable": false,
         "historyLength": 256,
@@ -56,10 +56,10 @@
       "jwtSecretFile": null
     },
     "erigon": {
-      "dataDir": "/var/mnt/xfs/erigon",
-      "enable": true,
-      "endpoint": "http://192.168.100.10:8551",
-      "jwtSecretFile": "/var/mnt/xfs/erigon/jwt.hex"
+      "dataDir": "/var/mnt/erigon",
+      "enable": false,
+      "endpoint": "http://127.0.0.1:8551",
+      "jwtSecretFile": null
     },
     "geth": {
       "dataDir": "/var/mnt/geth",

@@ -2,7 +2,7 @@
   "addons": {
     "mev-boost": {
       "enable": true,
-      "endpoint": "http://192.168.100.32:18550"
+      "endpoint": "http://192.168.100.33:18550"
     },
     "ssv-node": {
       "dataDir": "/mnt/eth/ssv",
@@ -14,8 +14,8 @@
     "lighthouse": {
       "dataDir": "/mnt/eth/lighthouse",
       "enable": true,
-      "endpoint": "http://192.168.100.32:5052",
-      "execEndpoint": "http://192.168.100.32:8551",
+      "endpoint": "http://192.168.100.33:5052",
+      "execEndpoint": "http://192.168.100.33:8551",
       "jwtSecretFile": "/mnt/eth/jwt.hex",
       "slasher": {
         "enable": false,
@@ -58,7 +58,7 @@
     "erigon": {
       "dataDir": "/mnt/eth/erigon",
       "enable": true,
-      "endpoint": "http://192.168.100.32:8551",
+      "endpoint": "http://192.168.100.33:8551",
       "jwtSecretFile": "/mnt/eth/jwt.hex"
     },
     "geth": {
