@@ -15,6 +15,11 @@ in
     device = "/dev/mapper/samsung-ssd";
     neededForBoot = true;
   };
+  # fileSystems."/var/mnt/nvme" = lib.mkImageMediaOverride {
+  #   fsType = "xfs";
+  #   device = "/dev/mapper/samsung-nvme";
+  #   neededForBoot = true;
+  # };
 
   homestakeros = {
     # Localization options
@@ -122,7 +127,7 @@ in
             BuilderProposals: true
 
         eth2:
-          BeaconNodeAddr: http://localhost:5052
+          BeaconNodeAddr: http://192.168.100.10:5152
 
         eth1:
           ETH1Addr: ws://localhost:8546
