@@ -182,7 +182,8 @@ in
         # NAT routes
         13001 # SSV
         30303 # geth discovery
-        9001 # lighthouse discovery
+        9000 # lighthouse discovery
+        9001 # lighthouse quic
 
         # Internal
         50001 # electrs
@@ -192,6 +193,7 @@ in
         12001
         30303
         51821
+        9000
         9001
 
         50001
