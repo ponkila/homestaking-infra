@@ -15,11 +15,11 @@ in
     device = "/dev/mapper/samsung-ssd";
     neededForBoot = true;
   };
-  # fileSystems."/var/mnt/nvme" = lib.mkImageMediaOverride {
-  #   fsType = "xfs";
-  #   device = "/dev/mapper/samsung-nvme";
-  #   neededForBoot = true;
-  # };
+  fileSystems."/var/mnt/nvme" = lib.mkImageMediaOverride {
+    fsType = "xfs";
+    device = "/dev/mapper/pro990-data";
+    neededForBoot = true;
+  };
 
   homestakeros = {
     # Localization options
