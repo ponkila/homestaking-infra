@@ -43,6 +43,21 @@ in
       privateKeyFile = sshKeysPath;
     };
 
+    # Prysm options
+    consensus.prysm = {
+      enable = true;
+      endpoint = "http://${infra.ip}:3500";
+      execEndpoint = "http://${infra.ip}:8541";
+      dataDir = "/var/mnt/nvme/ethereum/mainnet/prysm";
+      jwtSecretFile = "/var/mnt/nvme/ethereum/mainnet/jwt.hex";
+    };
+
+    # Addons
+    addons.mev-boost = {
+      enable = true;
+      endpoint = "http://${infra.ip}:18540";
+    };
+
     # Wireguard options
     vpn.wireguard = {
       enable = true;
@@ -108,6 +123,48 @@ in
         "--metrics"
         "--metrics.addr 127.0.0.1"
         "--metrics.port 6060"
+      ]}
+    '';
+
+    wantedBy = [ "multi-user.target" ];
+  };
+
+  systemd.services.reth = {
+    enable = true;
+
+    description = "mainnet el";
+    requires = [ "wg-quick-wg0.service" ];
+    after = [ "wg-quick-wg0.service" ];
+
+    script = ''
+      ${lib.concatStringsSep " " [
+        "${pkgs.reth}/bin/reth node"
+        "--chain mainnet"
+        "--datadir /var/mnt/nvme/ethereum/mainnet/reth"
+        "--port 30343"
+        "--discovery.port 30343"
+
+        # Auth for consensus client
+        "--authrpc.addr ${infra.ip}"
+        "--authrpc.port 8541"
+        "--authrpc.jwtsecret /var/mnt/nvme/ethereum/mainnet/jwt.hex"
+
+        # JSON-RPC for interacting
+        "--http"
+        "--http.addr ${infra.ip}"
+        "--http.port 8535"
+        "--http.api eth,web3,net,debug,txpool"
+        "--http.corsdomain=*"
+
+        # Websockets for SSV
+        "--ws"
+        "--ws.addr ${infra.ip}"
+        "--ws.port 8535"
+        "--ws.api eth,web3,net,debug,txpool"
+        "--ws.origins=*"
+
+        # Metrics
+        "--metrics ${infra.ip}:9542"
       ]}
     '';
 
@@ -203,22 +260,28 @@ in
         # NAT routes
         13001 # SSV
         30303 # geth discovery
+        30343 # reth discovery
         9000 # lighthouse discovery
         9001 # lighthouse quic
+        13000 # prysm discovery/quic
 
         # Internal
         50001 # electrs
         8545 # holesky RPC
+        8535 # mainnet RPC
       ];
       allowedUDPPorts = [
         12001
         30303
+        30343
         51821
         9000
         9001
+        13000
 
         50001
         8545
+        8535
       ];
     };
     useDHCP = false;
