@@ -6,6 +6,8 @@
 , ...
 }:
 let
+  # General
+  infra.ip = "192.168.100.50";
   sshKeysPath = "/var/mnt/ssd/secrets/ssh/id_ed25519";
 in
 {
@@ -46,7 +48,6 @@ in
       enable = true;
       configFile = "/var/mnt/ssd/secrets/wg0.conf";
     };
-
   };
 
   systemd.services.lighthouse = {
@@ -56,15 +57,18 @@ in
     requires = [ "wg-quick-wg0.service" ];
     after = [ "wg-quick-wg0.service" ];
 
-    script = ''${pkgs.lighthouse}/bin/lighthouse bn \
-      --network holesky \
-      --execution-endpoint http://localhost:8551 \
-      --execution-jwt ${config.age.secrets."holesky-jwt".path} \
-      --checkpoint-sync-url https://holesky.beaconstate.ethstaker.cc/ \
-      --http \
-      --datadir /var/mnt/ssd/ethereum/holesky/lighthouse \
-      --builder http://127.0.0.1:18550 \
-      --metrics
+    script = ''
+      ${lib.concatStringsSep " " [
+        "${pkgs.lighthouse}/bin/lighthouse bn"
+        "--network holesky"
+        "--execution-endpoint http://${infra.ip}:8551"
+        "--execution-jwt ${config.age.secrets."holesky-jwt".path}"
+        "--checkpoint-sync-url https://holesky.beaconstate.ethstaker.cc/"
+        "--http"
+        "--datadir /var/mnt/ssd/ethereum/holesky/lighthouse"
+        "--builder http://127.0.0.1:18550"
+        "--metrics"
+      ]}
     '';
 
     wantedBy = [ "multi-user.target" ];
@@ -77,23 +81,40 @@ in
     requires = [ "wg-quick-wg0.service" ];
     after = [ "wg-quick-wg0.service" ];
 
-    script = ''${pkgs.geth}/bin/geth \
-      --datadir /var/mnt/ssd/ethereum/holesky/geth \
-      --http --http.addr 192.168.100.50 --http.api="engine,eth,web3,net,debug" --http.port 8545 \
-      --ws --ws.api="engine,eth,web3,net,debug" \
-      --http.corsdomain "*" \
-      --http.vhosts "*" \
-      --holesky \
-      --authrpc.jwtsecret=${config.age.secrets."holesky-jwt".path} \
-      --metrics \
-      --metrics.addr 127.0.0.1 \
-      --maxpeers 100
+    script = ''
+      ${lib.concatStringsSep " " [
+        "${pkgs.geth}/bin/geth"
+        "--holesky"
+        "--datadir /var/mnt/ssd/ethereum/holesky/geth"
+        "--maxpeers 100"
+
+        # Auth for consensus client
+        "--authrpc.port 8551"
+        "--authrpc.jwtsecret=${config.age.secrets."holesky-jwt".path}"
+
+        # JSON-RPC for interacting
+        "--http"
+        "--http.addr ${infra.ip}"
+        "--http.api=engine,eth,web3,net,debug"
+        "--http.port 8545"
+        "--http.corsdomain=*"
+        "--http.vhosts=*"
+
+        # Websockets for SSV
+        "--ws"
+        "--ws.api=engine,eth,web3,net,debug"
+
+        # Metrics
+        "--metrics"
+        "--metrics.addr 127.0.0.1"
+        "--metrics.port 6060"
+      ]}
     '';
 
     wantedBy = [ "multi-user.target" ];
   };
 
-  systemd.services.mev-boost = {
+  systemd.services.mev-boost-holesky = {
     enable = true;
 
     description = "holesky mev";
@@ -225,7 +246,7 @@ in
       --db-dir /var/mnt/ssd/bitcoin/electrs/db \
       --cookie-file /var/mnt/ssd/bitcoin/bitcoind/.cookie \
       --network bitcoin \
-      --electrum-rpc-addr 192.168.100.50:50001 \
+      --electrum-rpc-addr ${infra.ip}:50001 \
       --monitoring-addr 127.0.0.1:4224
     '';
 
