@@ -163,6 +163,9 @@ in
         "--rpc-ws-host=0.0.0.0"
         "--rpc-ws-port=8536"
         "--rpc-ws-authentication-enabled=false"
+
+        # Metrics
+        "--metrics-enabled=true"
       ]}
     '';
 
@@ -332,6 +335,10 @@ in
             url: http://127.0.0.1:5054/metrics
           - name: electrs
             url: http://127.0.0.1:4224/metrics
+          - name: prysm
+            url: http://127.0.0.1:8080/metrics
+          - name: besu
+            url: http://127.0.0.1:9545/metrics
       '';
       "health.d/ssv_node_status" = pkgs.writeText "health.d/ssv_node_status.conf" ''
         alarm: jesse, juuso: ssv_node_status
