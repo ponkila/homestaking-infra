@@ -47,7 +47,7 @@ in
     consensus.prysm = {
       enable = true;
       endpoint = "http://${infra.ip}:3500";
-      execEndpoint = "http://${infra.ip}:8541";
+      execEndpoint = "http://${infra.ip}:8451";
       dataDir = "/var/mnt/nvme/ethereum/mainnet/prysm";
       jwtSecretFile = "/var/mnt/nvme/ethereum/mainnet/jwt.hex";
     };
@@ -129,7 +129,7 @@ in
     wantedBy = [ "multi-user.target" ];
   };
 
-  systemd.services.reth = {
+  systemd.services.besu = {
     enable = true;
 
     description = "mainnet el";
@@ -138,33 +138,31 @@ in
 
     script = ''
       ${lib.concatStringsSep " " [
-        "${pkgs.reth}/bin/reth node"
-        "--chain mainnet"
-        "--datadir /var/mnt/nvme/ethereum/mainnet/reth"
-        "--port 30343"
-        "--discovery.port 30343"
+        "${pkgs.besu}/bin/besu"
+        "--network=mainnet"
+        "--data-path=/var/mnt/nvme/ethereum/mainnet/besu"
+        "--p2p-port=30343"
+        "--sync-mode=CHECKPOINT"
+        "--host-allowlist=*"
+        "--nat-method=upnp"
 
         # Auth for consensus client
-        "--authrpc.addr ${infra.ip}"
-        "--authrpc.port 8541"
-        "--authrpc.jwtsecret /var/mnt/nvme/ethereum/mainnet/jwt.hex"
+        "--engine-rpc-enabled"
+        "--engine-rpc-port=8451"
+        "--engine-host-allowlist=*"
+        "--engine-jwt-secret=/var/mnt/nvme/ethereum/mainnet/jwt.hex"
 
         # JSON-RPC for interacting
-        "--http"
-        "--http.addr ${infra.ip}"
-        "--http.port 8535"
-        "--http.api eth,web3,net,debug,txpool"
-        "--http.corsdomain=*"
+        "--rpc-http-port=8535"
+        "--rpc-http-enabled=true"
+        "--rpc-http-host=${infra.ip}"
+        "--rpc-http-cors-origins=*"
 
         # Websockets for SSV
-        "--ws"
-        "--ws.addr ${infra.ip}"
-        "--ws.port 8535"
-        "--ws.api eth,web3,net,debug,txpool"
-        "--ws.origins=*"
-
-        # Metrics
-        "--metrics ${infra.ip}:9542"
+        "--rpc-ws-enabled=true"
+        "--rpc-ws-host=0.0.0.0"
+        "--rpc-ws-port=8536"
+        "--rpc-ws-authentication-enabled=false"
       ]}
     '';
 
@@ -260,7 +258,7 @@ in
         # NAT routes
         13001 # SSV
         30303 # geth discovery
-        30343 # reth discovery
+        30343 # besu discovery
         9000 # lighthouse discovery
         9001 # lighthouse quic
         13000 # prysm discovery/quic
@@ -269,6 +267,7 @@ in
         50001 # electrs
         8545 # holesky RPC
         8535 # mainnet RPC
+        8536 # mainnet WS
       ];
       allowedUDPPorts = [
         12001
@@ -282,6 +281,7 @@ in
         50001
         8545
         8535
+        8536
       ];
     };
     useDHCP = false;
