@@ -190,12 +190,9 @@ in
       --execution-endpoint http://localhost:8424 \
       --execution-jwt ${config.age.secrets."holesky-jwt".path} \
       --checkpoint-sync-url https://holesky.beaconstate.ethstaker.cc/ \
-      --datadir /var/mnt/xfs/lighthouse/holesky \
-      --port 9424 \
       --http \
-      --http-address 192.168.100.10 \
-      --http-port 5152 \
-      --http-allow-origin "*"
+      --datadir /var/mnt/xfs/lighthouse/holesky \
+      --port 9424
     '';
 
     wantedBy = [ "multi-user.target" ];
@@ -218,9 +215,6 @@ in
     firewall = {
       allowedTCPPorts = [ 50001 30303 30342 9424 8546 ];
       allowedUDPPorts = [ 50001 30303 30342 9424 8546 51821 ];
-      interfaces.wg0.allowedTCPPorts = [
-        5152 # lighthouse-holesky
-      ];
     };
     useDHCP = false;
   };
