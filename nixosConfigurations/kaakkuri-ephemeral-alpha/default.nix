@@ -76,7 +76,7 @@ in
       ${lib.concatStringsSep " " [
         "${pkgs.lighthouse}/bin/lighthouse bn"
         "--network holesky"
-        "--execution-endpoint http://${infra.ip}:8551"
+        "--execution-endpoint http://localhost:8551"
         "--execution-jwt ${config.age.secrets."holesky-jwt".path}"
         "--checkpoint-sync-url https://holesky.beaconstate.ethstaker.cc/"
         "--http"
