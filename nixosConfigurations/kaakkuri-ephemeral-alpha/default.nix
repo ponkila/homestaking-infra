@@ -206,7 +206,7 @@ in
             BuilderProposals: true
 
         eth2:
-          BeaconNodeAddr: http://192.168.100.10:5152
+          BeaconNodeAddr: http://localhost:5052
 
         eth1:
           ETH1Addr: ws://localhost:8546
