@@ -945,16 +945,15 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1731005368,
-        "narHash": "sha256-8Q42vK6rro3KRGZm1zcXRhUCVMyWsJxSOgNEfbSOiGg=",
+        "lastModified": 1732997886,
+        "narHash": "sha256-cl0fk0hsYB2M7lgP6yAoAqbfw79neP8nbpcCNYqJkLA=",
         "owner": "ponkila",
         "repo": "HomestakerOS",
-        "rev": "9922948fc849a131a6aeed93f66003f5a55f1787",
+        "rev": "73bea574bfbe42692a0193bd5487561d4f9c3840",
         "type": "github"
       },
       "original": {
         "owner": "ponkila",
-        "ref": "lido-csm-testnet",
         "repo": "HomestakerOS",
         "type": "github"
       }
