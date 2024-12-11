@@ -172,6 +172,8 @@ in
             url: http://127.0.0.1:4224/metrics
           - name: besu
             url: http://127.0.0.1:9545/metrics
+          - name: etcd
+            url: http://127.0.0.1:2379/metrics
       '';
       "health.d/ssv_node_status" = pkgs.writeText "health.d/ssv_node_status.conf" ''
         alarm: jesse, juuso: ssv_node_status
@@ -233,7 +235,7 @@ in
       enable = true;
       name = config.wirenix.peerName;
       listenPeerUrls = map (x: "http://[${x}]:2380") self;
-      listenClientUrls = map (x: "http://[${x}]:2379") self;
+      listenClientUrls = [ "http://localhost:2379" ] ++ (map (x: "http://[${x}]:2379") self);
       initialClusterToken = "etcd-cluster-1";
       initialClusterState = "new";
       initialCluster = kaakkuri ++ node1 ++ node2;
