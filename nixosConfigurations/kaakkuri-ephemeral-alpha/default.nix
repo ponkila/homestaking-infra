@@ -65,76 +65,6 @@ in
     };
   };
 
-  systemd.services.lighthouse = {
-    enable = true;
-
-    description = "holesky cl";
-    requires = [ "wg-quick-wg0.service" ];
-    after = [ "wg-quick-wg0.service" ];
-
-    script = ''
-      ${lib.concatStringsSep " " [
-        "${pkgs.lighthouse}/bin/lighthouse bn"
-        "--network holesky"
-        "--execution-endpoint http://localhost:8551"
-        "--execution-jwt ${config.age.secrets."holesky-jwt".path}"
-        "--checkpoint-sync-url https://holesky.beaconstate.ethstaker.cc/"
-        "--http"
-        "--datadir /var/mnt/ssd/ethereum/holesky/lighthouse"
-        "--builder http://127.0.0.1:18550"
-        "--metrics"
-      ]}
-    '';
-
-    serviceConfig = {
-      Restart = "always";
-      RestartSec = "5s";
-      Type = "simple";
-    };
-
-    wantedBy = [ "multi-user.target" ];
-  };
-
-  systemd.services.geth = {
-    enable = true;
-
-    description = "holesky el";
-    requires = [ "wg-quick-wg0.service" ];
-    after = [ "wg-quick-wg0.service" ];
-
-    script = ''
-      ${lib.concatStringsSep " " [
-        "${pkgs.geth}/bin/geth"
-        "--holesky"
-        "--datadir /var/mnt/ssd/ethereum/holesky/geth"
-        "--maxpeers 100"
-
-        # Auth for consensus client
-        "--authrpc.port 8551"
-        "--authrpc.jwtsecret=${config.age.secrets."holesky-jwt".path}"
-
-        # JSON-RPC for interacting
-        "--http"
-        "--http.addr ${infra.ip}"
-        "--http.api=engine,eth,web3,net,debug"
-        "--http.port 8545"
-        "--http.corsdomain=*"
-        "--http.vhosts=*"
-
-        # Websockets for SSV
-        "--ws"
-        "--ws.api=engine,eth,web3,net,debug"
-
-        # Metrics
-        "--metrics"
-        "--metrics.addr 127.0.0.1"
-        "--metrics.port 6060"
-      ]}
-    '';
-
-    wantedBy = [ "multi-user.target" ];
-  };
-
   systemd.services.besu = {
     enable = true;
 
@@ -178,75 +108,6 @@ in
     wantedBy = [ "multi-user.target" ];
   };
 
-  systemd.services.mev-boost-holesky = {
-    enable = true;
-
-    description = "holesky mev";
-    requires = [ "wg-quick-wg0.service" ];
-    after = [ "wg-quick-wg0.service" ];
-
-    script = ''${pkgs.mev-boost}/bin/mev-boost \
-      -holesky \
-      -addr 127.0.0.1:18550 \
-      -relay-check \
-      -relays "https://0x821f2a65afb70e7f2e820a925a9b4c80a159620582c1766b1b09729fec178b11ea22abb3a51f07b288be815a1a2ff516@bloxroute.holesky.blxrbdn.com,https://0xaa58208899c6105603b74396734a6263cc7d947f444f396a90f7b7d3e65d102aec7e5e5291b27e08d02c50a050825c2f@holesky.titanrelay.xyz,https://0xab78bf8c781c58078c3beb5710c57940874dd96aef2835e7742c866b4c7c0406754376c2c8285a36c630346aa5c5f833@holesky.aestus.live,https://0xafa4c6985aa049fb79dd37010438cfebeb0f2bd42b115b89dd678dab0670c1de38da0c4e9138c9290a398ecd9a0b3110@boost-relay-holesky.flashbots.net,https://0xb1559beef7b5ba3127485bbbb090362d9f497ba64e177ee2c8e7db74746306efad687f2cf8574e38d70067d40ef136dc@relay-stag.ultrasound.money"
-    '';
-
-    wantedBy = [ "multi-user.target" ];
-  };
-
-  systemd.services.ssvnode =
-    let
-      c = pkgs.writeText "config.yaml" ''
-        global:
-          LogFileBackups: 28
-          LogFilePath: /var/mnt/ssd/ethereum/holesky/ssvnode/debug.log
-          LogLevel: info
-
-        db:
-          Path: /var/mnt/ssd/ethereum/holesky/ssvnode/db
-
-        ssv:
-          Network: holesky
-          ValidatorOptions:
-            BuilderProposals: true
-
-        eth2:
-          BeaconNodeAddr: http://localhost:5052
-
-        eth1:
-          ETH1Addr: ws://localhost:8546
-
-        p2p:
-          # Optionally provide the external IP address of the node, if it cannot be automatically determined.
-          # HostAddress: 192.168.1.1
-
-          # Optionally override the default TCP & UDP ports of the node.
-          # TcpPort: 13001
-          # UdpPort: 12001
-
-        KeyStore:
-          PrivateKeyFile: ${config.sops.secrets."holesky/ssvnode/privateKey".path}
-          PasswordFile: ${config.sops.secrets."holesky/ssvnode/password".path}
-
-        MetricsAPIPort: 15000
-      '';
-    in
-    {
-      enable = true;
-
-      description = "holesky ssvnode";
-
-      serviceConfig = {
-        Restart = "on-failure";
-        RestartSec = 5;
-      };
-
-      script = ''${pkgs.ssvnode}/bin/ssvnode start-node -c ${c}'';
-
-      wantedBy = [ "multi-user.target" ];
-    };
-
   systemd.network = {
     enable = true;
     networks = {
@@ -265,30 +126,20 @@ in
     firewall = {
       allowedTCPPorts = [
         # NAT routes
-        13001 # SSV
-        30303 # geth discovery
         30343 # besu discovery
-        9000 # lighthouse discovery
-        9001 # lighthouse quic
         13000 # prysm discovery/quic
 
         # Internal
         50001 # electrs
-        8545 # holesky RPC
         8535 # mainnet RPC
         8536 # mainnet WS
       ];
       allowedUDPPorts = [
-        12001
-        30303
         30343
         51821
-        9000
-        9001
         13000
 
         50001
-        8545
         8535
         8536
       ];
@@ -331,14 +182,6 @@ in
       "health_alarm_notify.conf" = config.sops.secrets."netdata/health_alarm_notify.conf".path;
       "go.d/prometheus.conf" = pkgs.writeText "go.d/prometheus.conf" ''
         jobs:
-          - name: ssv
-            url: http://127.0.0.1:15000/metrics
-          - name: ssv_health
-            url: http://127.0.0.1:15000/health
-          - name: geth
-            url: http://127.0.0.1:6060/debug/metrics/prometheus
-          - name: lighthouse
-            url: http://127.0.0.1:5054/metrics
           - name: electrs
             url: http://127.0.0.1:4224/metrics
           - name: prysm
@@ -373,12 +216,7 @@ in
       agePlugins = [ pkgs.age-plugin-fido2-hmac ];
       hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF2U2OFXrH4ZT3gSYrTK6ZNkXTfGZQ5BhLh4cBelzzMF";
     };
-    secrets = {
-      holesky-jwt = {
-        rekeyFile = ./secrets/agenix/holesky-jwt.age;
-        generator.script = "jwt";
-      };
-    };
+    secrets = { };
   };
   sops = {
     defaultSopsFile = ./secrets/default.yaml;
@@ -386,9 +224,6 @@ in
       owner = "netdata";
       group = "netdata";
     };
-    secrets."holesky/ssvnode/password" = { };
-    secrets."holesky/ssvnode/privateKey" = { };
-    secrets."holesky/ssvnode/publicKey" = { };
     age.sshKeyPaths = [ sshKeysPath ];
   };
 
