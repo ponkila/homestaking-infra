@@ -945,11 +945,11 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1732997886,
-        "narHash": "sha256-cl0fk0hsYB2M7lgP6yAoAqbfw79neP8nbpcCNYqJkLA=",
+        "lastModified": 1733927779,
+        "narHash": "sha256-wLtJJ6ANBXgVnqae0/5zUudCaQkPaGzguB6dfWMNkpc=",
         "owner": "ponkila",
         "repo": "HomestakerOS",
-        "rev": "73bea574bfbe42692a0193bd5487561d4f9c3840",
+        "rev": "5e5b741bfc8466228de1a94d0f6aba5ded32ad15",
         "type": "github"
       },
       "original": {

@@ -43,19 +43,24 @@ in
       privateKeyFile = sshKeysPath;
     };
 
-    # Prysm options
-    consensus.prysm = {
+    # Lighthouse options
+    consensus.lighthouse = {
       enable = true;
-      endpoint = "http://${infra.ip}:3500";
-      execEndpoint = "http://${infra.ip}:8451";
-      dataDir = "/var/mnt/nvme/ethereum/mainnet/prysm";
+      endpoint = "http://${infra.ip}:5052";
+      execEndpoint = "http://${infra.ip}:8551";
+      dataDir = "/var/mnt/nvme/ethereum/mainnet/lighthouse";
+      slasher = {
+        enable = false;
+        historyLength = 256;
+        maxDatabaseSize = 16;
+      };
       jwtSecretFile = "/var/mnt/nvme/ethereum/mainnet/jwt.hex";
     };
 
     # Addons
     addons.mev-boost = {
       enable = true;
-      endpoint = "http://${infra.ip}:18540";
+      endpoint = "http://${infra.ip}:18550";
     };
 
     # Wireguard options
@@ -65,44 +70,33 @@ in
     };
   };
 
-  systemd.services.besu = {
+  systemd.services.besu-mainnet = {
     enable = true;
 
     description = "mainnet el";
     requires = [ "wg-quick-wg0.service" ];
     after = [ "wg-quick-wg0.service" ];
 
-    script = ''
-      ${lib.concatStringsSep " " [
-        "${pkgs.besu}/bin/besu"
-        "--network=mainnet"
-        "--data-path=/var/mnt/nvme/ethereum/mainnet/besu"
-        "--p2p-port=30343"
-        "--sync-mode=CHECKPOINT"
-        "--host-allowlist=*"
-        "--nat-method=upnp"
-
-        # Auth for consensus client
-        "--engine-rpc-enabled"
-        "--engine-rpc-port=8451"
-        "--engine-host-allowlist=*"
-        "--engine-jwt-secret=/var/mnt/nvme/ethereum/mainnet/jwt.hex"
-
-        # JSON-RPC for interacting
-        "--rpc-http-port=8535"
-        "--rpc-http-enabled=true"
-        "--rpc-http-host=${infra.ip}"
-        "--rpc-http-cors-origins=*"
-
-        # Websockets for SSV
-        "--rpc-ws-enabled=true"
-        "--rpc-ws-host=0.0.0.0"
-        "--rpc-ws-port=8536"
-        "--rpc-ws-authentication-enabled=false"
-
-        # Metrics
-        "--metrics-enabled=true"
-      ]}
+    script = ''${pkgs.besu}/bin/besu \
+      --network=mainnet \
+      --rpc-http-enabled=true \
+      --rpc-http-host=192.168.100.50 \
+      --rpc-http-cors-origins="*" \
+      --rpc-ws-enabled=true \
+      --rpc-ws-host=0.0.0.0 \
+      --host-allowlist="*" \
+      --engine-host-allowlist="*" \
+      --engine-rpc-enabled \
+      --engine-jwt-secret="/var/mnt/nvme/ethereum/mainnet/jwt.hex" \
+      --data-path=/var/mnt/nvme/ethereum/mainnet/besu \
+      --nat-method=upnp \
+      --p2p-port=30303 \
+      --sync-mode=CHECKPOINT \
+      --engine-rpc-port=8551 \
+      --rpc-http-port=8545 \
+      --rpc-ws-port=8546 \
+      --rpc-ws-authentication-enabled=false \
+      --metrics-enabled=true
     '';
 
     wantedBy = [ "multi-user.target" ];
@@ -125,23 +119,15 @@ in
   networking = {
     firewall = {
       allowedTCPPorts = [
-        # NAT routes
-        30343 # besu discovery
-        13000 # prysm discovery/quic
-
-        # Internal
-        50001 # electrs
-        8535 # mainnet RPC
-        8536 # mainnet WS
+        50001
+        30303
+        8546
       ];
       allowedUDPPorts = [
-        30343
-        51821
-        13000
-
         50001
-        8535
-        8536
+        30303
+        8546
+        51821
       ];
     };
     useDHCP = false;
@@ -184,8 +170,6 @@ in
         jobs:
           - name: electrs
             url: http://127.0.0.1:4224/metrics
-          - name: prysm
-            url: http://127.0.0.1:8080/metrics
           - name: besu
             url: http://127.0.0.1:9545/metrics
       '';
