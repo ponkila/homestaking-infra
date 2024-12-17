@@ -966,11 +966,11 @@
       },
       "locked": {
         "dir": "nixosModules/base",
-        "lastModified": 1729085784,
-        "narHash": "sha256-L9hIPLPBXI6Eo0OMxkkpDunRKHKguP+kd5Dd+XM/mDc=",
+        "lastModified": 1734359216,
+        "narHash": "sha256-B5xt4IFsjK+KDS7FhDdZE3jmcEMVPbK6d+qun98Uu38=",
         "owner": "ponkila",
         "repo": "HomestakerOS",
-        "rev": "2983669a1e3e98daf2a1d3359ac9a2247c67be44",
+        "rev": "09aedc9eac2555ee92769a2075751a525ed22aed",
         "type": "github"
       },
       "original": {
@@ -1548,16 +1548,16 @@
     },
     "nixpkgs_10": {
       "locked": {
-        "lastModified": 1730137625,
-        "narHash": "sha256-9z8oOgFZiaguj+bbi3k4QhAD6JabWrnv7fscC/mt0KE=",
+        "lastModified": 1734083684,
+        "narHash": "sha256-5fNndbndxSx5d+C/D0p/VF32xDiJCJzyOqorOYW4JEo=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "64b80bfb316b57cdb8919a9110ef63393d74382a",
+        "rev": "314e12ba369ccdb9b352a4db26ff419f7c49fa84",
         "type": "github"
       },
       "original": {
         "owner": "NixOS",
-        "ref": "nixos-24.05",
+        "ref": "nixos-24.11",
         "repo": "nixpkgs",
         "type": "github"
       }
