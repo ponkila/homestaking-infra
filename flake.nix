@@ -23,8 +23,8 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     homestakeros-base.inputs.nixpkgs.follows = "nixpkgs";
     homestakeros-base.url = "github:ponkila/HomestakerOS?dir=nixosModules/base";
-    homestakeros.url = "github:ponkila/HomestakerOS/lido-csm-testnet";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
+    homestakeros.url = "github:ponkila/HomestakerOS";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
     sops-nix.url = "github:Mic92/sops-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.url = "github:numtide/treefmt-nix";
