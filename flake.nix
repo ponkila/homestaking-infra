@@ -28,7 +28,7 @@
     sops-nix.url = "github:Mic92/sops-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.url = "github:numtide/treefmt-nix";
-    wirenix.url = "sourcehut:~msalerno/wirenix?rev=c1e3bf1800de10da8f3af320415a31e3cb28b555";
+    wirenix.url = "sourcehut:~msalerno/wirenix";
     clib.url = "github:nix-community/nixpkgs.lib";
   };
 
