@@ -45,7 +45,7 @@ in
       http://192.168.100.40:8545 {
 
         reverse_proxy {
-          to 192.168.100.10:8546 192.168.100.33:8546
+          to 192.168.100.10:8546 192.168.100.50:8546
 
           health_uri /eth/v1/node/syncing
           health_port 5052
@@ -247,7 +247,7 @@ in
         };
         routes = [
           {
-            routeConfig.Gateway = "fe80::1";
+            Gateway = "fe80::1";
           }
         ];
       };
@@ -311,10 +311,10 @@ in
         every: 10s
         warn: $this == 0
       '';
-      "health.d/upstream_192.168.100.33.conf" = pkgs.writeText "health.d/upstream_192.168.100.33.conf" ''
-        alarm: tommi: healthy-upstream_192.168.100.33
+      "health.d/upstream_192.168.100.50.conf" = pkgs.writeText "health.d/upstream_192.168.100.50.conf" ''
+        alarm: jesse: healthy-upstream_192.168.100.50
         lookup: min -10s
-        on: prometheus_caddy.caddy_reverse_proxy_upstreams_healthy-upstream_192.168.100.33_8546
+        on: prometheus_caddy.caddy_reverse_proxy_upstreams_healthy-upstream_192.168.100.50_8546
         every: 10s
         warn: $this == 0
       '';
