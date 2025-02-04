@@ -100,15 +100,7 @@ in
       --metrics-enabled=true
     '';
 
-    serviceConfig = {
-      MemoryHigh = "8G";
-    };
-
     wantedBy = [ "multi-user.target" ];
-  };
-
-  systemd.services.lighthouse.serviceConfig = {
-    MemoryHigh = "16G";
   };
 
   systemd.network = {
