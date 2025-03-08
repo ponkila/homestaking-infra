@@ -19,7 +19,7 @@
         "example": [
           "--some-extra-option=value"
         ],
-        "type": "nullOr"
+        "type": "listOf"
       }
     },
     "ssv-node": {
@@ -35,19 +35,19 @@
         "example": [
           "--some-extra-option=value"
         ],
-        "type": "nullOr"
+        "type": "listOf"
       },
       "privateKeyFile": {
         "default": "/var/mnt/addons/ssv/ssv_operator_key",
         "description": "Path to the private SSV operator key.",
         "example": null,
-        "type": "nullOr"
+        "type": "path"
       },
       "privateKeyPasswordFile": {
         "default": "/var/mnt/addons/ssv/password",
         "description": "Path to the password file of SSV operator key",
         "example": null,
-        "type": "nullOr"
+        "type": "path"
       }
     }
   },
@@ -83,13 +83,13 @@
         "example": [
           "--some-extra-option=value"
         ],
-        "type": "nullOr"
+        "type": "listOf"
       },
       "jwtSecretFile": {
         "default": null,
         "description": "Path to the token that ensures safe connection between CL and EL.",
         "example": "/var/mnt/lighthouse/jwt.hex",
-        "type": "nullOr"
+        "type": "path"
       },
       "slasher": {
         "enable": {
@@ -143,13 +143,13 @@
         "example": [
           "--some-extra-option=value"
         ],
-        "type": "nullOr"
+        "type": "listOf"
       },
       "jwtSecretFile": {
         "default": null,
         "description": "Path to the token that ensures safe connection between CL and EL.",
         "example": "/var/mnt/nimbus/jwt.hex",
-        "type": "nullOr"
+        "type": "path"
       }
     },
     "prysm": {
@@ -183,13 +183,13 @@
         "example": [
           "--some-extra-option=value"
         ],
-        "type": "nullOr"
+        "type": "listOf"
       },
       "jwtSecretFile": {
         "default": null,
         "description": "Path to the token that ensures safe connection between CL and EL.",
         "example": "/var/mnt/prysm/jwt.hex",
-        "type": "nullOr"
+        "type": "path"
       },
       "slasher": {
         "enable": {
@@ -231,13 +231,13 @@
         "example": [
           "--some-extra-option=value"
         ],
-        "type": "nullOr"
+        "type": "listOf"
       },
       "jwtSecretFile": {
         "default": null,
         "description": "Path to the token that ensures safe connection between CL and EL.",
         "example": "/var/mnt/teku/jwt.hex",
-        "type": "nullOr"
+        "type": "path"
       }
     }
   },
@@ -267,13 +267,13 @@
         "example": [
           "--some-extra-option=value"
         ],
-        "type": "nullOr"
+        "type": "listOf"
       },
       "jwtSecretFile": {
         "default": null,
         "description": "Path to the token that ensures safe connection between CL and EL.",
         "example": "/var/mnt/besu/jwt.hex",
-        "type": "nullOr"
+        "type": "str"
       }
     },
     "erigon": {
@@ -301,13 +301,13 @@
         "example": [
           "--some-extra-option=value"
         ],
-        "type": "nullOr"
+        "type": "listOf"
       },
       "jwtSecretFile": {
         "default": null,
         "description": "Path to the token that ensures safe connection between CL and EL.",
         "example": "/var/mnt/erigon/jwt.hex",
-        "type": "nullOr"
+        "type": "str"
       }
     },
     "geth": {
@@ -335,13 +335,13 @@
         "example": [
           "--some-extra-option=value"
         ],
-        "type": "nullOr"
+        "type": "listOf"
       },
       "jwtSecretFile": {
         "default": null,
         "description": "Path to the token that ensures safe connection between CL and EL.",
         "example": "/var/mnt/geth/jwt.hex",
-        "type": "nullOr"
+        "type": "str"
       }
     },
     "nethermind": {
@@ -369,13 +369,13 @@
         "example": [
           "--some-extra-option=value"
         ],
-        "type": "nullOr"
+        "type": "listOf"
       },
       "jwtSecretFile": {
         "default": null,
         "description": "Path to the token that ensures safe connection between CL and EL.",
         "example": "/var/mnt/nethermind/jwt.hex",
-        "type": "nullOr"
+        "type": "str"
       }
     }
   },
@@ -384,13 +384,13 @@
       "default": "homestaker",
       "description": "The name of the machine.",
       "example": null,
-      "type": "strMatching \"^\\$|^[[:alnum:]]([[:alnum:]_-]{0,61}[[:alnum:]])?\\$\""
+      "type": "str"
     },
     "timezone": {
       "default": null,
       "description": "The time zone used when displaying times and dates.",
       "example": "America/New_York",
-      "type": "nullOr"
+      "type": "str"
     }
   },
   "mounts": {
@@ -426,7 +426,7 @@
       "default": null,
       "description": "Path to the Ed25519 SSH host key. If absent, the key will be generated automatically.",
       "example": "/var/mnt/secrets/ssh/id_ed25519",
-      "type": "nullOr"
+      "type": "path"
     }
   },
   "vpn": {
