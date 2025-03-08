@@ -19,7 +19,7 @@
         "example": [
           "--some-extra-option=value"
         ],
-        "type": "listOf"
+        "type": "nullOr (listOf (str))"
       }
     },
     "ssv-node": {
@@ -35,19 +35,19 @@
         "example": [
           "--some-extra-option=value"
         ],
-        "type": "listOf"
+        "type": "nullOr (listOf (str))"
       },
       "privateKeyFile": {
         "default": "/var/mnt/addons/ssv/ssv_operator_key",
         "description": "Path to the private SSV operator key.",
         "example": null,
-        "type": "path"
+        "type": "nullOr (path)"
       },
       "privateKeyPasswordFile": {
         "default": "/var/mnt/addons/ssv/password",
         "description": "Path to the password file of SSV operator key",
         "example": null,
-        "type": "path"
+        "type": "nullOr (path)"
       }
     }
   },
@@ -83,13 +83,13 @@
         "example": [
           "--some-extra-option=value"
         ],
-        "type": "listOf"
+        "type": "nullOr (listOf (str))"
       },
       "jwtSecretFile": {
         "default": null,
         "description": "Path to the token that ensures safe connection between CL and EL.",
         "example": "/var/mnt/lighthouse/jwt.hex",
-        "type": "path"
+        "type": "nullOr (path)"
       },
       "slasher": {
         "enable": {
@@ -143,13 +143,13 @@
         "example": [
           "--some-extra-option=value"
         ],
-        "type": "listOf"
+        "type": "nullOr (listOf (str))"
       },
       "jwtSecretFile": {
         "default": null,
         "description": "Path to the token that ensures safe connection between CL and EL.",
         "example": "/var/mnt/nimbus/jwt.hex",
-        "type": "path"
+        "type": "nullOr (path)"
       }
     },
     "prysm": {
@@ -183,13 +183,13 @@
         "example": [
           "--some-extra-option=value"
         ],
-        "type": "listOf"
+        "type": "nullOr (listOf (str))"
       },
       "jwtSecretFile": {
         "default": null,
         "description": "Path to the token that ensures safe connection between CL and EL.",
         "example": "/var/mnt/prysm/jwt.hex",
-        "type": "path"
+        "type": "nullOr (path)"
       },
       "slasher": {
         "enable": {
@@ -231,13 +231,13 @@
         "example": [
           "--some-extra-option=value"
         ],
-        "type": "listOf"
+        "type": "nullOr (listOf (str))"
       },
       "jwtSecretFile": {
         "default": null,
         "description": "Path to the token that ensures safe connection between CL and EL.",
         "example": "/var/mnt/teku/jwt.hex",
-        "type": "path"
+        "type": "nullOr (path)"
       }
     }
   },
@@ -267,13 +267,13 @@
         "example": [
           "--some-extra-option=value"
         ],
-        "type": "listOf"
+        "type": "nullOr (listOf (str))"
       },
       "jwtSecretFile": {
         "default": null,
         "description": "Path to the token that ensures safe connection between CL and EL.",
         "example": "/var/mnt/besu/jwt.hex",
-        "type": "str"
+        "type": "nullOr (str)"
       }
     },
     "erigon": {
@@ -301,13 +301,13 @@
         "example": [
           "--some-extra-option=value"
         ],
-        "type": "listOf"
+        "type": "nullOr (listOf (str))"
       },
       "jwtSecretFile": {
         "default": null,
         "description": "Path to the token that ensures safe connection between CL and EL.",
         "example": "/var/mnt/erigon/jwt.hex",
-        "type": "str"
+        "type": "nullOr (str)"
       }
     },
     "geth": {
@@ -335,13 +335,13 @@
         "example": [
           "--some-extra-option=value"
         ],
-        "type": "listOf"
+        "type": "nullOr (listOf (str))"
       },
       "jwtSecretFile": {
         "default": null,
         "description": "Path to the token that ensures safe connection between CL and EL.",
         "example": "/var/mnt/geth/jwt.hex",
-        "type": "str"
+        "type": "nullOr (str)"
       }
     },
     "nethermind": {
@@ -369,13 +369,13 @@
         "example": [
           "--some-extra-option=value"
         ],
-        "type": "listOf"
+        "type": "nullOr (listOf (str))"
       },
       "jwtSecretFile": {
         "default": null,
         "description": "Path to the token that ensures safe connection between CL and EL.",
         "example": "/var/mnt/nethermind/jwt.hex",
-        "type": "str"
+        "type": "nullOr (str)"
       }
     }
   },
@@ -390,7 +390,7 @@
       "default": null,
       "description": "The time zone used when displaying times and dates.",
       "example": "America/New_York",
-      "type": "str"
+      "type": "nullOr (str)"
     }
   },
   "mounts": {
@@ -413,20 +413,76 @@
         "where": "/mnt"
       }
     },
-    "type": "attrsOf"
+    "options": {
+      "before": {
+        "default": [],
+        "description": "If the specified units are started at the same time as this unit, delay them until this unit has started.\n",
+        "example": [
+          "some-system.service"
+        ],
+        "type": "listOf (str)"
+      },
+      "description": {
+        "default": "storage device",
+        "description": "Description of this unit used in systemd messages and progress indicators.\n",
+        "example": "ethereum mainnet",
+        "type": "str"
+      },
+      "enable": {
+        "default": false,
+        "description": "Whether to enable Whether to enable this mount..",
+        "example": true,
+        "type": "bool"
+      },
+      "options": {
+        "default": "noatime",
+        "description": "Options used to mount the file system; strings concatenated with \",\".\n",
+        "example": "noatime",
+        "type": "str"
+      },
+      "type": {
+        "default": "auto",
+        "description": "File system type.",
+        "example": "btrfs",
+        "type": "str"
+      },
+      "wantedBy": {
+        "default": [
+          "multi-user.target"
+        ],
+        "description": "Units that want (i.e. depend on) this unit.",
+        "example": [
+          "some-system.target"
+        ],
+        "type": "listOf (str)"
+      },
+      "what": {
+        "default": null,
+        "description": "Absolute path of device node, file or other resource. (Mandatory)\n",
+        "example": "/dev/sda1",
+        "type": "str"
+      },
+      "where": {
+        "default": null,
+        "description": "Absolute path of a directory of the mount point. Will be created if it doesn’t exist. (Mandatory)\n",
+        "example": "/mnt",
+        "type": "str"
+      }
+    },
+    "type": "attrsOf (submodule)"
   },
   "ssh": {
     "authorizedKeys": {
       "default": [],
       "description": "A list of public SSH keys to be added to the user's authorized keys.",
       "example": null,
-      "type": "listOf"
+      "type": "listOf (str)"
     },
     "privateKeyFile": {
       "default": null,
       "description": "Path to the Ed25519 SSH host key. If absent, the key will be generated automatically.",
       "example": "/var/mnt/secrets/ssh/id_ed25519",
-      "type": "path"
+      "type": "nullOr (path)"
     }
   },
   "vpn": {
