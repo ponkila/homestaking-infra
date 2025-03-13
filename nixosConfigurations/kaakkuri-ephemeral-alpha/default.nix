@@ -8,15 +8,10 @@
 let
   # General
   infra.ip = "192.168.100.50";
-  sshKeysPath = "/var/mnt/ssd/secrets/ssh/id_ed25519";
+  sshKeysPath = "/var/mnt/nvme/secrets/ssh/id_ed25519";
 in
 {
   boot.initrd.availableKernelModules = [ "xfs" ];
-  fileSystems."/var/mnt/ssd" = lib.mkImageMediaOverride {
-    fsType = "xfs";
-    device = "/dev/mapper/samsung-ssd";
-    neededForBoot = true;
-  };
   fileSystems."/var/mnt/nvme" = lib.mkImageMediaOverride {
     fsType = "xfs";
     device = "/dev/mapper/pro990-data";
@@ -58,6 +53,20 @@ in
       jwtSecretFile = "/var/mnt/nvme/ethereum/mainnet/jwt.hex";
     };
 
+    # Besu options
+    execution.besu = {
+      enable = true;
+      endpoint = "http://${infra.ip}:8551";
+      dataDir = "/var/mnt/nvme/ethereum/mainnet/besu";
+      jwtSecretFile = "/var/mnt/nvme/ethereum/mainnet/jwt.hex";
+      extraOptions = [
+        "--nat-method=upnp"
+        "--p2p-port=30303"
+        "--sync-mode=CHECKPOINT"
+        "--host-allowlist=\"*\""
+      ];
+    };
+
     # Addons
     addons.mev-boost = {
       enable = true;
@@ -67,40 +76,8 @@ in
     # Wireguard options
     vpn.wireguard = {
       enable = true;
-      configFile = "/var/mnt/ssd/secrets/wg0.conf";
+      configFile = "/var/mnt/nvme/secrets/wg0.conf";
     };
-  };
-
-  systemd.services.besu-mainnet = {
-    enable = true;
-
-    description = "mainnet el";
-    requires = [ "wg-quick-wg0.service" ];
-    after = [ "wg-quick-wg0.service" ];
-
-    script = ''${pkgs.besu}/bin/besu \
-      --network=mainnet \
-      --rpc-http-enabled=true \
-      --rpc-http-host=192.168.100.50 \
-      --rpc-http-cors-origins="*" \
-      --rpc-ws-enabled=true \
-      --rpc-ws-host=0.0.0.0 \
-      --host-allowlist="*" \
-      --engine-host-allowlist="*" \
-      --engine-rpc-enabled \
-      --engine-jwt-secret="/var/mnt/nvme/ethereum/mainnet/jwt.hex" \
-      --data-path=/var/mnt/nvme/ethereum/mainnet/besu \
-      --nat-method=upnp \
-      --p2p-port=30303 \
-      --sync-mode=CHECKPOINT \
-      --engine-rpc-port=8551 \
-      --rpc-http-port=8545 \
-      --rpc-ws-port=8546 \
-      --rpc-ws-authentication-enabled=false \
-      --metrics-enabled=true
-    '';
-
-    wantedBy = [ "multi-user.target" ];
   };
 
   systemd.network = {
@@ -137,11 +114,11 @@ in
   services.bitcoind."mainnet" = {
     enable = true;
     prune = "disable";
-    dataDir = "/var/mnt/ssd/bitcoin/bitcoind";
+    dataDir = "/var/mnt/nvme/bitcoin/bitcoind";
     extraCmdlineOptions = [
       "-server=1"
       "-txindex=0"
-      "-rpccookiefile=/var/mnt/ssd/bitcoin/bitcoind/.cookie"
+      "-rpccookiefile=/var/mnt/nvme/bitcoin/bitcoind/.cookie"
     ];
   };
 
@@ -153,8 +130,8 @@ in
     after = [ "wg-quick-wg0.service" "bitcoind-mainnet.service" ];
 
     script = ''${pkgs.electrs}/bin/electrs \
-      --db-dir /var/mnt/ssd/bitcoin/electrs/db \
-      --cookie-file /var/mnt/ssd/bitcoin/bitcoind/.cookie \
+      --db-dir /var/mnt/nvme/bitcoin/electrs/db \
+      --cookie-file /var/mnt/nvme/bitcoin/bitcoind/.cookie \
       --network bitcoin \
       --electrum-rpc-addr ${infra.ip}:50001 \
       --monitoring-addr 127.0.0.1:4224
@@ -240,7 +217,7 @@ in
       initialClusterToken = "etcd-cluster-1";
       initialClusterState = "new";
       initialCluster = kaakkuri ++ node1 ++ node2;
-      dataDir = "/var/mnt/ssd/etcd";
+      dataDir = "/var/mnt/nvme/etcd";
       openFirewall = true;
     };
 
