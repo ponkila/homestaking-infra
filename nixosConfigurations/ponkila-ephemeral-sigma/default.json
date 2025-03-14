@@ -1,29 +1,29 @@
 {
   "addons": {
     "mev-boost": {
-      "enable": true,
-      "endpoint": "http://192.168.100.10:18550",
+      "enable": false,
+      "endpoint": "http://127.0.0.1:18550",
       "extraOptions": null
     },
     "ssv-node": {
-      "dataDir": "/var/mnt/xfs/addons/ssv",
+      "dataDir": "/var/mnt/addons/ssv",
       "extraOptions": null,
-      "privateKeyFile": "/run/secrets/ssvnode/privateKey",
-      "privateKeyPasswordFile": "/run/secrets/ssvnode/password"
+      "privateKeyFile": "/var/mnt/addons/ssv/ssv_operator_key",
+      "privateKeyPasswordFile": "/var/mnt/addons/ssv/password"
     }
   },
   "consensus": {
     "lighthouse": {
-      "dataDir": "/var/mnt/xfs/lighthouse",
-      "enable": true,
-      "endpoint": "http://192.168.100.10:5052",
-      "execEndpoint": "http://192.168.100.10:8551",
+      "dataDir": "/var/mnt/lighthouse",
+      "enable": false,
+      "endpoint": "http://127.0.0.1:5052",
+      "execEndpoint": "http://127.0.0.1:8551",
       "extraOptions": null,
-      "jwtSecretFile": "/run/agenix/mainnet-jwt",
+      "jwtSecretFile": null,
       "slasher": {
         "enable": false,
-        "historyLength": 256,
-        "maxDatabaseSize": 16
+        "historyLength": 4096,
+        "maxDatabaseSize": 256
       }
     },
     "nimbus": {
@@ -85,34 +85,34 @@
     }
   },
   "localization": {
-    "hostname": "ponkila-ephemeral-beta",
+    "hostname": "ponkila-ephemeral-sigma",
     "timezone": "Europe/Helsinki"
   },
   "mounts": {
-    "bitcoin": {
+    "wireguard": {
       "before": [
-        "bitcoind-mainnet.service"
+        "wg-quick-dinar.service"
       ],
-      "description": "bitcoin storage",
+      "description": "wireguard storage",
       "enable": true,
-      "type": "xfs",
+      "options": "subvolid=257",
+      "type": "btrfs",
       "wantedBy": [
         "multi-user.target"
       ],
-      "what": "/dev/mapper/samsung-bitcoin",
-      "where": "/var/mnt/bitcoin"
+      "what": "/dev/disk/by-label/nvme",
+      "where": "/etc/wireguard"
     }
   },
   "ssh": {
     "authorizedKeys": [
-      "sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAIOdsfK46X5IhxxEy81am6A8YnHo2rcF2qZ75cHOKG7ToAAAACHNzaDprYXJp ssh:kari",
       "sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAILn/9IHTGC1sLxnPnLbtJpvF7HgXQ8xNkRwSLq8ay8eJAAAADHNzaDpzdGFybGFicw== ssh:starlabs"
     ],
-    "privateKeyFile": "/var/mnt/xfs/secrets/ssh/id_ed25519"
+    "privateKeyFile": null
   },
   "vpn": {
     "wireguard": {
-      "configFile": "/run/secrets/wireguard/wg0",
+      "configFile": "/etc/wireguard/dinar.conf",
       "enable": true
     }
   }

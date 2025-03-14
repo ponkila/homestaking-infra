@@ -2,10 +2,12 @@
   "addons": {
     "mev-boost": {
       "enable": false,
-      "endpoint": "http://127.0.0.1:18550"
+      "endpoint": "http://127.0.0.1:18550",
+      "extraOptions": null
     },
     "ssv-node": {
       "dataDir": "/var/mnt/addons/ssv",
+      "extraOptions": null,
       "privateKeyFile": "/var/mnt/addons/ssv/ssv_operator_key",
       "privateKeyPasswordFile": "/var/mnt/addons/ssv/password"
     }
@@ -16,6 +18,7 @@
       "enable": false,
       "endpoint": "http://127.0.0.1:5052",
       "execEndpoint": "http://127.0.0.1:8551",
+      "extraOptions": null,
       "jwtSecretFile": null,
       "slasher": {
         "enable": false,
@@ -28,6 +31,7 @@
       "enable": false,
       "endpoint": "http://127.0.0.1:5052",
       "execEndpoint": "http://127.0.0.1:8551",
+      "extraOptions": null,
       "jwtSecretFile": null
     },
     "prysm": {
@@ -35,6 +39,7 @@
       "enable": false,
       "endpoint": "http://127.0.0.1:3500",
       "execEndpoint": "http://127.0.0.1:8551",
+      "extraOptions": null,
       "jwtSecretFile": null,
       "slasher": {
         "enable": false
@@ -45,6 +50,7 @@
       "enable": false,
       "endpoint": "http://127.0.0.1:5051",
       "execEndpoint": "http://127.0.0.1:8551",
+      "extraOptions": null,
       "jwtSecretFile": null
     }
   },
@@ -53,24 +59,28 @@
       "dataDir": "/var/mnt/besu",
       "enable": false,
       "endpoint": "http://127.0.0.1:8551",
+      "extraOptions": null,
       "jwtSecretFile": null
     },
     "erigon": {
       "dataDir": "/var/mnt/erigon",
       "enable": false,
       "endpoint": "http://127.0.0.1:8551",
+      "extraOptions": null,
       "jwtSecretFile": null
     },
     "geth": {
       "dataDir": "/var/mnt/geth",
       "enable": false,
       "endpoint": "http://127.0.0.1:8551",
+      "extraOptions": null,
       "jwtSecretFile": null
     },
     "nethermind": {
       "dataDir": "/var/mnt/nethermind",
       "enable": false,
       "endpoint": "http://127.0.0.1:8551",
+      "extraOptions": null,
       "jwtSecretFile": null
     }
   },
