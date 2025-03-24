@@ -79,7 +79,6 @@
               packages = with pkgs; [
                 config.agenix-rekey.package
                 jq
-                self'.packages.init-qemu
                 self'.packages.nsq
                 sops
                 ssh-to-age
@@ -99,7 +98,6 @@
                 Available commands:
 
                   nsq         : Get and update the nix-store queries
-                  init-qemu   : Use QEMU to boot up a host
                   lens        : Update web UI assets
 
                 INFO
@@ -121,7 +119,6 @@
           packages =
             rec {
               "nsq" = pkgs.callPackage ./packages/nsq { };
-              "init-qemu" = pkgs.callPackage ./packages/init-qemu { };
             }
             # Entrypoint aliases, accessible trough 'nix build'
             // (with flake.nixosConfigurations; {
