@@ -300,22 +300,6 @@
         "type": "github"
       }
     },
-    "devour-flake": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1733242247,
-        "narHash": "sha256-RrSH+9vlDDDh+yZao012bvV8Hoej/5poQQYfYlEr6Zw=",
-        "owner": "srid",
-        "repo": "devour-flake",
-        "rev": "017e3a0eb62e2a3d63fb20c5028af71f39a81181",
-        "type": "github"
-      },
-      "original": {
-        "owner": "srid",
-        "repo": "devour-flake",
-        "type": "github"
-      }
-    },
     "devshell": {
       "inputs": {
         "nixpkgs": [
@@ -361,13 +345,11 @@
     },
     "ethereum-nix": {
       "inputs": {
-        "devour-flake": "devour-flake",
         "devshell": "devshell_2",
         "flake-compat": "flake-compat_5",
         "flake-parts": "flake-parts_5",
         "flake-utils": "flake-utils_3",
         "foundry-nix": "foundry-nix",
-        "lib-extras": "lib-extras",
         "nixpkgs": "nixpkgs_8",
         "nixpkgs-2311": "nixpkgs-2311",
         "nixpkgs-unstable": "nixpkgs-unstable",
@@ -375,11 +357,11 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1738656545,
-        "narHash": "sha256-rxiRiAJig7GkNoZaxj+7tQYdW9QjBzmpepMnboLgmDs=",
+        "lastModified": 1742240834,
+        "narHash": "sha256-Egym15NIHjah9ocGTA6g4Gx5f1vbpKrs+o7l/acAdiA=",
         "owner": "nix-community",
         "repo": "ethereum.nix",
-        "rev": "db665f74737f0d9b269a1ea9677fdb692fd93f87",
+        "rev": "47ab45c85bb6d2bc8b104706b797234ebff8efc7",
         "type": "github"
       },
       "original": {
@@ -585,21 +567,6 @@
       "original": {
         "owner": "hercules-ci",
         "repo": "flake-parts",
-        "type": "github"
-      }
-    },
-    "flake-root": {
-      "locked": {
-        "lastModified": 1692742795,
-        "narHash": "sha256-f+Y0YhVCIJ06LemO+3Xx00lIcqQxSKJHXT/yk1RTKxw=",
-        "owner": "srid",
-        "repo": "flake-root",
-        "rev": "d9a70d9c7a5fd7f3258ccf48da9335e9b47c3937",
-        "type": "github"
-      },
-      "original": {
-        "owner": "srid",
-        "repo": "flake-root",
         "type": "github"
       }
     },
@@ -812,11 +779,11 @@
         "treefmt-nix": "treefmt-nix_3"
       },
       "locked": {
-        "lastModified": 1740404746,
-        "narHash": "sha256-uDHhV9Ozw9ZueVAaX+YvYly3gxZ8MG8JO4HYc1QmD/Y=",
+        "lastModified": 1742922748,
+        "narHash": "sha256-ZKhX5/xN+bUs0YCypyurKOhoSV2plrOc+6sNhxn74rw=",
         "owner": "ponkila",
         "repo": "HomestakerOS",
-        "rev": "d66d59008c4a6faa3ecf1f50b72aad4cea2967a0",
+        "rev": "75ae8f11e1472de4d4732aaf9db98c7c804aab44",
         "type": "github"
       },
       "original": {
@@ -844,45 +811,6 @@
         "dir": "nixosModules/base",
         "owner": "ponkila",
         "repo": "HomestakerOS",
-        "type": "github"
-      }
-    },
-    "lib-extras": {
-      "inputs": {
-        "devshell": [
-          "homestakeros",
-          "ethereum-nix",
-          "devshell"
-        ],
-        "flake-parts": [
-          "homestakeros",
-          "ethereum-nix",
-          "flake-parts"
-        ],
-        "flake-root": "flake-root",
-        "nixpkgs": [
-          "homestakeros",
-          "ethereum-nix",
-          "nixpkgs"
-        ],
-        "treefmt-nix": [
-          "homestakeros",
-          "ethereum-nix",
-          "treefmt-nix"
-        ]
-      },
-      "locked": {
-        "lastModified": 1699974671,
-        "narHash": "sha256-4EsuPiX4pGEg8ME9ONn8ebY1ZKYLOp9DRCcdTrOj8sY=",
-        "owner": "aldoborrero",
-        "repo": "lib-extras",
-        "rev": "83c8935af27738b8b155e0077522220d81865269",
-        "type": "github"
-      },
-      "original": {
-        "owner": "aldoborrero",
-        "ref": "v0.2.2",
-        "repo": "lib-extras",
         "type": "github"
       }
     },
@@ -1235,11 +1163,11 @@
     },
     "nixpkgs-unstable": {
       "locked": {
-        "lastModified": 1736241350,
-        "narHash": "sha256-CHd7yhaDigUuJyDeX0SADbTM9FXfiWaeNyY34FL1wQU=",
+        "lastModified": 1740019556,
+        "narHash": "sha256-vn285HxnnlHLWnv59Og7muqECNMS33mWLM14soFIv2g=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "8c9fd3e564728e90829ee7dbac6edc972971cd0f",
+        "rev": "dad564433178067be1fbdfcce23b546254b6d641",
         "type": "github"
       },
       "original": {
