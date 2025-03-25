@@ -6,10 +6,10 @@
       "extraOptions": null
     },
     "ssv-node": {
-      "dataDir": "/var/mnt/addons/ssv",
+      "dataDir": "/mnt/addons/ssv",
       "extraOptions": null,
-      "privateKeyFile": "/var/mnt/addons/ssv/ssv_operator_key",
-      "privateKeyPasswordFile": "/var/mnt/addons/ssv/password"
+      "privateKeyFile": "/mnt/addons/ssv/ssv_operator_key",
+      "privateKeyPasswordFile": "/mnt/addons/ssv/password"
     }
   },
   "consensus": {
@@ -27,7 +27,7 @@
       }
     },
     "nimbus": {
-      "dataDir": "/var/mnt/nimbus",
+      "dataDir": "/mnt/nimbus",
       "enable": false,
       "endpoint": "http://127.0.0.1:5052",
       "execEndpoint": "http://127.0.0.1:8551",
@@ -35,7 +35,7 @@
       "jwtSecretFile": null
     },
     "prysm": {
-      "dataDir": "/var/mnt/prysm",
+      "dataDir": "/mnt/prysm",
       "enable": false,
       "endpoint": "http://127.0.0.1:3500",
       "execEndpoint": "http://127.0.0.1:8551",
@@ -46,7 +46,7 @@
       }
     },
     "teku": {
-      "dataDir": "/var/mnt/teku",
+      "dataDir": "/mnt/teku",
       "enable": false,
       "endpoint": "http://127.0.0.1:5051",
       "execEndpoint": "http://127.0.0.1:8551",
@@ -68,21 +68,21 @@
       "jwtSecretFile": "/var/mnt/nvme/ethereum/mainnet/jwt.hex"
     },
     "erigon": {
-      "dataDir": "/var/mnt/erigon",
+      "dataDir": "/mnt/erigon",
       "enable": false,
       "endpoint": "http://127.0.0.1:8551",
       "extraOptions": null,
       "jwtSecretFile": null
     },
     "geth": {
-      "dataDir": "/var/mnt/geth",
+      "dataDir": "/mnt/geth",
       "enable": false,
       "endpoint": "http://127.0.0.1:8551",
       "extraOptions": null,
       "jwtSecretFile": null
     },
     "nethermind": {
-      "dataDir": "/var/mnt/nethermind",
+      "dataDir": "/mnt/nethermind",
       "enable": false,
       "endpoint": "http://127.0.0.1:8551",
       "extraOptions": null,
