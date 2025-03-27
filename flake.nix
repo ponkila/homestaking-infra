@@ -117,7 +117,7 @@
 
           # Custom packages, accessible trough 'nix build', 'nix run', etc.
           packages =
-            rec {
+            {
               "nsq" = pkgs.callPackage ./packages/nsq { };
             }
             # Entrypoint aliases, accessible trough 'nix build'
@@ -262,6 +262,36 @@
             "ponkila-ephemeral-beta" = nixosSystem ponkila-ephemeral-beta;
             "ponkila-ephemeral-sigma" = nixosSystem ponkila-ephemeral-sigma;
           };
+
+          checks."x86_64-linux" = {
+            homestakeros-base = inputs.nixpkgs.legacyPackages."x86_64-linux".testers.runNixOSTest {
+              name = "tests that the base image boots";
+              nodes.machine = { lib, ... }: {
+                imports = [
+                  inputs.homestakeros-base.nixosModules.base
+                  inputs.homestakeros-base.nixosModules.kexecTree
+                  inputs.homestakeros.nixosModules.homestakeros
+                  {
+                    nixpkgs.overlays = [
+                      inputs.homestakeros.overlays.default
+                    ];
+                    boot.loader.grub.enable = false;
+                    # in tests, the timesyncd must be force enabled
+                    services.timesyncd.enable = lib.mkForce true;
+                  }
+                ];
+              };
+              node.specialArgs = { inherit inputs outputs; };
+              # since we are using an overlay, we must make pkgs writable
+              node.pkgsReadOnly = false;
+              testScript = ''
+                machine.start()
+                machine.wait_for_unit("default.target")
+                machine.succeed("uname -a")
+              '';
+            };
+          };
+
         };
     };
 }
