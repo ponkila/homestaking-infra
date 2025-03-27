@@ -112,18 +112,6 @@
       ],
       "what": "/dev/sda",
       "where": "/var/mnt/keep-network"
-    },
-    "ssv-dkg": {
-      "before": [],
-      "description": "storage device",
-      "enable": true,
-      "options": "subvolid=259",
-      "type": "btrfs",
-      "wantedBy": [
-        "multi-user.target"
-      ],
-      "what": "/dev/sda",
-      "where": "/var/mnt/ssv-dkg"
     }
   },
   "ssh": {
