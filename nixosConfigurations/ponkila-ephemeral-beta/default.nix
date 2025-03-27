@@ -56,11 +56,25 @@ in
       jwtSecretFile = config.age.secrets."mainnet-jwt".path;
     };
 
+    execution.besu = {
+      enable = true;
+      endpoint = "http://${infra.ip}:8551";
+      dataDir = "/var/mnt/xfs/besu/mainnet";
+      jwtSecretFile = "${config.age.secrets."mainnet-jwt".path}";
+      extraOptions = [
+        "--nat-method=upnp"
+        "--p2p-port=30303"
+        "--sync-mode=CHECKPOINT"
+        "--host-allowlist=\"*\""
+      ];
+    };
+
     # Addons
     addons.mev-boost = {
       enable = true;
       endpoint = "http://${infra.ip}:18550";
     };
+
     addons.ssv-node = {
       dataDir = "/var/mnt/xfs/addons/ssv";
       privateKeyFile = config.sops.secrets."ssvnode/privateKey".path;
@@ -106,37 +120,7 @@ in
       --network bitcoin \
       --electrum-rpc-addr 192.168.100.10:50001
     '';
-
-    wantedBy = [ "multi-user.target" ];
-  };
-
-  systemd.services.besu-mainnet = {
-    enable = true;
-
-    description = "mainnet el";
-    requires = [ "wg-quick-wg0.service" ];
-    after = [ "wg-quick-wg0.service" ];
-
-    script = ''${pkgs.besu}/bin/besu \
-      --network=mainnet \
-      --rpc-http-enabled=true \
-      --rpc-http-host=192.168.100.10 \
-      --rpc-http-cors-origins="*" \
-      --rpc-ws-enabled=true \
-      --rpc-ws-host=0.0.0.0 \
-      --host-allowlist="*" \
-      --engine-host-allowlist="*" \
-      --engine-rpc-enabled \
-      --engine-jwt-secret=${config.age.secrets."mainnet-jwt".path} \
-      --data-path=/var/mnt/xfs/besu/mainnet \
-      --nat-method=upnp \
-      --p2p-port=30303 \
-      --sync-mode=CHECKPOINT \
-      --engine-rpc-port=8551 \
-      --rpc-http-port=8545 \
-      --rpc-ws-port=8546 \
-      --rpc-ws-authentication-enabled=false
-    '';
+    serviceConfig.Restart = "on-failure";
 
     wantedBy = [ "multi-user.target" ];
   };

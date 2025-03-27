@@ -89,33 +89,6 @@ in
     wantedBy = [ "multi-user.target" ];
   };
 
-  systemd.services.ssv-dkg-holesky = {
-    enable = false;
-
-    description = "ssv-dkg holesky";
-
-    serviceConfig = {
-      Restart = "always";
-      RestartSec = "5s";
-    };
-
-    script = ''nix run github:jhvst/nix-community/jhvst/ssv-dkg#ssv-dkg -- start-operator \
-      --privKey /var/mnt/ssv-dkg/privateKey \
-      --privKeyPassword /var/mnt/ssv-dkg/password \
-      --operatorID 881 \
-      --port 3030 \
-      --logLevel info \
-      --logFormat json \
-      --logLevelFormat capitalColor \
-      --logFilePath /var/mnt/ssv-dkg/debug.log \
-      --outputPath /var/mnt/ssv-dkg \
-      --serverTLSCertPath /var/mnt/ssv-dkg/tls.crt \
-      --serverTLSKeyPath /var/mnt/ssv-dkg/tls.key
-    '';
-
-    wantedBy = [ "multi-user.target" ];
-  };
-
   services.nginx = {
     enable = true;
     config = ''
@@ -181,16 +154,6 @@ in
         where = "/var/mnt/keep-network";
         type = "btrfs";
         options = "subvolid=258";
-
-        wantedBy = [ "multi-user.target" ];
-      };
-      ssv-dkg = {
-        enable = true;
-
-        what = "/dev/sda";
-        where = "/var/mnt/ssv-dkg";
-        type = "btrfs";
-        options = "subvolid=259";
 
         wantedBy = [ "multi-user.target" ];
       };
