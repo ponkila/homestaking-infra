@@ -10,6 +10,14 @@ let
   infra.ip = "192.168.100.10";
   lighthouse.datadir = "/var/mnt/xfs/lighthouse";
   sshKeysPath = "/var/mnt/xfs/secrets/ssh/id_ed25519";
+
+  # Mesh
+  inherit (inputs.clib.lib.network.ipv6) fromString;
+  meshSelf = map (x: x.address) (map fromString config.systemd.network.networks."50-simple".address);
+  clusterAddr = map (node: "${node.wirenix.peerName}=${toString (map (wg: "http://[${wg.address}]") (map fromString node.systemd.network.networks."50-simple".address))}:2380");
+  hetzner = [ outputs.nixosConfigurations."hetzner-ephemeral-alpha".config ];
+  kaakkuri = [ outputs.nixosConfigurations."kaakkuri-ephemeral-alpha".config ];
+  ponkila = [ outputs.nixosConfigurations."ponkila-ephemeral-beta".config ];
 in
 {
   boot.initrd.availableKernelModules = [ "xfs" "dm_mod" "dm-raid" "dm_integrity" "raid0" ];
@@ -93,6 +101,16 @@ in
         before = [ "bitcoind-mainnet.service" ];
         wantedBy = [ "multi-user.target" ];
       };
+      kioxia = {
+        enable = true;
+        description = "nvme/single/kioxia";
+
+        what = "/dev/mapper/kioxia-exceria_pro";
+        where = "/var/mnt/kioxia";
+        type = "xfs";
+
+        wantedBy = [ "multi-user.target" ];
+      };
     };
   };
 
@@ -128,7 +146,7 @@ in
   systemd.network = {
     enable = true;
     networks = {
-      "10-wan" = {
+      "10-fiber" = {
         linkConfig.RequiredForOnline = "routable";
         matchConfig.Name = "enp193s0f0";
         networkConfig = {
@@ -136,8 +154,14 @@ in
           IPv6AcceptRA = true;
         };
         address = [ "192.168.17.20/24" ];
+        routes = [
+          {
+            Gateway = "192.168.17.1";
+            Metric = 2 * 1;
+          }
+        ];
       };
-      "10-usb" = {
+      "10-cellular" = {
         linkConfig.RequiredForOnline = "routable";
         matchConfig.Name = "enp66s0u1";
         networkConfig = {
@@ -145,13 +169,18 @@ in
           IPv6AcceptRA = true;
         };
       };
+      "50-simple" = {
+        dns = [ "127.0.0.1:1053" ];
+        domains = [ "ponkila.nix" ];
+      };
     };
   };
   networking = {
     firewall = {
-      allowedTCPPorts = [ 50001 30303 8546 ];
+      allowedTCPPorts = [ 50001 30303 8546 5432 8008 ];
       allowedUDPPorts = [ 50001 30303 8546 51821 ];
     };
+    nameservers = [ "localhost:1053" ];
     useDHCP = false;
   };
 
@@ -190,21 +219,15 @@ in
       "go.d/prometheus.conf" = pkgs.writeText "go.d/prometheus.conf" ''
         jobs:
           - name: etcd
-            url: http://127.0.0.1:2379/metrics
+            url: http://[${lib.concatStrings meshSelf}]:2379/metrics
       '';
     };
   };
 
   systemd.tmpfiles.rules = [
-    "d /var/log/smartd 0755 netdata netdata -"
+    # should be upstreamed, patroni is unable to start if it cannot create this folder
+    "d /run/postgresql 0755 patroni patroni -"
   ];
-  services.smartd = {
-    enable = true;
-    extraOptions = [
-      "-A /var/log/smartd/"
-      "--interval=600"
-    ];
-  };
 
   wirenix = {
     enable = true;
@@ -215,25 +238,92 @@ in
     aclConfig = import ../../nixosModules/wirenix/acl.nix;
   };
 
-  services.etcd =
+  services.etcd = {
+    enable = true;
+    name = config.wirenix.peerName;
+    listenPeerUrls = map (x: "http://[${x}]:2380") meshSelf;
+    listenClientUrls = map (x: "http://[${x}]:2379") meshSelf;
+    initialClusterToken = "etcd-cluster-1";
+    initialClusterState = "new";
+    initialCluster =
+      clusterAddr hetzner ++
+      clusterAddr kaakkuri ++
+      clusterAddr ponkila;
+    dataDir = "/var/mnt/xfs/etcd";
+    openFirewall = true;
+  };
+
+  services.patroni =
     let
-      inherit (inputs.clib.lib.network.ipv6) fromString;
-      self = map (x: x.address) (map fromString config.systemd.network.networks."50-simple".address);
-      clusterAddr = map (node: "${node.wirenix.peerName}=${toString (map (wg: "http://[${wg.address}]") (map fromString node.systemd.network.networks."50-simple".address))}:2380");
-      kaakkuri = clusterAddr [ outputs.nixosConfigurations."kaakkuri-ephemeral-alpha".config ];
-      node1 = clusterAddr [ outputs.nixosConfigurations."hetzner-ephemeral-alpha".config ];
-      node2 = clusterAddr [ outputs.nixosConfigurations."ponkila-ephemeral-beta".config ];
+      clusterListenURLs = map (node: "${toString (map (wg: "[${wg.address}]") (map fromString node.systemd.network.networks."50-simple".address))}:2379");
+      clusterSiblingIPs = map (node: "${toString (map (wg: "[${wg.address}]") (map fromString node.systemd.network.networks."50-simple".address))}");
+      clusterReplicationIP = map (node: "${toString (map (wg: "${wg.address}") (map fromString node.systemd.network.networks."50-simple".address))}");
     in
     {
       enable = true;
-      name = config.wirenix.peerName;
-      listenPeerUrls = map (x: "http://[${x}]:2380") self;
-      listenClientUrls = [ "http://localhost:2379" ] ++ (map (x: "http://[${x}]:2379") self);
-      initialClusterToken = "etcd-cluster-1";
-      initialClusterState = "new";
-      initialCluster = kaakkuri ++ node1 ++ node2;
-      dataDir = "/var/mnt/xfs/etcd";
-      openFirewall = true;
+      postgresqlPackage = pkgs.postgresql_16;
+      scope = "ponkila";
+      settings = {
+        etcd3 = {
+          hosts = lib.concatStringsSep "," (clusterListenURLs (hetzner ++ kaakkuri ++ ponkila));
+        };
+        postgresql = {
+          pg_hba = [
+            "local  all             all             trust"
+            "host   all             all             ${lib.concatStrings meshSelf}/128                           trust"
+            "host   replication     all             ${lib.concatStrings meshSelf}/128                           trust"
+            "host   replication     all             ${lib.concatStrings (clusterReplicationIP hetzner)}/128     trust"
+            "host   replication     all             ${lib.concatStrings (clusterReplicationIP kaakkuri)}/128    trust"
+          ];
+          authentication = {
+            replication = {
+              username = "repl";
+              password = "fizzbuzz";
+            };
+            superuser = {
+              username = "dba";
+              password = "foobar";
+            };
+          };
+        };
+      };
+      postgresqlDataDir = "/var/mnt/kioxia/postgresql/${config.services.postgresql.package.psqlSchema}";
+      nodeIp = lib.concatStrings (map (x: "[${x}]") meshSelf);
+      otherNodesIps = clusterSiblingIPs (hetzner ++ kaakkuri);
+      name = lib.concatStrings meshSelf;
+      dataDir = "/var/mnt/kioxia/patroni";
+    };
+
+  services.coredns = {
+    enable = true;
+    config = ''
+      ponkila.nix:1053 {
+        etcd {
+          path /skydns
+          endpoint ${lib.concatStringsSep " " config.services.etcd.listenClientUrls}
+        }
+        prometheus
+        loadbalance
+      }
+
+      .:1053 {
+        forward . 1.1.1.2 2606:4700:4700::1112
+        cache
+      }
+    '';
+  };
+
+  systemd.services.wheres-the-postgres =
+    let
+      wheres-the-postgres = pkgs.callPackage ../../packages/wheres-the-postgres { inherit config; };
+    in
+    {
+      enable = true;
+      after = [ "etcd.service" "coredns.service" ];
+      requires = [ "etcd.service" "coredns.service" ];
+      script = "${wheres-the-postgres}/bin/wheres-the-postgres";
+      serviceConfig.Restart = "on-failure";
+      wantedBy = [ "multi-user.target" ];
     };
 
   system.stateVersion = "24.11";

@@ -9,6 +9,14 @@ let
   # General
   infra.ip = "192.168.100.50";
   sshKeysPath = "/var/mnt/nvme/secrets/ssh/id_ed25519";
+
+  # Mesh
+  inherit (inputs.clib.lib.network.ipv6) fromString;
+  meshSelf = map (x: x.address) (map fromString config.systemd.network.networks."50-simple".address);
+  clusterAddr = map (node: "${node.wirenix.peerName}=${toString (map (wg: "http://[${wg.address}]") (map fromString node.systemd.network.networks."50-simple".address))}:2380");
+  hetzner = [ outputs.nixosConfigurations."hetzner-ephemeral-alpha".config ];
+  kaakkuri = [ outputs.nixosConfigurations."kaakkuri-ephemeral-alpha".config ];
+  ponkila = [ outputs.nixosConfigurations."ponkila-ephemeral-beta".config ];
 in
 {
   boot.initrd.availableKernelModules = [ "xfs" ];
@@ -87,6 +95,10 @@ in
         };
         address = [ "192.168.1.25/24" ]; # static IP
       };
+      "50-simple" = {
+        dns = [ "127.0.0.1:1053" ];
+        domains = [ "ponkila.nix" ];
+      };
     };
   };
   networking = {
@@ -95,6 +107,8 @@ in
         50001
         30303
         8546
+        5432
+        8008
       ];
       allowedUDPPorts = [
         50001
@@ -103,6 +117,7 @@ in
         51821
       ];
     };
+    nameservers = [ "localhost:1053" ];
     useDHCP = false;
   };
 
@@ -147,20 +162,18 @@ in
           - name: besu
             url: http://127.0.0.1:9545/metrics
           - name: etcd
-            url: http://127.0.0.1:2379/metrics
-      '';
-      "health.d/ssv_node_status" = pkgs.writeText "health.d/ssv_node_status.conf" ''
-        alarm: jesse, juuso: ssv_node_status
-        lookup: min -10s
-        on: prometheus_ssv.ssv_node_status
-        every: 10s
-        warn: $this == 0
+            url: http://[${lib.concatStrings meshSelf}]:2379/metrics
+          - name: patroni
+            url: http://[${lib.concatStrings meshSelf}]:8008/metrics
+          - name: coredns
+            url: http://localhost:9153/metrics
       '';
     };
   };
 
   systemd.tmpfiles.rules = [
     "d /var/log/smartd 0755 netdata netdata -"
+    "d /run/postgresql 0755 patroni patroni -"
   ];
   services.smartd = {
     enable = true;
@@ -196,26 +209,93 @@ in
     aclConfig = import ../../nixosModules/wirenix/acl.nix;
   };
 
-  services.etcd =
+  services.etcd = {
+    enable = true;
+    name = config.wirenix.peerName;
+    listenPeerUrls = map (x: "http://[${x}]:2380") meshSelf;
+    listenClientUrls = map (x: "http://[${x}]:2379") meshSelf;
+    initialClusterToken = "etcd-cluster-1";
+    initialClusterState = "new";
+    initialCluster =
+      clusterAddr hetzner ++
+      clusterAddr kaakkuri ++
+      clusterAddr ponkila;
+    dataDir = "/var/mnt/nvme/etcd";
+    openFirewall = true;
+  };
+
+  services.patroni =
     let
-      inherit (inputs.clib.lib.network.ipv6) fromString;
-      self = map (x: x.address) (map fromString config.systemd.network.networks."50-simple".address);
-      clusterAddr = map (node: "${node.wirenix.peerName}=${toString (map (wg: "http://[${wg.address}]") (map fromString node.systemd.network.networks."50-simple".address))}:2380");
-      kaakkuri = clusterAddr [ outputs.nixosConfigurations."kaakkuri-ephemeral-alpha".config ];
-      node1 = clusterAddr [ outputs.nixosConfigurations."hetzner-ephemeral-alpha".config ];
-      node2 = clusterAddr [ outputs.nixosConfigurations."ponkila-ephemeral-beta".config ];
+      clusterListenURLs = map (node: "${toString (map (wg: "[${wg.address}]") (map fromString node.systemd.network.networks."50-simple".address))}:2379");
+      clusterSiblingIPs = map (node: "${toString (map (wg: "[${wg.address}]") (map fromString node.systemd.network.networks."50-simple".address))}");
+      clusterReplicationIP = map (node: "${toString (map (wg: "${wg.address}") (map fromString node.systemd.network.networks."50-simple".address))}");
     in
     {
       enable = true;
-      name = config.wirenix.peerName;
-      listenPeerUrls = map (x: "http://[${x}]:2380") self;
-      listenClientUrls = [ "http://localhost:2379" ] ++ (map (x: "http://[${x}]:2379") self);
-      initialClusterToken = "etcd-cluster-1";
-      initialClusterState = "new";
-      initialCluster = kaakkuri ++ node1 ++ node2;
-      dataDir = "/var/mnt/nvme/etcd";
-      openFirewall = true;
+      postgresqlPackage = pkgs.postgresql_16;
+      scope = "ponkila";
+      settings = {
+        etcd3 = {
+          hosts = lib.concatStringsSep "," (clusterListenURLs (hetzner ++ kaakkuri ++ ponkila));
+        };
+        postgresql = {
+          pg_hba = [
+            "local  all             all             trust"
+            "host   all             all             ${lib.concatStrings meshSelf}/128                           trust"
+            "host   replication     all             ${lib.concatStrings meshSelf}/128                           trust"
+            "host   replication     all             ${lib.concatStrings (clusterReplicationIP ponkila)}/128     trust"
+            "host   replication     all             ${lib.concatStrings (clusterReplicationIP hetzner)}/128     trust"
+          ];
+          authentication = {
+            replication = {
+              username = "repl";
+              password = "fizzbuzz";
+            };
+            superuser = {
+              username = "dba";
+              password = "foobar";
+            };
+          };
+        };
+      };
+      postgresqlDataDir = "/var/mnt/nvme/postgresql/${config.services.postgresql.package.psqlSchema}";
+      nodeIp = lib.concatStrings (map (x: "[${x}]") meshSelf);
+      otherNodesIps = clusterSiblingIPs (hetzner ++ ponkila);
+      name = lib.concatStrings meshSelf;
+      dataDir = "/var/mnt/nvme/patroni";
     };
 
-  system.stateVersion = "24.05";
+  services.coredns = {
+    enable = true;
+    config = ''
+      ponkila.nix:1053 {
+        etcd {
+          path /skydns
+          endpoint ${lib.concatStringsSep " " config.services.etcd.listenClientUrls}
+        }
+        prometheus
+        loadbalance
+      }
+
+      .:1053 {
+        forward . 1.1.1.2 2606:4700:4700::1112
+        cache
+      }
+    '';
+  };
+
+  systemd.services.wheres-the-postgres =
+    let
+      wheres-the-postgres = pkgs.callPackage ../../packages/wheres-the-postgres { inherit config; };
+    in
+    {
+      enable = true;
+      after = [ "etcd.service" "coredns.service" ];
+      requires = [ "etcd.service" "coredns.service" ];
+      script = "${wheres-the-postgres}/bin/wheres-the-postgres";
+      serviceConfig.Restart = "on-failure";
+      wantedBy = [ "multi-user.target" ];
+    };
+
+  system.stateVersion = "24.11";
 }
