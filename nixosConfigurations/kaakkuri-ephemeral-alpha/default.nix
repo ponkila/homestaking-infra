@@ -76,10 +76,24 @@ in
       endpoint = "http://${infra.ip}:18550";
     };
 
+    addons.ssv-node = {
+      dataDir = "/var/mnt/10-main/ethereum/mainnet/ssv";
+    };
+
     # Wireguard options
     vpn.wireguard = {
       enable = true;
       configFile = "/var/mnt/nvme/secrets/wg0.conf";
+    };
+
+    mounts = {
+      "10-main" = {
+        enable = true;
+        description = "nvme/single/samsung";
+        what = "/dev/mapper/pro990-data";
+        where = "/var/mnt/10-main";
+        type = "xfs";
+      };
     };
   };
 
