@@ -84,9 +84,7 @@ in
     };
 
     addons.ssv-node = {
-      dataDir = "/var/mnt/xfs/addons/ssv";
-      privateKeyFile = config.sops.secrets."ssvnode/privateKey".path;
-      privateKeyPasswordFile = config.sops.secrets."ssvnode/password".path;
+      dataDir = "/var/mnt/kioxia/ssv";
     };
 
     mounts = {
@@ -205,9 +203,15 @@ in
       group = "netdata";
     };
     secrets."nix-serve/secretKeyFile" = { };
-    secrets."ssvnode/password" = { };
-    secrets."ssvnode/privateKey" = { };
-    secrets."ssvnode/publicKey" = { };
+    secrets."ssvnode/password" = {
+      path = "/var/mnt/kioxia/ssv/password";
+    };
+    secrets."ssvnode/privateKey" = {
+      path = "/var/mnt/kioxia/ssv/ssv_operator_key";
+    };
+    secrets."ssvnode/publicKey" = {
+      path = "/var/mnt/kioxia/ssv/ssv_operator_key.pub";
+    };
     secrets."wireguard/wg0" = { };
     age.sshKeyPaths = [ sshKeysPath ];
   };
