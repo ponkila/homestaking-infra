@@ -331,6 +331,7 @@ in
     openFirewall = true;
   };
 
+  services.postgresql.package = pkgs.postgresql_16;
   services.patroni =
     let
       clusterListenURLs = map (node: "${toString (map (wg: "[${wg.address}]") (map fromString node.systemd.network.networks."50-simple".address))}:2379");
@@ -404,5 +405,5 @@ in
       wantedBy = [ "multi-user.target" ];
     };
 
-  system.stateVersion = "24.11";
+  system.stateVersion = "25.05";
 }
