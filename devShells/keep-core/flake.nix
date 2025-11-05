@@ -1,51 +1,33 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
-    systems.url = "github:nix-systems/default";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     devenv.url = "github:cachix/devenv";
+    flake-parts.url = "github:hercules-ci/flake-parts";
   };
 
-  nixConfig = {
-    extra-trusted-public-keys = "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=";
-    extra-substituters = "https://devenv.cachix.org";
-  };
-
-  outputs = {
-    self,
-    nixpkgs,
-    devenv,
-    systems,
-    ...
-  } @ inputs: let
-    forEachSystem = nixpkgs.lib.genAttrs (import systems);
-  in {
-    packages = forEachSystem (system: {
-      devenv-up = self.devShells.${system}.default.config.procfileScript;
-    });
-
-    devShells =
-      forEachSystem
-      (system: let
-        pkgs = nixpkgs.legacyPackages.${system};
-      in {
-        default = devenv.lib.mkShell {
-          inherit inputs pkgs;
-          modules = [
-            {
-              # https://devenv.sh/reference/options/
-              packages = with pkgs; [
-                gotestsum
-                protoc-gen-go
-                gnumake
-                protobuf
-                jq
-              ];
-
-              languages.go.enable = true;
-              languages.javascript.enable = true;
-            }
+  outputs = { ... }@inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } {
+    systems = inputs.nixpkgs.lib.systems.flakeExposed;
+    perSystem = { pkgs, ... }: {
+      devShells.default = inputs.devenv.lib.mkShell {
+        inherit inputs pkgs;
+        modules = [{
+          # https://devenv.sh/reference/options/
+          packages = with pkgs; [
+            gnumake
+            gotestsum
+            jq
+            protobuf
+            protoc-gen-go
           ];
-        };
-      });
+          languages = {
+            go.enable = true;
+            javascript = {
+              enable = true;
+              npm.enable = true;
+            };
+          };
+        }];
+      };
+    };
   };
 }
