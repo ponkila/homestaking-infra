@@ -339,7 +339,7 @@ in
       clusterReplicationIP = map (node: "${toString (map (wg: "${wg.address}") (map fromString node.systemd.network.networks."50-simple".address))}");
     in
     {
-      enable = true;
+      enable = false;
       postgresqlPackage = pkgs.postgresql_16;
       scope = "ponkila";
       settings = {
@@ -397,7 +397,7 @@ in
       wheres-the-postgres = pkgs.callPackage ../../packages/wheres-the-postgres { inherit config; };
     in
     {
-      enable = true;
+      enable = false;
       after = [ "etcd.service" "coredns.service" ];
       requires = [ "etcd.service" "coredns.service" ];
       script = "${wheres-the-postgres}/bin/wheres-the-postgres";
