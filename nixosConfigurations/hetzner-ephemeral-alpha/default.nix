@@ -47,7 +47,6 @@ in
         servers {
           metrics
         }
-        debug True
       }
 
       http://192.168.100.40:8545 {
