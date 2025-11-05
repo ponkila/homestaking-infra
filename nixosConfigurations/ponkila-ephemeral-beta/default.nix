@@ -126,6 +126,8 @@ in
       --electrum-rpc-addr 192.168.100.10:50001
     '';
     serviceConfig.Restart = "on-failure";
+    serviceConfig.User = "bitcoind-mainnet";
+    serviceConfig.Group = "bitcoind-mainnet";
 
     wantedBy = [ "multi-user.target" ];
   };
@@ -210,8 +212,10 @@ in
   };
 
   systemd.tmpfiles.rules = [
-    # should be upstreamed, patroni is unable to start if it cannot create this folder
-    "d /run/postgresql 0755 patroni patroni -"
+    "d ${config.services.etcd.dataDir} 0755 etcd etcd -" # upsert directory
+    "Z ${config.services.etcd.dataDir} - etcd etcd -" # recursively chown to user
+    "Z ${config.services.bitcoind."mainnet".dataDir} - bitcoind-mainnet bitcoind-mainnet -"
+    "Z /var/mnt/kioxia/bitcoin/electrs - bitcoind-mainnet bitcoind-mainnet -"
   ];
 
   wirenix = {

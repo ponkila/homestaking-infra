@@ -161,6 +161,8 @@ in
       --monitoring-addr 127.0.0.1:4224
     '';
     serviceConfig.Restart = "on-failure";
+    serviceConfig.User = "bitcoind-mainnet";
+    serviceConfig.Group = "bitcoind-mainnet";
 
     wantedBy = [ "multi-user.target" ];
   };
@@ -186,8 +188,10 @@ in
   };
 
   systemd.tmpfiles.rules = [
-    "d /var/log/smartd 0755 netdata netdata -"
-    "d /run/postgresql 0755 patroni patroni -"
+    "d ${config.services.etcd.dataDir} 0755 etcd etcd -" # upsert directory
+    "Z ${config.services.etcd.dataDir} - etcd etcd -" # recursively chown to user
+    "Z ${config.services.bitcoind."mainnet".dataDir} - bitcoind-mainnet bitcoind-mainnet -"
+    "Z /var/mnt/nvme/bitcoin/electrs - bitcoind-mainnet bitcoind-mainnet -"
   ];
   services.smartd = {
     enable = true;
