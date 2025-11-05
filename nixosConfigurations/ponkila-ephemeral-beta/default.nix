@@ -88,17 +88,6 @@ in
     };
 
     mounts = {
-      bitcoin = {
-        enable = true;
-        description = "bitcoin storage";
-
-        what = "/dev/mapper/samsung-bitcoin";
-        where = "/var/mnt/bitcoin";
-        type = "xfs";
-
-        before = [ "bitcoind-mainnet.service" ];
-        wantedBy = [ "multi-user.target" ];
-      };
       kioxia = {
         enable = true;
         description = "nvme/single/kioxia";
@@ -115,11 +104,11 @@ in
   services.bitcoind."mainnet" = {
     enable = true;
     prune = "disable";
-    dataDir = "/var/mnt/bitcoin/bitcoind";
+    dataDir = "/var/mnt/kioxia/bitcoin/bitcoind";
     extraCmdlineOptions = [
       "-server=1"
       "-txindex=0"
-      "-rpccookiefile=/var/mnt/bitcoin/bitcoind/.cookie"
+      "-rpccookiefile=/var/mnt/kioxia/bitcoin/bitcoind/.cookie"
     ];
   };
 
@@ -131,8 +120,8 @@ in
     after = [ "wg-quick-wg0.service" "bitcoind-mainnet.service" ];
 
     script = ''${pkgs.electrs}/bin/electrs \
-      --db-dir /var/mnt/bitcoin/electrs/db \
-      --cookie-file /var/mnt/bitcoin/bitcoind/.cookie \
+      --db-dir /var/mnt/kioxia/bitcoin/electrs/db \
+      --cookie-file /var/mnt/kioxia/bitcoin/bitcoind/.cookie \
       --network bitcoin \
       --electrum-rpc-addr 192.168.100.10:50001
     '';
@@ -146,7 +135,7 @@ in
     networks = {
       "10-fiber" = {
         linkConfig.RequiredForOnline = "routable";
-        matchConfig.Name = "enp193s0f0";
+        matchConfig.Name = "enp1s0f0";
         networkConfig = {
           DHCP = "ipv4";
           IPv6AcceptRA = true;
@@ -158,14 +147,6 @@ in
             Metric = 2 * 1;
           }
         ];
-      };
-      "10-cellular" = {
-        linkConfig.RequiredForOnline = "routable";
-        matchConfig.Name = "enp66s0u1";
-        networkConfig = {
-          DHCP = "ipv4";
-          IPv6AcceptRA = true;
-        };
       };
       "50-simple" = {
         dns = [ "127.0.0.1:1053" ];
