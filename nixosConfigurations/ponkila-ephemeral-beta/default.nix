@@ -73,6 +73,7 @@ in
         "--host-allowlist=\"*\""
         "--nat-method=upnp"
         "--p2p-port=30303"
+        "--profile=PERFORMANCE"
         "--sync-mode=SNAP"
       ];
     };
