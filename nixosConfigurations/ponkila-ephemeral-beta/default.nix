@@ -111,6 +111,8 @@ in
       "-rpccookiefile=/var/mnt/kioxia/bitcoin/bitcoind/.cookie"
     ];
   };
+  systemd.services.bitcoind-mainnet.requires = [ "var-mnt-kioxia.mount" ];
+  systemd.services.bitcoind-mainnet.after = [ "var-mnt-kioxia.mount" ];
 
   systemd.services.electrs = {
     enable = true;
