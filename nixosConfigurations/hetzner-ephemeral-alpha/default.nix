@@ -235,9 +235,6 @@ in
         9601
         # https://docs.ssv.network/operator-user-guides/operator-node/enabling-dkg
         3030
-        # patroni
-        5432
-        8008
       ];
       allowedUDPPorts = [
         51820
@@ -299,10 +296,6 @@ in
     };
   };
 
-  systemd.tmpfiles.rules = [
-    "d /run/postgresql 0755 patroni patroni -"
-  ];
-
   # Hetzner console access
   services.getty.autologinUser = "core";
 
@@ -330,48 +323,6 @@ in
     openFirewall = true;
   };
 
-  services.postgresql.package = pkgs.postgresql_16;
-  services.patroni =
-    let
-      clusterListenURLs = map (node: "${toString (map (wg: "[${wg.address}]") (map fromString node.systemd.network.networks."50-simple".address))}:2379");
-      clusterSiblingIPs = map (node: "${toString (map (wg: "[${wg.address}]") (map fromString node.systemd.network.networks."50-simple".address))}");
-      clusterReplicationIP = map (node: "${toString (map (wg: "${wg.address}") (map fromString node.systemd.network.networks."50-simple".address))}");
-    in
-    {
-      enable = false;
-      postgresqlPackage = pkgs.postgresql_16;
-      scope = "ponkila";
-      settings = {
-        etcd3 = {
-          hosts = lib.concatStringsSep "," (clusterListenURLs (hetzner ++ kaakkuri ++ ponkila));
-        };
-        postgresql = {
-          pg_hba = [
-            "local  all             all             trust"
-            "host   all             all             ${lib.concatStrings meshSelf}/128                           trust"
-            "host   replication     all             ${lib.concatStrings meshSelf}/128                           trust"
-            "host   replication     all             ${lib.concatStrings (clusterReplicationIP kaakkuri)}/128    trust"
-            "host   replication     all             ${lib.concatStrings (clusterReplicationIP ponkila)}/128     trust"
-          ];
-          authentication = {
-            replication = {
-              username = "repl";
-              password = "fizzbuzz";
-            };
-            superuser = {
-              username = "dba";
-              password = "foobar";
-            };
-          };
-        };
-      };
-      postgresqlDataDir = "/var/mnt/postgresql/${config.services.postgresql.package.psqlSchema}";
-      nodeIp = lib.concatStrings (map (x: "[${x}]") meshSelf);
-      otherNodesIps = clusterSiblingIPs (kaakkuri ++ ponkila);
-      name = lib.concatStrings meshSelf;
-      dataDir = "/var/mnt/patroni";
-    };
-
   services.coredns = {
     enable = true;
     config = ''
@@ -390,19 +341,6 @@ in
       }
     '';
   };
-
-  systemd.services.wheres-the-postgres =
-    let
-      wheres-the-postgres = pkgs.callPackage ../../packages/wheres-the-postgres { inherit config; };
-    in
-    {
-      enable = false;
-      after = [ "etcd.service" "coredns.service" ];
-      requires = [ "etcd.service" "coredns.service" ];
-      script = "${wheres-the-postgres}/bin/wheres-the-postgres";
-      serviceConfig.Restart = "on-failure";
-      wantedBy = [ "multi-user.target" ];
-    };
 
   system.stateVersion = "25.05";
 }
