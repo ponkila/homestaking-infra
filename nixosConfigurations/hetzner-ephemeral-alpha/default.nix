@@ -86,7 +86,7 @@ in
       Type = "simple";
     };
 
-    script = ''/var/mnt/keep-network/v2.1.0/keep-client start \
+    script = ''/var/mnt/keep-network/v2.3.1/keep-client start \
       --ethereum.url ws://192.168.100.40:8545 \
       --ethereum.keyFile /run/secrets/keep-network/operator-key \
       --bitcoin.electrum.url tcp://192.168.100.40:50001 \
