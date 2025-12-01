@@ -8,6 +8,14 @@
 let
   # General
   sshKeysPath = "/var/mnt/secrets/ssh/id_ed25519";
+
+  # Mesh network
+  inherit (inputs.clib.lib.network.ipv6) fromString;
+  meshSelf = map (x: x.address) (map fromString config.systemd.network.networks."50-simple".address);
+  clusterAddr = map (node: "${node.wirenix.peerName}=${toString (map (wg: "http://[${wg.address}]") (map fromString node.systemd.network.networks."50-simple".address))}:2380");
+  hetzner = [ outputs.nixosConfigurations."hetzner-ephemeral-alpha".config ];
+  kaakkuri = [ outputs.nixosConfigurations."kaakkuri-ephemeral-alpha".config ];
+  ponkila = [ outputs.nixosConfigurations."ponkila-ephemeral-beta".config ];
 in
 {
   boot.initrd.availableKernelModules = [
@@ -39,7 +47,6 @@ in
         servers {
           metrics
         }
-        debug True
       }
 
       http://192.168.100.40:8545 {
@@ -79,7 +86,7 @@ in
       Type = "simple";
     };
 
-    script = ''/var/mnt/keep-network/v2.1.0/keep-client start \
+    script = ''/var/mnt/keep-network/v2.3.1/keep-client start \
       --ethereum.url ws://192.168.100.40:8545 \
       --ethereum.keyFile /run/secrets/keep-network/operator-key \
       --bitcoin.electrum.url tcp://192.168.100.40:50001 \
@@ -214,6 +221,10 @@ in
           }
         ];
       };
+      "50-simple" = {
+        dns = [ "127.0.0.1:1053" ];
+        domains = [ "ponkila.nix" ];
+      };
     };
   };
   networking = {
@@ -239,6 +250,7 @@ in
         ];
       };
     };
+    nameservers = [ "localhost:1053" ];
     useDHCP = false;
   };
 
@@ -296,26 +308,39 @@ in
     aclConfig = import ../../nixosModules/wirenix/acl.nix;
   };
 
-  services.etcd =
-    let
-      inherit (inputs.clib.lib.network.ipv6) fromString;
-      self = map (x: x.address) (map fromString config.systemd.network.networks."50-simple".address);
-      clusterAddr = map (node: "${node.wirenix.peerName}=${toString (map (wg: "http://[${wg.address}]") (map fromString node.systemd.network.networks."50-simple".address))}:2380");
-      kaakkuri = clusterAddr [ outputs.nixosConfigurations."kaakkuri-ephemeral-alpha".config ];
-      node1 = clusterAddr [ outputs.nixosConfigurations."hetzner-ephemeral-alpha".config ];
-      node2 = clusterAddr [ outputs.nixosConfigurations."ponkila-ephemeral-beta".config ];
-    in
-    {
-      enable = true;
-      name = config.wirenix.peerName;
-      listenPeerUrls = map (x: "http://[${x}]:2380") self;
-      listenClientUrls = map (x: "http://[${x}]:2379") self;
-      initialClusterToken = "etcd-cluster-1";
-      initialClusterState = "new";
-      initialCluster = kaakkuri ++ node1 ++ node2;
-      dataDir = "/var/mnt/etcd";
-      openFirewall = true;
-    };
+  services.etcd = {
+    enable = true;
+    name = config.wirenix.peerName;
+    listenPeerUrls = map (x: "http://[${x}]:2380") meshSelf;
+    listenClientUrls = map (x: "http://[${x}]:2379") meshSelf;
+    initialClusterToken = "etcd-cluster-1";
+    initialClusterState = "new";
+    initialCluster =
+      clusterAddr hetzner ++
+      clusterAddr kaakkuri ++
+      clusterAddr ponkila;
+    dataDir = "/var/mnt/etcd";
+    openFirewall = true;
+  };
 
-  system.stateVersion = "24.11";
+  services.coredns = {
+    enable = true;
+    config = ''
+      ponkila.nix:1053 {
+        etcd {
+          path /skydns
+          endpoint ${lib.concatStringsSep " " config.services.etcd.listenClientUrls}
+        }
+        prometheus
+        loadbalance
+      }
+
+      .:1053 {
+        forward . 1.1.1.2 2606:4700:4700::1112
+        cache
+      }
+    '';
+  };
+
+  system.stateVersion = "25.05";
 }

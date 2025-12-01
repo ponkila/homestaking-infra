@@ -3,13 +3,11 @@
     "mev-boost": {
       "enable": false,
       "endpoint": "http://127.0.0.1:18550",
-      "extraOptions": null
+      "extraOptions": []
     },
     "ssv-node": {
       "dataDir": "/mnt/addons/ssv",
-      "extraOptions": null,
-      "privateKeyFile": "/mnt/addons/ssv/ssv_operator_key",
-      "privateKeyPasswordFile": "/mnt/addons/ssv/password"
+      "extraOptions": []
     }
   },
   "consensus": {
@@ -18,8 +16,8 @@
       "enable": false,
       "endpoint": "http://127.0.0.1:5052",
       "execEndpoint": "http://127.0.0.1:8551",
-      "extraOptions": null,
-      "jwtSecretFile": null,
+      "extraOptions": [],
+      "jwtSecretFile": "/mnt/secrets/jwt.hex",
       "slasher": {
         "enable": false,
         "historyLength": 4096,
@@ -31,16 +29,16 @@
       "enable": false,
       "endpoint": "http://127.0.0.1:5052",
       "execEndpoint": "http://127.0.0.1:8551",
-      "extraOptions": null,
-      "jwtSecretFile": null
+      "extraOptions": [],
+      "jwtSecretFile": "/mnt/secrets/jwt.hex"
     },
     "prysm": {
       "dataDir": "/mnt/prysm",
       "enable": false,
       "endpoint": "http://127.0.0.1:3500",
       "execEndpoint": "http://127.0.0.1:8551",
-      "extraOptions": null,
-      "jwtSecretFile": null,
+      "extraOptions": [],
+      "jwtSecretFile": "/mnt/secrets/jwt.hex",
       "slasher": {
         "enable": false
       }
@@ -50,8 +48,8 @@
       "enable": false,
       "endpoint": "http://127.0.0.1:5051",
       "execEndpoint": "http://127.0.0.1:8551",
-      "extraOptions": null,
-      "jwtSecretFile": null
+      "extraOptions": [],
+      "jwtSecretFile": "/mnt/secrets/jwt.hex"
     }
   },
   "execution": {
@@ -59,29 +57,29 @@
       "dataDir": "/mnt/besu",
       "enable": false,
       "endpoint": "http://127.0.0.1:8551",
-      "extraOptions": null,
-      "jwtSecretFile": null
+      "extraOptions": [],
+      "jwtSecretFile": "/mnt/secrets/jwt.hex"
     },
     "erigon": {
       "dataDir": "/mnt/erigon",
       "enable": false,
       "endpoint": "http://127.0.0.1:8551",
-      "extraOptions": null,
-      "jwtSecretFile": null
+      "extraOptions": [],
+      "jwtSecretFile": "/mnt/secrets/jwt.hex"
     },
     "geth": {
       "dataDir": "/mnt/geth",
       "enable": false,
       "endpoint": "http://127.0.0.1:8551",
-      "extraOptions": null,
-      "jwtSecretFile": null
+      "extraOptions": [],
+      "jwtSecretFile": "/mnt/secrets/jwt.hex"
     },
     "nethermind": {
       "dataDir": "/mnt/nethermind",
       "enable": false,
       "endpoint": "http://127.0.0.1:8551",
-      "extraOptions": null,
-      "jwtSecretFile": null
+      "extraOptions": [],
+      "jwtSecretFile": "/mnt/secrets/jwt.hex"
     }
   },
   "localization": {
@@ -108,7 +106,7 @@
     "authorizedKeys": [
       "sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAILn/9IHTGC1sLxnPnLbtJpvF7HgXQ8xNkRwSLq8ay8eJAAAADHNzaDpzdGFybGFicw== ssh:starlabs"
     ],
-    "privateKeyFile": null
+    "privateKeyFile": "/mnt/secrets/ssh/id_ed25519"
   },
   "vpn": {
     "wireguard": {

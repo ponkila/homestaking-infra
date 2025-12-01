@@ -7,10 +7,12 @@
   nixConfig = {
     extra-substituters = [
       "https://cache.nixos.org"
+      "https://devenv.cachix.org"
       "https://nix-community.cachix.org"
     ];
     extra-trusted-public-keys = [
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
     ];
   };
@@ -19,17 +21,17 @@
     agenix-rekey.inputs.nixpkgs.follows = "nixpkgs";
     agenix-rekey.url = "github:oddlama/agenix-rekey";
     agenix.url = "github:ryantm/agenix";
+    clib.url = "github:nix-community/nixpkgs.lib";
     devenv.url = "github:cachix/devenv";
     flake-parts.url = "github:hercules-ci/flake-parts";
     homestakeros-base.inputs.nixpkgs.follows = "nixpkgs";
     homestakeros-base.url = "github:ponkila/HomestakerOS?dir=nixosModules/base";
     homestakeros.url = "github:ponkila/HomestakerOS";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     sops-nix.url = "github:Mic92/sops-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     wirenix.url = "sourcehut:~msalerno/wirenix";
-    clib.url = "github:nix-community/nixpkgs.lib";
   };
 
   # Add the inputs declared above to the argument attribute set

@@ -1,8 +1,6 @@
 { pkgs
 , config
 , lib
-, inputs
-, outputs
 , ...
 }:
 {
@@ -77,7 +75,7 @@
     };
   };
   networking = {
-    firewall.allowedUDPPorts = [ 51823 ];
+    firewall.allowedUDPPorts = [ 51822 ];
     nameservers = [ "127.0.0.1:1053" ];
     useDHCP = false;
   };
@@ -119,5 +117,5 @@
     aclConfig = import ../../nixosModules/wirenix/acl.nix;
   };
 
-  system.stateVersion = "24.11";
+  system.stateVersion = "25.05";
 }

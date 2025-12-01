@@ -9,6 +9,14 @@ let
   # General
   infra.ip = "192.168.100.50";
   sshKeysPath = "/var/mnt/nvme/secrets/ssh/id_ed25519";
+
+  # Mesh
+  inherit (inputs.clib.lib.network.ipv6) fromString;
+  meshSelf = map (x: x.address) (map fromString config.systemd.network.networks."50-simple".address);
+  clusterAddr = map (node: "${node.wirenix.peerName}=${toString (map (wg: "http://[${wg.address}]") (map fromString node.systemd.network.networks."50-simple".address))}:2380");
+  hetzner = [ outputs.nixosConfigurations."hetzner-ephemeral-alpha".config ];
+  kaakkuri = [ outputs.nixosConfigurations."kaakkuri-ephemeral-alpha".config ];
+  ponkila = [ outputs.nixosConfigurations."ponkila-ephemeral-beta".config ];
 in
 {
   boot.initrd.availableKernelModules = [ "xfs" ];
@@ -55,10 +63,11 @@ in
       dataDir = "/var/mnt/nvme/ethereum/mainnet/besu";
       jwtSecretFile = "/var/mnt/nvme/ethereum/mainnet/jwt.hex";
       extraOptions = [
+        "--host-allowlist=\"*\""
         "--nat-method=upnp"
         "--p2p-port=30303"
-        "--sync-mode=CHECKPOINT"
-        "--host-allowlist=\"*\""
+        "--profile=PERFORMANCE"
+        "--sync-mode=SNAP"
       ];
     };
 
@@ -68,10 +77,24 @@ in
       endpoint = "http://${infra.ip}:18550";
     };
 
+    addons.ssv-node = {
+      dataDir = "/var/mnt/10-main/ethereum/mainnet/ssv";
+    };
+
     # Wireguard options
     vpn.wireguard = {
       enable = true;
       configFile = "/var/mnt/nvme/secrets/wg0.conf";
+    };
+
+    mounts = {
+      "10-main" = {
+        enable = true;
+        description = "nvme/single/samsung";
+        what = "/dev/mapper/pro990-data";
+        where = "/var/mnt/10-main";
+        type = "xfs";
+      };
     };
   };
 
@@ -86,6 +109,10 @@ in
           IPv6AcceptRA = true;
         };
         address = [ "192.168.1.25/24" ]; # static IP
+      };
+      "50-simple" = {
+        dns = [ "127.0.0.1:1053" ];
+        domains = [ "ponkila.nix" ];
       };
     };
   };
@@ -103,6 +130,7 @@ in
         51821
       ];
     };
+    nameservers = [ "localhost:1053" ];
     useDHCP = false;
   };
 
@@ -132,6 +160,8 @@ in
       --monitoring-addr 127.0.0.1:4224
     '';
     serviceConfig.Restart = "on-failure";
+    serviceConfig.User = "bitcoind-mainnet";
+    serviceConfig.Group = "bitcoind-mainnet";
 
     wantedBy = [ "multi-user.target" ];
   };
@@ -147,20 +177,18 @@ in
           - name: besu
             url: http://127.0.0.1:9545/metrics
           - name: etcd
-            url: http://127.0.0.1:2379/metrics
-      '';
-      "health.d/ssv_node_status" = pkgs.writeText "health.d/ssv_node_status.conf" ''
-        alarm: jesse, juuso: ssv_node_status
-        lookup: min -10s
-        on: prometheus_ssv.ssv_node_status
-        every: 10s
-        warn: $this == 0
+            url: http://[${lib.concatStrings meshSelf}]:2379/metrics
+          - name: coredns
+            url: http://localhost:9153/metrics
       '';
     };
   };
 
   systemd.tmpfiles.rules = [
-    "d /var/log/smartd 0755 netdata netdata -"
+    "d ${config.services.etcd.dataDir} 0755 etcd etcd -" # upsert directory
+    "Z ${config.services.etcd.dataDir} - etcd etcd -" # recursively chown to user
+    "Z ${config.services.bitcoind."mainnet".dataDir} - bitcoind-mainnet bitcoind-mainnet -"
+    "Z /var/mnt/nvme/bitcoin/electrs - bitcoind-mainnet bitcoind-mainnet -"
   ];
   services.smartd = {
     enable = true;
@@ -196,26 +224,39 @@ in
     aclConfig = import ../../nixosModules/wirenix/acl.nix;
   };
 
-  services.etcd =
-    let
-      inherit (inputs.clib.lib.network.ipv6) fromString;
-      self = map (x: x.address) (map fromString config.systemd.network.networks."50-simple".address);
-      clusterAddr = map (node: "${node.wirenix.peerName}=${toString (map (wg: "http://[${wg.address}]") (map fromString node.systemd.network.networks."50-simple".address))}:2380");
-      kaakkuri = clusterAddr [ outputs.nixosConfigurations."kaakkuri-ephemeral-alpha".config ];
-      node1 = clusterAddr [ outputs.nixosConfigurations."hetzner-ephemeral-alpha".config ];
-      node2 = clusterAddr [ outputs.nixosConfigurations."ponkila-ephemeral-beta".config ];
-    in
-    {
-      enable = true;
-      name = config.wirenix.peerName;
-      listenPeerUrls = map (x: "http://[${x}]:2380") self;
-      listenClientUrls = [ "http://localhost:2379" ] ++ (map (x: "http://[${x}]:2379") self);
-      initialClusterToken = "etcd-cluster-1";
-      initialClusterState = "new";
-      initialCluster = kaakkuri ++ node1 ++ node2;
-      dataDir = "/var/mnt/nvme/etcd";
-      openFirewall = true;
-    };
+  services.etcd = {
+    enable = true;
+    name = config.wirenix.peerName;
+    listenPeerUrls = map (x: "http://[${x}]:2380") meshSelf;
+    listenClientUrls = map (x: "http://[${x}]:2379") meshSelf;
+    initialClusterToken = "etcd-cluster-1";
+    initialClusterState = "new";
+    initialCluster =
+      clusterAddr hetzner ++
+      clusterAddr kaakkuri ++
+      clusterAddr ponkila;
+    dataDir = "/var/mnt/nvme/etcd";
+    openFirewall = true;
+  };
 
-  system.stateVersion = "24.05";
+  services.coredns = {
+    enable = true;
+    config = ''
+      ponkila.nix:1053 {
+        etcd {
+          path /skydns
+          endpoint ${lib.concatStringsSep " " config.services.etcd.listenClientUrls}
+        }
+        prometheus
+        loadbalance
+      }
+
+      .:1053 {
+        forward . 1.1.1.2 2606:4700:4700::1112
+        cache
+      }
+    '';
+  };
+
+  system.stateVersion = "25.05";
 }

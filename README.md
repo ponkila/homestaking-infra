@@ -22,10 +22,10 @@ We are currently working on [HomestakerOS](https://github.com/ponkila/Homestaker
 ## Hosts
 | Hostname | System | Network(s) | Info
 |-|-|-|-|
-dinar-ephemeral-beta      | x86-64 | Mainnet | Lighthouse + Erigon
-hetzner-ephemeral-alpha   | x86-64 | Mainnet | Blutgang + Threshold.network
-kaakkuri-ephemeral-alpha  | x86-64 | Holesky | Lighthouse + Geth
-ponkila-ephemeral-beta    | x86-64 | Mainnet | Lighthouse + Erigon
+hetzner-ephemeral-alpha   | x86-64 | Mainnet | Caddy + Nginx + Threshold.network
+kaakkuri-ephemeral-alpha  | x86-64 | Mainnet | Lighthouse + Besu
+ponkila-ephemeral-beta    | x86-64 | Mainnet | Lighthouse + Besu
+ponkila-ephemeral-sigma   | x86-64 | Mainnet | Lighthouse
 
 ## Building (no cross-compile)
 

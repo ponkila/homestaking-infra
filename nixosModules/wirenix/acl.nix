@@ -41,6 +41,21 @@
       ];
     }
     {
+      name = "ponkila-ephemeral-sigma";
+      subnets = {
+        simple = {
+          listenPort = 51822;
+        };
+      };
+      endpoints = [
+        {
+          # no match field means match all peers
+          port = 51822;
+          ip = "nyt2.ponkila.com";
+        }
+      ];
+    }
+    {
       name = "kaakkuri";
       subnets = {
         simple = {
