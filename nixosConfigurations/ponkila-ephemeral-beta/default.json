@@ -3,13 +3,11 @@
     "mev-boost": {
       "enable": true,
       "endpoint": "http://192.168.100.10:18550",
-      "extraOptions": null
+      "extraOptions": []
     },
     "ssv-node": {
-      "dataDir": "/var/mnt/xfs/addons/ssv",
-      "extraOptions": null,
-      "privateKeyFile": "/run/secrets/ssvnode/privateKey",
-      "privateKeyPasswordFile": "/run/secrets/ssvnode/password"
+      "dataDir": "/var/mnt/kioxia/ssv",
+      "extraOptions": []
     }
   },
   "consensus": {
@@ -18,7 +16,7 @@
       "enable": true,
       "endpoint": "http://192.168.100.10:5052",
       "execEndpoint": "http://192.168.100.10:8551",
-      "extraOptions": null,
+      "extraOptions": [],
       "jwtSecretFile": "/run/agenix/mainnet-jwt",
       "slasher": {
         "enable": false,
@@ -31,16 +29,16 @@
       "enable": false,
       "endpoint": "http://127.0.0.1:5052",
       "execEndpoint": "http://127.0.0.1:8551",
-      "extraOptions": null,
-      "jwtSecretFile": null
+      "extraOptions": [],
+      "jwtSecretFile": "/mnt/secrets/jwt.hex"
     },
     "prysm": {
       "dataDir": "/mnt/prysm",
       "enable": false,
       "endpoint": "http://127.0.0.1:3500",
       "execEndpoint": "http://127.0.0.1:8551",
-      "extraOptions": null,
-      "jwtSecretFile": null,
+      "extraOptions": [],
+      "jwtSecretFile": "/mnt/secrets/jwt.hex",
       "slasher": {
         "enable": false
       }
@@ -50,8 +48,8 @@
       "enable": false,
       "endpoint": "http://127.0.0.1:5051",
       "execEndpoint": "http://127.0.0.1:8551",
-      "extraOptions": null,
-      "jwtSecretFile": null
+      "extraOptions": [],
+      "jwtSecretFile": "/mnt/secrets/jwt.hex"
     }
   },
   "execution": {
@@ -60,10 +58,11 @@
       "enable": true,
       "endpoint": "http://192.168.100.10:8551",
       "extraOptions": [
+        "--host-allowlist=\"*\"",
         "--nat-method=upnp",
         "--p2p-port=30303",
-        "--sync-mode=CHECKPOINT",
-        "--host-allowlist=\"*\""
+        "--profile=PERFORMANCE",
+        "--sync-mode=SNAP"
       ],
       "jwtSecretFile": "/run/agenix/mainnet-jwt"
     },
@@ -71,22 +70,22 @@
       "dataDir": "/mnt/erigon",
       "enable": false,
       "endpoint": "http://127.0.0.1:8551",
-      "extraOptions": null,
-      "jwtSecretFile": null
+      "extraOptions": [],
+      "jwtSecretFile": "/mnt/secrets/jwt.hex"
     },
     "geth": {
       "dataDir": "/mnt/geth",
       "enable": false,
       "endpoint": "http://127.0.0.1:8551",
-      "extraOptions": null,
-      "jwtSecretFile": null
+      "extraOptions": [],
+      "jwtSecretFile": "/mnt/secrets/jwt.hex"
     },
     "nethermind": {
       "dataDir": "/mnt/nethermind",
       "enable": false,
       "endpoint": "http://127.0.0.1:8551",
-      "extraOptions": null,
-      "jwtSecretFile": null
+      "extraOptions": [],
+      "jwtSecretFile": "/mnt/secrets/jwt.hex"
     }
   },
   "localization": {
@@ -94,20 +93,6 @@
     "timezone": "Europe/Helsinki"
   },
   "mounts": {
-    "bitcoin": {
-      "before": [
-        "bitcoind-mainnet.service"
-      ],
-      "description": "bitcoin storage",
-      "enable": true,
-      "options": "noatime",
-      "type": "xfs",
-      "wantedBy": [
-        "multi-user.target"
-      ],
-      "what": "/dev/mapper/samsung-bitcoin",
-      "where": "/var/mnt/bitcoin"
-    },
     "kioxia": {
       "before": [],
       "description": "nvme/single/kioxia",
