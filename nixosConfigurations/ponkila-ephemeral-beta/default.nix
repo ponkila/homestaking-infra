@@ -179,6 +179,8 @@ in
       netdata-claimConfiguration = {
         rekeyFile = ./secrets/agenix/netdata-claimConfiguration.age;
         path = "/etc/netdata/claim.conf";
+        owner = "netdata";
+        group = "netdata";
       };
     };
   };
