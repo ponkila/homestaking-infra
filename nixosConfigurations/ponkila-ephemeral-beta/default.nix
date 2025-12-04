@@ -221,6 +221,7 @@ in
     "Z ${config.services.etcd.dataDir} - etcd etcd -" # recursively chown to user
     "Z ${config.services.bitcoind."mainnet".dataDir} - bitcoind-mainnet bitcoind-mainnet -"
     "Z /var/mnt/kioxia/bitcoin/electrs - bitcoind-mainnet bitcoind-mainnet -"
+    "z ${config.age.secrets.netdata-claimConfiguration.path} - netdata netdata -"
   ];
 
   wirenix = {
