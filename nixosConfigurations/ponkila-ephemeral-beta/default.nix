@@ -175,6 +175,11 @@ in
         rekeyFile = ./secrets/agenix/mainnet-jwt.age;
         generator.script = "jwt";
       };
+      # https://learn.netdata.cloud/docs/netdata-cloud/connect-agent
+      netdata-claimConfiguration = {
+        rekeyFile = ./secrets/agenix/netdata-claimConfiguration.age;
+        path = "/etc/netdata/claim.conf";
+      };
     };
   };
   sops = {
