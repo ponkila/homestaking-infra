@@ -32,6 +32,8 @@
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     wirenix.url = "sourcehut:~msalerno/wirenix";
+    ethereum-nix-tip.url = "github:nix-community/ethereum.nix";
+    cgroup-exporter.url = "github:arianvp/cgroup-exporter";
   };
 
   # Add the inputs declared above to the argument attribute set
@@ -44,7 +46,7 @@
       inputs.treefmt-nix.flakeModule
     ];
 
-    perSystem = { pkgs, config, system, ... }: {
+    perSystem = { pkgs, config, system, inputs', lib, ... }: {
 
       # Overlays
       _module.args.pkgs = import inputs.nixpkgs {
@@ -112,16 +114,51 @@
       };
 
       # Custom packages, accessible trough 'nix build', 'nix run', etc.
-      packages = {
-        "nsq" = pkgs.callPackage ./packages/nsq { };
-      }
-      # Entrypoint aliases, accessible trough 'nix build'
-      // (with flake.nixosConfigurations; {
-        "hetzner-ephemeral-alpha" = hetzner-ephemeral-alpha.config.system.build.kexecTree;
-        "kaakkuri-ephemeral-alpha" = kaakkuri-ephemeral-alpha.config.system.build.kexecTree;
-        "ponkila-ephemeral-beta" = ponkila-ephemeral-beta.config.system.build.kexecTree;
-        "ponkila-ephemeral-sigma" = ponkila-ephemeral-sigma.config.system.build.kexecTree;
-      });
+      packages =
+        let
+          dashboards = pkgs.callPackages ./packages/grafana-dashboards { };
+          alerts = pkgs.callPackages ./packages/prometheus-alerts { };
+        in
+        {
+          "nsq" = pkgs.callPackage ./packages/nsq { };
+          "reth-tip" = inputs'.ethereum-nix-tip.packages.reth.overrideAttrs (_: {
+            cargoBuildType = "maxperf";
+          });
+          "acl" = pkgs.writeText "acl.nix"
+            (builtins.toJSON (import ./nixosModules/wirenix/acl.nix {
+              inherit (flake) nixosConfigurations;
+              inherit lib;
+              subnetName = "simple";
+            }));
+          # useful to check that each dashboard evaluates
+          "grafana-dashboards-all" = pkgs.linkFarm "grafana-dashboards" (
+            lib.mapAttrsToList
+              (dashboardName: drv: {
+                name = dashboardName;
+                path = drv;
+              })
+              dashboards
+          );
+          "awesome-prometheus-alerts" = pkgs.callPackage ./packages/awesome-prometheus-alerts { };
+          "prometheus-alerts-all" = pkgs.linkFarm "prometheus-alerts" (
+            lib.mapAttrsToList
+              (alertName: drv: {
+                name = alertName;
+                path = drv;
+              })
+              alerts
+          );
+        }
+        # generator for each individual dashboard
+        // (lib.mapAttrs' (name: drv: lib.nameValuePair "grafana-dashboard-${name}" drv) dashboards)
+        // (lib.mapAttrs' (name: drv: lib.nameValuePair "prometheus-alert-${name}" drv) alerts)
+        # Entrypoint aliases, accessible trough 'nix build'
+        // (with flake.nixosConfigurations; {
+          "hetzner-ephemeral-alpha" = hetzner-ephemeral-alpha.config.system.build.kexecTree;
+          "kaakkuri-ephemeral-alpha" = kaakkuri-ephemeral-alpha.config.system.build.kexecTree;
+          "ponkila-ephemeral-beta" = ponkila-ephemeral-beta.config.system.build.kexecTree;
+          "ponkila-ephemeral-sigma" = ponkila-ephemeral-sigma.config.system.build.kexecTree;
+        });
     };
     flake =
       let
@@ -152,6 +189,7 @@
 
             inputs.agenix-rekey.nixosModules.default
             inputs.agenix.nixosModules.default
+            inputs.cgroup-exporter.nixosModules.default
             inputs.sops-nix.nixosModules.sops
             inputs.wirenix.nixosModules.default
             {
@@ -177,6 +215,7 @@
             inputs.homestakeros-base.nixosModules.kexecTree
             inputs.homestakeros.nixosModules.homestakeros
 
+            inputs.cgroup-exporter.nixosModules.default
             inputs.agenix-rekey.nixosModules.default
             inputs.agenix.nixosModules.default
             inputs.sops-nix.nixosModules.sops
@@ -204,6 +243,8 @@
             inputs.homestakeros-base.nixosModules.kexecTree
             inputs.homestakeros.nixosModules.homestakeros
 
+
+            inputs.cgroup-exporter.nixosModules.default
             inputs.agenix-rekey.nixosModules.default
             inputs.agenix.nixosModules.default
             inputs.sops-nix.nixosModules.sops
@@ -231,6 +272,7 @@
             inputs.homestakeros-base.nixosModules.kexecTree
             inputs.homestakeros.nixosModules.homestakeros
 
+            inputs.cgroup-exporter.nixosModules.default
             inputs.agenix-rekey.nixosModules.default
             inputs.agenix.nixosModules.default
             inputs.wirenix.nixosModules.default

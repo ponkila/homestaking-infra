@@ -1,5 +1,4 @@
 { pkgs
-, config
 , lib
 , ...
 }:
@@ -80,16 +79,14 @@
     nameservers = [ "127.0.0.1:1053" ];
     useDHCP = false;
   };
-  services.coredns = {
+
+  imports = [ ../../nixosModules/mesh.nix ];
+  mesh = {
     enable = true;
-    config = ''
-      .:1053 {
-        forward . 1.1.1.1 {
-          health_check 5s
-        }
-        cache 30
-      }
-    '';
+    endpoint = {
+      ip = "nyt2.ponkila.com";
+      port = 51822;
+    };
   };
 
   environment.systemPackages = with pkgs; [
@@ -103,19 +100,6 @@
       hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINMEbHrkxwZAsdv+V9moza0VTKY97R/qeennww20FUID";
     };
     secrets = { };
-  };
-
-  services.netdata = {
-    enable = true;
-  };
-
-  wirenix = {
-    enable = true;
-    peerName = "ponkila-ephemeral-sigma"; # defaults to hostname otherwise
-    configurer = "networkd"; # defaults to "static", could also be "networkd"
-    keyProviders = [ "agenix-rekey" ]; # could also be ["agenix-rekey"] or ["acl" "agenix-rekey"]
-    secretsDir = ../../nixosModules/wirenix/agenix; # only if you're using agenix-rekey
-    aclConfig = import ../../nixosModules/wirenix/acl.nix;
   };
 
   system.stateVersion = "25.05";
