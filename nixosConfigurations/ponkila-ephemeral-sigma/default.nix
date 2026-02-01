@@ -57,8 +57,12 @@
         linkConfig.RequiredForOnline = "routable";
         matchConfig.Name = "enp1s0";
         networkConfig = {
-          DHCP = "ipv4";
+          DHCP = "yes";
           IPv6AcceptRA = true;
+          IPv6PrivacyExtensions = "prefer-public";
+        };
+        dhcpV6Config = {
+          DUIDType = "link-layer";
         };
         dns = [ "127.0.0.1:1053" ];
       };
@@ -76,6 +80,9 @@
   };
   networking = {
     firewall.allowedUDPPorts = [ 51822 ];
+    interfaces."enp1s0".allowedTCPPorts = [
+      9101 # IPv6 resolver for router
+    ];
     nameservers = [ "127.0.0.1:1053" ];
     useDHCP = false;
   };
@@ -94,6 +101,19 @@
   ];
 
   # Secrets
+  systemd.services.ipv6-exporter = {
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network.target" ];
+
+    script = ''
+      ${pkgs.socat}/bin/socat -T 1 TCP-LISTEN:9101,reuseaddr,fork EXEC:"${pkgs.writeShellScript "ipv6-response" ''
+        IP=$(${pkgs.iproute2}/bin/ip -j -6 addr show dev enp1s0 scope global | \
+             ${pkgs.jq}/bin/jq -r '.[0].addr_info[] | select(.prefixlen == 128 and (.local | startswith("2001:"))) | .local')
+        echo -e "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nConnection: close\r\n\r\n$IP"
+      ''}"
+    '';
+  };
+
   age = {
     rekey = {
       agePlugins = [ pkgs.age-plugin-fido2-hmac ];
