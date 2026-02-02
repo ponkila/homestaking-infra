@@ -61,10 +61,10 @@ in
     wirenix = {
       inherit aclConfig;
       enable = true;
-      configurer = "networkd"; # defaults to "static", could also be "networkd"
-      keyProviders = [ "agenix-rekey" ]; # could also be ["agenix-rekey"] or ["acl" "agenix-rekey"]
+      configurer = "networkd";
+      keyProviders = [ "agenix-rekey" ];
       peerName = config.networking.hostName;
-      secretsDir = ./wirenix/agenix; # only if you're using agenix-rekey
+      secretsDir = ./wirenix/agenix;
     };
     systemd.network.enable = true;
 

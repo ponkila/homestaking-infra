@@ -62,20 +62,20 @@ in
       dataDir = "/var/mnt/nvme/ethereum/mainnet/besu";
       jwtSecretFile = "/var/mnt/nvme/ethereum/mainnet/jwt.hex";
       extraOptions = [
-        "--host-allowlist=\"*\""
-        "--nat-method=upnp"
-        "--p2p-port=30303"
-        "--sync-mode=SNAP"
-        "--rpc-max-logs-range=60000"
-        "--rpc-max-trace-filter-range=60000"
         "--bonsai-historical-block-limit=60000"
+        "--bonsai-limit-trie-logs-enabled=false"
         "--cache-last-blocks=37000"
+        "--host-allowlist=\"*\""
+        "--logging=WARN"
+        "--metrics-category=BLOCKCHAIN,ETHEREUM,EXECUTORS,JVM,NETWORK,PEERS,PERMISSIONING,PROCESS,PRUNER,RPC,SYNCHRONIZER,TRANSACTION_POOL,KVSTORE_ROCKSDB,KVSTORE_PRIVATE_ROCKSDB,KVSTORE_ROCKSDB_STATS,KVSTORE_PRIVATE_ROCKSDB_STATS"
         "--metrics-host=${config.mesh.address}"
         "--metrics-port=9545"
-        "--metrics-category=BLOCKCHAIN,ETHEREUM,EXECUTORS,JVM,NETWORK,PEERS,PERMISSIONING,PROCESS,PRUNER,RPC,SYNCHRONIZER,TRANSACTION_POOL,KVSTORE_ROCKSDB,KVSTORE_PRIVATE_ROCKSDB,KVSTORE_ROCKSDB_STATS,KVSTORE_PRIVATE_ROCKSDB_STATS"
-        "--bonsai-limit-trie-logs-enabled=false"
+        "--nat-method=upnp"
+        "--p2p-port=30303"
+        "--profile=PERFORMANCE"
         "--rpc-http-api=ETH,NET,WEB3,ADMIN"
-        "--logging=WARN"
+        "--rpc-max-logs-range=60000"
+        "--sync-mode=SNAP"
       ];
     };
 
@@ -114,8 +114,12 @@ in
         linkConfig.RequiredForOnline = "routable";
         matchConfig.Name = "enp6s0";
         networkConfig = {
-          DHCP = "ipv4";
+          DHCP = "yes";
           IPv6AcceptRA = true;
+          IPv6PrivacyExtensions = "prefer-public";
+        };
+        dhcpV6Config = {
+          DUIDType = "link-layer";
         };
       };
       "50-simple" = {
@@ -203,13 +207,6 @@ in
     "Z ${config.services.bitcoind."mainnet".dataDir} - bitcoind-mainnet bitcoind-mainnet -"
     "Z /var/mnt/nvme/bitcoin/fulcrum - bitcoind-mainnet bitcoind-mainnet -"
   ];
-  services.smartd = {
-    enable = true;
-    extraOptions = [
-      "-A /var/log/smartd/"
-      "--interval=600"
-    ];
-  };
 
   age = {
     generators.jwt = { pkgs, ... }: "${pkgs.openssl}/bin/openssl rand -hex 32";

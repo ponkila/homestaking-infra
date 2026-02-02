@@ -1,5 +1,7 @@
 { pkgs
 , lib
+, config
+, outputs
 , ...
 }:
 {
@@ -106,7 +108,6 @@
     lighthouse
   ];
 
-  # Secrets
   services.prometheus = let fixpoint = config.services.prometheus.exporters; in rec {
     enable = true;
     alertmanager = {

@@ -61,29 +61,6 @@ in
       ];
     };
 
-    execution.besu = {
-      enable = false;
-      endpoint = "http://${infra.ip}:8551";
-      dataDir = "/var/mnt/xfs/besu/mainnet";
-      jwtSecretFile = "${config.age.secrets."mainnet-jwt".path}";
-      extraOptions = [
-        "--host-allowlist=\"*\""
-        "--nat-method=upnp"
-        "--p2p-port=30303"
-        "--profile=PERFORMANCE"
-        "--sync-mode=SNAP"
-        "--rpc-max-logs-range=0"
-        "--rpc-max-trace-filter-range=0"
-        "--cache-last-blocks=60000"
-        "--metrics-host=${config.mesh.address}"
-        "--metrics-port=9545"
-        "--metrics-category=BLOCKCHAIN,ETHEREUM,EXECUTORS,JVM,NETWORK,PEERS,PERMISSIONING,PROCESS,PRUNER,RPC,SYNCHRONIZER,TRANSACTION_POOL,KVSTORE_ROCKSDB,KVSTORE_PRIVATE_ROCKSDB,KVSTORE_ROCKSDB_STATS,KVSTORE_PRIVATE_ROCKSDB_STATS"
-        "--bonsai-limit-trie-logs-enabled=false"
-        "--rpc-http-api=ETH,NET,WEB3,ADMIN"
-        "--logging=WARN"
-      ];
-    };
-
     # Addons
     addons.mev-boost = {
       enable = true;
@@ -423,7 +400,6 @@ in
     name = "default";
     options.path = pkgs.linkFarm "grafana-dashboards" [
       { name = "node-exporter.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-node-exporter; }
-      { name = "besu.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-besu; }
       { name = "ebpf-biolatency.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-ebpf-biolatency; }
       { name = "smartctl.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-smartctl; }
       { name = "reth.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-reth; }
