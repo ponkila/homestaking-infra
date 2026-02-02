@@ -22,7 +22,7 @@
     agenix-rekey.url = "github:oddlama/agenix-rekey";
     agenix.url = "github:ryantm/agenix";
     clib.url = "github:nix-community/nixpkgs.lib";
-    devenv.url = "github:cachix/devenv";
+    devshell.url = "github:numtide/devshell";
     flake-parts.url = "github:hercules-ci/flake-parts";
     homestakeros-base.inputs.nixpkgs.follows = "nixpkgs";
     homestakeros-base.url = "github:ponkila/HomestakerOS?dir=nixosModules/base";
@@ -34,6 +34,7 @@
     wirenix.url = "sourcehut:~msalerno/wirenix";
     ethereum-nix-tip.url = "github:nix-community/ethereum.nix";
     cgroup-exporter.url = "github:arianvp/cgroup-exporter";
+    git-hooks-nix.url = "github:cachix/git-hooks.nix";
   };
 
   # Add the inputs declared above to the argument attribute set
@@ -42,8 +43,9 @@
     systems = inputs.nixpkgs.lib.systems.flakeExposed;
     imports = [
       inputs.agenix-rekey.flakeModule
-      inputs.devenv.flakeModule
       inputs.treefmt-nix.flakeModule
+      inputs.devshell.flakeModule
+      inputs.git-hooks-nix.flakeModule
     ];
 
     perSystem = { pkgs, config, system, inputs', lib, ... }: {
@@ -72,44 +74,45 @@
 
       # Development shell
       # Accessible trough 'nix develop .# --impure' or 'direnv allow'
-      devenv.shells = {
-        default = {
-          packages = with pkgs; [
-            config.agenix-rekey.package
-            jq
-            config.packages.nsq
-            sops
-            ssh-to-age
-          ];
-          env = {
-            NIX_CONFIG = ''
+      devshells.default = {
+        packages = with pkgs; [
+          config.agenix-rekey.package
+          jq
+          sops
+          ssh-to-age
+        ];
+        env = [
+          {
+            name = "NIX_CONFIG";
+            value = ''
               accept-flake-config = true
               extra-experimental-features = flakes nix-command
               warn-dirty = false
             '';
-          };
-          enterShell = ''
-            cat <<INFO
+          }
+        ];
+        commands = [
+          {
+            name = "lens";
+            help = "Update web UI assets";
+            command = ''
+              nix eval --no-warn-dirty --json github:ponkila/homestakeros#schema | jq > nixosModules/homestakeros/options.json \
+              && nix run --no-warn-dirty github:ponkila/homestakeros#update-json
+            '';
+          }
+          {
+            name = "nsq";
+            help = "Get and update the nix-store queries";
+            command = "${config.packages.nsq}/bin/nsq";
+          }
+        ];
+      };
 
-            ### homestaking-infra ###
-
-            Available commands:
-
-              nsq         : Get and update the nix-store queries
-              lens        : Update web UI assets
-
-            INFO
-          '';
-          pre-commit.hooks = {
-            nixpkgs-fmt.enable = true;
-            shellcheck.enable = true;
-          };
-          # Workaround for https://github.com/cachix/devenv/issues/760
-          containers = pkgs.lib.mkForce { };
-          scripts.lens.exec = ''
-            nix eval --no-warn-dirty --json github:ponkila/homestakeros#schema | jq > nixosModules/homestakeros/options.json \
-            && nix run --no-warn-dirty github:ponkila/homestakeros#update-json
-          '';
+      pre-commit = {
+        check.enable = true;
+        settings.hooks = {
+          nixpkgs-fmt.enable = true;
+          shellcheck.enable = true;
         };
       };
 
