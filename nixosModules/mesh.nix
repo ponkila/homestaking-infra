@@ -76,7 +76,9 @@ in
     services = {
       coredns = {
         enable = true;
+        # Note: etcd is not a hard requirement if it's already on > 3 hosts
         config = ''
+          ${lib.optionalString config.services.etcd.enable ''
           ponkila.nix:1053 {
             etcd {
               path /skydns
@@ -85,6 +87,7 @@ in
             prometheus
             loadbalance
           }
+          ''}
 
           .:1053 {
             forward . 1.1.1.2 2606:4700:4700::1112
