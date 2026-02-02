@@ -287,9 +287,6 @@ in
         3919
         9601
       ];
-      allowedUDPPorts = [
-        51820
-      ];
       interfaces."wg0" = {
         allowedTCPPorts = [
           8545 # eth rpc: ws or http

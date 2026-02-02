@@ -195,7 +195,6 @@ in
       allowedUDPPorts = [
         30303
         8546
-        51821
       ];
       interfaces."simple".allowedTCPPorts = [
         5054 # lighthouse

@@ -68,10 +68,15 @@ in
     };
     systemd.network.enable = true;
 
-    networking.firewall.interfaces."simple".allowedTCPPorts = [
-      9094
-      config.services.prometheus.alertmanager.port
-    ];
+    networking.firewall = {
+      allowedUDPPorts = [
+        config.mesh.endpoint.port
+      ];
+      interfaces."simple".allowedTCPPorts = [
+        9094 # AlertManager cluster port
+        config.services.prometheus.alertmanager.port
+      ];
+    };
 
     services = {
       coredns = {

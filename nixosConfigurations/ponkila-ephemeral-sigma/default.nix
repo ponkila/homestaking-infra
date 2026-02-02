@@ -73,12 +73,9 @@
     };
   };
   networking = {
-    firewall = {
-      allowedUDPPorts = [ 51820 ];
-      interfaces."enp1s0".allowedTCPPorts = [
-        9101 # IPv6 resolver for router
-      ];
-    };
+    firewall.interfaces."enp1s0".allowedTCPPorts = [
+      9101 # IPv6 resolver for router
+    ];
     nameservers = [ "127.0.0.1:1053" ];
     useDHCP = false;
   };
@@ -115,6 +112,21 @@
       "ntp1.hetzner.de"
       "time.mikes.fi"
     ];
+  };
+
+  containers.lighthouse = {
+    privateNetwork = false;
+    config = { ... }: {
+
+      environment.systemPackages = with pkgs; [
+        lighthouse
+        curl
+      ];
+
+      services.journald.forwardToSyslog = true;
+
+      system.stateVersion = "25.11";
+    };
   };
 
   services.prometheus = let fixpoint = config.services.prometheus.exporters; in rec {
