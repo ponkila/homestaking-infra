@@ -108,6 +108,15 @@
     lighthouse
   ];
 
+  services.chrony = {
+    enable = true;
+    servers = [
+      "time.cloudflare.com"
+      "ntp1.hetzner.de"
+      "time.mikes.fi"
+    ];
+  };
+
   services.prometheus = let fixpoint = config.services.prometheus.exporters; in rec {
     enable = true;
     alertmanager = {

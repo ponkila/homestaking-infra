@@ -148,6 +148,14 @@ in
     nameservers = [ "localhost:1053" ];
     useDHCP = false;
   };
+  services.chrony = {
+    enable = true;
+    servers = [
+      "time.cloudflare.com"
+      "ntp1.hetzner.de"
+      "time.mikes.fi"
+    ];
+  };
 
   services.bitcoind."mainnet" = {
     enable = true;
