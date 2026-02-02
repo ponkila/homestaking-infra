@@ -154,6 +154,9 @@ in
       "-txindex=1"
       "-loglevelalways=1"
       "-logtimestamps=0"
+      "-onlynet=ipv4"
+      "-onlynet=ipv6"
+      "-listen=0"
     ];
     rpc = {
       port = 8332;
@@ -164,27 +167,35 @@ in
     };
   };
 
-  systemd.services.fulcrum = {
-    enable = true;
+  systemd.services.fulcrum =
+    let
+      cfg = pkgs.writeText "fulcum.conf" ''
+        peering = false
+      '';
+    in
+    {
+      enable = true;
 
-    description = "fulcrum rpc";
-    requires = [ "wg-quick-wg0.service" "bitcoind-mainnet.service" ];
-    after = [ "wg-quick-wg0.service" "bitcoind-mainnet.service" ];
+      description = "fulcrum rpc";
+      requires = [ "wg-quick-wg0.service" "bitcoind-mainnet.service" ];
+      after = [ "wg-quick-wg0.service" "bitcoind-mainnet.service" ];
 
-    script = ''${pkgs.fulcrum}/bin/Fulcrum \
+      script = ''${pkgs.fulcrum}/bin/Fulcrum \
       --datadir /var/mnt/nvme/bitcoin/fulcrum \
       --tcp ${infra.ip}:50001 \
       --stats 127.0.0.1:4224 \
       --bitcoind 127.0.0.1:8332 \
-      --rpcuser core
+      --rpcuser core \
+      --ts-format none \
+      ${cfg}
     '';
-    serviceConfig.Restart = "on-failure";
-    serviceConfig.User = "bitcoind-mainnet";
-    serviceConfig.Group = "bitcoind-mainnet";
-    serviceConfig.EnvironmentFile = config.age.secrets.bitcoinConf.path;
+      serviceConfig.Restart = "on-failure";
+      serviceConfig.User = "bitcoind-mainnet";
+      serviceConfig.Group = "bitcoind-mainnet";
+      serviceConfig.EnvironmentFile = config.age.secrets.bitcoinConf.path;
 
-    wantedBy = [ "multi-user.target" ];
-  };
+      wantedBy = [ "multi-user.target" ];
+    };
 
   systemd.tmpfiles.rules = [
     "d ${config.services.etcd.dataDir} 0755 etcd etcd -" # upsert directory
