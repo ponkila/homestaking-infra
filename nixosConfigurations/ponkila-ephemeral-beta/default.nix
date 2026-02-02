@@ -294,7 +294,7 @@ in
             telegram_configs = [{
               send_resolved = true;
               bot_token_file = "/var/mnt/xfs/secrets/telegram.txt";
-              chat_id = -4721018666;
+              chat_id = -1003849721555;
             }];
           }
         ];
