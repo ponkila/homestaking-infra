@@ -230,20 +230,72 @@ in
         sources.journald = {
           type = "journald";
         };
-        transforms.journald-grafana = {
-          type = "remap";
+        # https://datatracker.ietf.org/doc/html/rfc5424#section-6.2.1
+        transforms.syslog_facility = {
+          type = "exclusive_route";
           inputs = [ "journald" ];
-          source = ''
-            .service_name = ._SYSTEMD_UNIT
-          '';
+          routes = [
+            {
+              name = "kernel";
+              condition = ''
+                .SYSLOG_FACILITY == "0"
+              '';
+            }
+            {
+              name = "systemd";
+              condition = ''
+                .SYSLOG_FACILITY == "3"
+              '';
+            }
+          ];
         };
-        sinks.loki = {
+        transforms.syslog_kernel = {
+          type = "exclusive_route";
+          inputs = [ "syslog_facility.kernel" ];
+          routes = [
+            {
+              # https://www.kernel.org/doc/html/v5.8/firmware-guide/acpi/apei/output_format.html
+              name = "APEI";
+              condition = ''
+                contains(string!(.message), "[Hardware Error]")
+              '';
+            }
+          ];
+        };
+        sinks.loki_systemd = {
           type = "loki";
-          inputs = [ "journald-grafana" ];
+          inputs = [ "syslog_facility.systemd" ];
           endpoint = "http://localhost:${toString config.services.loki.configuration.server.http_listen_port}";
           encoding.codec = "text";
           labels = {
             service = "{{ _SYSTEMD_UNIT }}";
+          };
+        };
+        sinks.loki_unmatched = {
+          type = "loki";
+          inputs = [ "syslog_facility._unmatched" ];
+          endpoint = "http://localhost:${toString config.services.loki.configuration.server.http_listen_port}";
+          encoding.codec = "text";
+          labels = {
+            service = "unknown";
+          };
+        };
+        sinks.loki_apei = {
+          type = "loki";
+          inputs = [ "syslog_kernel.APEI" ];
+          endpoint = "http://localhost:${toString config.services.loki.configuration.server.http_listen_port}";
+          encoding.codec = "text";
+          labels = {
+            service = "APEI";
+          };
+        };
+        sinks.loki_kernel_unmatched = {
+          type = "loki";
+          inputs = [ "syslog_kernel._unmatched" ];
+          endpoint = "http://localhost:${toString config.services.loki.configuration.server.http_listen_port}";
+          encoding.codec = "text";
+          labels = {
+            service = "kernel";
           };
         };
       };
