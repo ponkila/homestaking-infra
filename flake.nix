@@ -32,7 +32,6 @@
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     wirenix.url = "sourcehut:~msalerno/wirenix";
-    ethereum-nix-tip.url = "github:nix-community/ethereum.nix";
     cgroup-exporter.url = "github:arianvp/cgroup-exporter";
     git-hooks-nix.url = "github:cachix/git-hooks.nix";
   };
@@ -43,9 +42,9 @@
     systems = inputs.nixpkgs.lib.systems.flakeExposed;
     imports = [
       inputs.agenix-rekey.flakeModule
-      inputs.treefmt-nix.flakeModule
       inputs.devshell.flakeModule
       inputs.git-hooks-nix.flakeModule
+      inputs.treefmt-nix.flakeModule
     ];
 
     perSystem = { pkgs, config, system, inputs', lib, ... }: {
@@ -124,7 +123,7 @@
         in
         {
           "nsq" = pkgs.callPackage ./packages/nsq { };
-          "reth-tip" = inputs'.ethereum-nix-tip.packages.reth.overrideAttrs (_: {
+          "reth" = pkgs.reth.overrideAttrs (_: {
             cargoBuildType = "maxperf";
           });
           "acl" = pkgs.writeText "acl.nix"

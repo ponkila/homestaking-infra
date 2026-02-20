@@ -116,20 +116,22 @@ in
     {
       enable = true;
 
-      script = ''${outputs.packages.x86_64-linux.reth-tip}/bin/reth node \
-        --chain mainnet \
-        --metrics 127.0.0.1:7384 \
-        --authrpc.jwtsecret ${config.age.secrets."mainnet-jwt".path} \
-        --datadir ${baseDir} \
+      script = ''${outputs.packages.x86_64-linux.reth}/bin/reth node \
         --authrpc.addr ${infra.ip} \
+        --authrpc.jwtsecret ${config.age.secrets."mainnet-jwt".path} \
         --authrpc.port 8551 \
-        --datadir.static-files ${baseDir}/static-files \
-        --datadir.pprof-dumps ${baseDir}/pprof-dumps \
+        --chain mainnet \
         --color never \
-        --tracing-otlp=http://localhost:4318/v1/traces \
-        --engine.state-provider-metrics \
+        --datadir ${baseDir} \
+        --datadir.pprof-dumps ${baseDir}/pprof-dumps \
+        --datadir.static-files ${baseDir}/static-files \
         --engine.persistence-threshold 128 \
+        --engine.state-provider-metrics \
         --http --http.api all --http.addr ${infra.ip} \
+        --metrics 127.0.0.1:7384 \
+        --rpc.max-blocks-per-filter 360000 \
+        --rpc.max-logs-per-response 360000 \
+        --tracing-otlp=http://localhost:4318/v1/traces \
         --ws --ws.addr ${infra.ip} --ws.origins "*" --ws.api all
       '';
       serviceConfig.Restart = "always";
