@@ -47,7 +47,7 @@
       inputs.treefmt-nix.flakeModule
     ];
 
-    perSystem = { pkgs, config, system, inputs', lib, ... }: {
+    perSystem = { pkgs, config, system, lib, ... }: {
 
       # Overlays
       _module.args.pkgs = import inputs.nixpkgs {
@@ -76,6 +76,7 @@
       devshells.default = {
         packages = with pkgs; [
           config.agenix-rekey.package
+          config.pre-commit.settings.package
           jq
           sops
           ssh-to-age

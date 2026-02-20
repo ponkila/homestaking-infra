@@ -225,7 +225,7 @@ in
       bitcoinConf = {
         rekeyFile = ./secrets/agenix/bitcoin/rpcpassword.age;
         owner = config.services.bitcoind."mainnet".user;
-        group = config.services.bitcoind."mainnet".group;
+        inherit (config.services.bitcoind."mainnet") group;
       };
     };
   };

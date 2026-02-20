@@ -116,7 +116,7 @@
 
   containers.lighthouse = {
     privateNetwork = false;
-    config = { ... }: {
+    config = _: {
 
       environment.systemPackages = with pkgs; [
         lighthouse

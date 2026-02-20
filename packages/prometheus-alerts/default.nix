@@ -2,23 +2,35 @@
 }:
 
 let
-  mkAlert = { name, alerts }:
-    writeText name (builtins.toJSON { groups = alerts; });
+  mkAlert = { name, groups }:
+    writeText name (builtins.toJSON { inherit groups; });
 in
 {
 
   ipmi = mkAlert {
     name = "ipmi-alerts";
-    alerts = [
+    groups = [
+      {
+        name = "sel-recording";
+        rules = [
+          {
+            record = "ipmi_sel_logs_24h";
+            expr = "increase(ipmi_sel_logs_count[24h])";
+          }
+        ];
+      }
       {
         name = "ipmi-alerts";
         rules = [
           {
             alert = "IPMISELNewEntry";
-            expr = ''increase(ipmi_sel_logs_count[5m]) > 0'';
-            "for" = "0m";
+            expr = ''
+              ipmi_sel_logs_24h > 0
+              and on() hour() == 9
+              and on() minute() < 5
+            '';
             labels = {
-              severity = "warning";
+              severity = "info";
             };
             annotations = {
               summary = "New IPMI SEL entry detected";
@@ -31,7 +43,7 @@ in
   };
   rasdaemon = mkAlert {
     name = "rasdaemon-alerts";
-    alerts = [
+    groups = [
       {
         name = "rasdaemon";
         rules = [
@@ -52,7 +64,7 @@ in
   };
   lighthouse = mkAlert {
     name = "lighthouse-alerts";
-    alerts = [
+    groups = [
       {
         name = "lighthouse";
         rules = [
@@ -72,7 +84,7 @@ in
   };
   systemd = mkAlert {
     name = "systemd-alerts";
-    alerts = [
+    groups = [
       {
         name = "systemd";
         rules = [

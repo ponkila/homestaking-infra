@@ -129,7 +129,12 @@ in
       };
     };
 
-    networking.firewall.allowedTCPPorts = [ config.services.grafana.settings.server.http_port ];
+    networking = {
+      firewall = {
+        allowedTCPPorts = [ config.services.grafana.settings.server.http_port ];
+      };
+    };
+
     services.grafana = mkIf cfg.grafana.enable {
       enable = true;
       settings = {
