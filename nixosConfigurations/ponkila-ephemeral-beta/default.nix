@@ -273,6 +273,7 @@ in
       "ntp1.hetzner.de"
       "time.mikes.fi"
     ];
+    autotrimThreshold = 3;
   };
 
   monitoring = {
