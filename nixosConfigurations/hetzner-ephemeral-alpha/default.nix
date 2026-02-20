@@ -73,7 +73,7 @@ in
     podman.enable = true;
     oci-containers.containers = {
       keep-core = {
-        image = "localhost/keep-core/v2.4.1:latest";
+        image = "localhost/keep-core/v2.5.0:latest";
         environmentFiles = [
           config.sops.secrets."keep-network/env".path
         ];
@@ -103,35 +103,9 @@ in
       };
     };
   };
-
-  systemd.services.keep-network = {
-    enable = false;
-
-    description = "keep-network bridge service";
-    requires = [ "caddy.service" "nginx.service" ];
-    after = [ "caddy.service" "nginx.service" ];
-    environment = {
-      GOLOG_LOG_FMT = "json";
-    };
-
-    serviceConfig = {
-      EnvironmentFile = ''${config.sops.secrets."keep-network/env".path}'';
-      Restart = "always";
-      RestartSec = "5s";
-      User = "core";
-      Group = "core";
-      Type = "simple";
-    };
-
-    script = ''/var/mnt/keep-network/v2.4.1/keep-client start \
-      --ethereum.url ws://192.168.100.40:8545 \
-      --ethereum.keyFile /run/secrets/keep-network/operator-key \
-      --bitcoin.electrum.url tcp://192.168.100.40:50001 \
-      --storage.dir /var/mnt/keep-network
-    '';
-
-    wantedBy = [ "multi-user.target" ];
-  };
+  systemd.services.podman-keep-core.preStart = ''
+    ${pkgs.podman}/bin/podman load -i /var/mnt/keep-network/v2.5.0/keep-core-v2.5.0.tar
+  '';
 
   systemd.services.mitmproxy-ponkila = {
 
