@@ -4,36 +4,28 @@
 {
   description = "Ethereum home-staking infrastructure powered by Nix";
 
-  nixConfig = {
-    extra-substituters = [
-      "https://cache.nixos.org"
-      "https://devenv.cachix.org"
-      "https://nix-community.cachix.org"
-    ];
-    extra-trusted-public-keys = [
-      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-      "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
-      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-    ];
-  };
-
   inputs = {
     agenix-rekey.inputs.nixpkgs.follows = "nixpkgs";
     agenix-rekey.url = "github:oddlama/agenix-rekey";
+    agenix.inputs.nixpkgs.follows = "nixpkgs";
     agenix.url = "github:ryantm/agenix";
     clib.url = "github:nix-community/nixpkgs.lib";
-    devshell.url = "github:numtide/devshell";
     flake-parts.url = "github:hercules-ci/flake-parts";
     homestakeros-base.inputs.nixpkgs.follows = "nixpkgs";
     homestakeros-base.url = "github:ponkila/HomestakerOS?dir=nixosModules/base";
+    homestakeros.inputs.nixpkgs.follows = "nixpkgs";
     homestakeros.url = "github:ponkila/HomestakerOS";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+    sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     sops-nix.url = "github:Mic92/sops-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.url = "github:numtide/treefmt-nix";
+    wirenix.inputs.nixpkgs.follows = "nixpkgs";
     wirenix.url = "sourcehut:~msalerno/wirenix";
+    cgroup-exporter.inputs.nixpkgs.follows = "nixpkgs";
     cgroup-exporter.url = "github:arianvp/cgroup-exporter";
-    git-hooks-nix.url = "github:cachix/git-hooks.nix";
+    git-hooks.inputs.nixpkgs.follows = "nixpkgs";
+    git-hooks.url = "github:cachix/git-hooks.nix";
   };
 
   # Add the inputs declared above to the argument attribute set
@@ -42,8 +34,7 @@
     systems = inputs.nixpkgs.lib.systems.flakeExposed;
     imports = [
       inputs.agenix-rekey.flakeModule
-      inputs.devshell.flakeModule
-      inputs.git-hooks-nix.flakeModule
+      inputs.git-hooks.flakeModule
       inputs.treefmt-nix.flakeModule
     ];
 
@@ -71,50 +62,45 @@
         settings.global.excludes = [ "devShells/keep-core/flake.nix" ];
       };
 
-      # Development shell
-      # Accessible trough 'nix develop .# --impure' or 'direnv allow'
-      devshells.default = {
-        packages = with pkgs; [
-          config.agenix-rekey.package
-          config.pre-commit.settings.package
-          jq
-          sops
-          ssh-to-age
-        ];
-        env = [
-          {
-            name = "NIX_CONFIG";
-            value = ''
-              accept-flake-config = true
-              extra-experimental-features = flakes nix-command
-              warn-dirty = false
-            '';
-          }
-        ];
-        commands = [
-          {
-            name = "lens";
-            help = "Update web UI assets";
-            command = ''
-              nix eval --no-warn-dirty --json github:ponkila/homestakeros#schema | jq > nixosModules/homestakeros/options.json \
-              && nix run --no-warn-dirty github:ponkila/homestakeros#update-json
-            '';
-          }
-          {
-            name = "nsq";
-            help = "Get and update the nix-store queries";
-            command = "${config.packages.nsq}/bin/nsq";
-          }
-        ];
+      # Pre-commit hooks
+      pre-commit.check.enable = false;
+      pre-commit.settings.hooks.treefmt = {
+        enable = true;
+        package = config.treefmt.build.wrapper;
       };
 
-      pre-commit = {
-        check.enable = true;
-        settings.hooks = {
-          nixpkgs-fmt.enable = true;
-          shellcheck.enable = true;
+      # Development shell
+      devShells.default =
+        let
+          lens = pkgs.writeShellScriptBin "lens" ''
+            nix eval --no-warn-dirty --json github:ponkila/homestakeros#schema | jq > nixosModules/homestakeros/options.json \
+            && nix run --no-warn-dirty github:ponkila/homestakeros#update-json
+          '';
+          nsq = pkgs.writeShellScriptBin "nsq" ''
+            exec ${config.packages.nsq}/bin/nsq "$@"
+          '';
+        in
+        pkgs.mkShell {
+          packages = [
+            config.agenix-rekey.package
+            config.pre-commit.settings.package
+            lens
+            nsq
+            pkgs.jq
+            pkgs.sops
+            pkgs.ssh-to-age
+          ];
+          shellHook = ''
+            ${config.pre-commit.installationScript}
+            echo ""
+            echo " homestaking-infra devshell"
+            echo ""
+            echo " commands:"
+            echo "   lens  - Update web UI assets"
+            echo "   nsq   - Get and update the nix-store queries"
+            echo ""
+          '';
         };
-      };
 
       # Custom packages, accessible trough 'nix build', 'nix run', etc.
       packages =
