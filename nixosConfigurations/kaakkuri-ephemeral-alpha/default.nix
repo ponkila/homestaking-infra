@@ -131,10 +131,12 @@ in
   networking = {
     firewall = {
       allowedTCPPorts = [
-        50001
-        30303
-        8546
-        9100
+        50001 # fulcrum
+        30303 # besu p2p
+        8546 # besu websocket
+        9100 # prometheus exporters
+        9090 # prometheus ui
+        3000 # grafana
       ];
       allowedUDPPorts = [
         50001
