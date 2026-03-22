@@ -103,6 +103,13 @@ in
         where = "/var/mnt/10-main";
         type = "xfs";
       };
+      "20-ssd" = {
+        enable = true;
+        description = "ssd/single/samsung";
+        what = "/dev/mapper/qvo870-ssd1";
+        where = "/var/mnt/20-ssd";
+        type = "xfs";
+      };
     };
   };
   systemd.services.ssv-node.enable = false;
@@ -162,7 +169,7 @@ in
   services.bitcoind."mainnet" = {
     enable = true;
     prune = "disable";
-    dataDir = "/var/mnt/nvme/bitcoin/bitcoind";
+    dataDir = "/var/mnt/20-ssd/bitcoin/bitcoind";
     extraCmdlineOptions = [
       "-server=1"
       "-txindex=1"
@@ -195,7 +202,7 @@ in
       after = [ "wg-quick-wg0.service" "bitcoind-mainnet.service" ];
 
       script = ''${pkgs.fulcrum}/bin/Fulcrum \
-      --datadir /var/mnt/nvme/bitcoin/fulcrum \
+      --datadir /var/mnt/20-ssd/bitcoin/fulcrum \
       --tcp ${infra.ip}:50001 \
       --stats 127.0.0.1:4224 \
       --bitcoind 127.0.0.1:8332 \
@@ -215,7 +222,7 @@ in
     "d ${config.services.etcd.dataDir} 0755 etcd etcd -" # upsert directory
     "Z ${config.services.etcd.dataDir} - etcd etcd -" # recursively chown to user
     "Z ${config.services.bitcoind."mainnet".dataDir} - bitcoind-mainnet bitcoind-mainnet -"
-    "Z /var/mnt/nvme/bitcoin/fulcrum - bitcoind-mainnet bitcoind-mainnet -"
+    "Z /var/mnt/20-ssd/bitcoin/fulcrum - bitcoind-mainnet bitcoind-mainnet -"
   ];
 
   age = {
