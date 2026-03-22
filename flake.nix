@@ -113,6 +113,26 @@
           "reth" = pkgs.reth.overrideAttrs (_: {
             cargoBuildType = "maxperf";
           });
+          "reth-tip" = pkgs.reth.overrideAttrs (prev: {
+            version = "unstable";
+            src = pkgs.fetchFromGitHub {
+              owner = "paradigmxyz";
+              repo = prev.pname;
+              rev = "6fb533778636ff7f277c89199caf49041a7bf397";
+              hash = "sha256-WN0UfKS7/ArZekk47lYvl5hr/TyhV//oh5+VbdBPxIo=";
+            };
+            cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
+              inherit (prev) pname;
+              version = "unstable";
+              src = pkgs.fetchFromGitHub {
+                owner = "paradigmxyz";
+                repo = prev.pname;
+                rev = "6fb533778636ff7f277c89199caf49041a7bf397";
+                hash = "sha256-WN0UfKS7/ArZekk47lYvl5hr/TyhV//oh5+VbdBPxIo=";
+              };
+              hash = "sha256-NEqfWPJz2UOHx0vqF3laBnborfAZdFdgC3idG8F97Gk=";
+            };
+          });
           "acl" = pkgs.writeText "acl.nix"
             (builtins.toJSON (import ./nixosModules/wirenix/acl.nix {
               inherit (flake) nixosConfigurations;

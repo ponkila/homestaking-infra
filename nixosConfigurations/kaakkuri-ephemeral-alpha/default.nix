@@ -57,7 +57,7 @@ in
 
     # Besu options
     execution.besu = {
-      enable = true;
+      enable = false;
       endpoint = "http://${infra.ip}:8551";
       dataDir = "/var/mnt/nvme/ethereum/mainnet/besu";
       jwtSecretFile = "/var/mnt/nvme/ethereum/mainnet/jwt.hex";
@@ -330,8 +330,8 @@ in
       in
       srapeConfigs' ++ [
         {
-          job_name = "besu";
-          static_configs = [{ targets = [ "${config.mesh.address}:9545" ]; }];
+          job_name = "reth";
+          static_configs = [{ targets = [ "127.0.0.1:7384" ]; }];
         }
         {
           job_name = "lighthouse";
@@ -358,12 +358,12 @@ in
   services.grafana.provision.dashboards.settings.providers = [{
     name = "default";
     options.path = pkgs.linkFarm "grafana-dashboards" [
-      { name = "node-exporter.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-node-exporter; }
-      { name = "besu.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-besu; }
-      { name = "ebpf-biolatency.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-ebpf-biolatency; }
-      { name = "smartctl.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-smartctl; }
-      { name = "etcd.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-etcd; }
       { name = "cgroup.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-cgroup; }
+      { name = "ebpf-biolatency.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-ebpf-biolatency; }
+      { name = "etcd.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-etcd; }
+      { name = "node-exporter.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-node-exporter; }
+      { name = "reth.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-reth; }
+      { name = "smartctl.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-smartctl; }
     ];
   }];
 
@@ -389,4 +389,8 @@ in
   };
 
   system.stateVersion = "25.05";
+
+  environment.systemPackages = [
+    outputs.packages.x86_64-linux.reth-tip
+  ];
 }
