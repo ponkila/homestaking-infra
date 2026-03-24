@@ -113,25 +113,27 @@
           "reth" = pkgs.reth.overrideAttrs (_: {
             cargoBuildType = "maxperf";
           });
-          "reth-tip" = pkgs.reth.overrideAttrs (prev: {
+          "reth-tip" = pkgs.reth.overrideAttrs (prev: rec {
             version = "unstable";
-            src = pkgs.fetchFromGitHub {
-              owner = "paradigmxyz";
-              repo = prev.pname;
+            cargoBuildType = "maxperf";
+            src = pkgs.fetchgit {
+              url = "https://github.com/paradigmxyz/reth";
               rev = "6fb533778636ff7f277c89199caf49041a7bf397";
-              hash = "sha256-WN0UfKS7/ArZekk47lYvl5hr/TyhV//oh5+VbdBPxIo=";
+              hash = "sha256-R9XgjIQlX0+v7vy1LZnZx9TXDkOU2GuHpVXd1xk3hLY=";
+              leaveDotGit = true;
+              postFetch = ''
+                git -C "$out" rev-parse HEAD > "$out/COMMIT"
+                rm -rf "$out/.git"
+              '';
             };
             cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
               inherit (prev) pname;
-              version = "unstable";
-              src = pkgs.fetchFromGitHub {
-                owner = "paradigmxyz";
-                repo = prev.pname;
-                rev = "6fb533778636ff7f277c89199caf49041a7bf397";
-                hash = "sha256-WN0UfKS7/ArZekk47lYvl5hr/TyhV//oh5+VbdBPxIo=";
-              };
+              inherit src version;
               hash = "sha256-NEqfWPJz2UOHx0vqF3laBnborfAZdFdgC3idG8F97Gk=";
             };
+            preBuild = ''
+              export VERGEN_GIT_SHA=$(cat COMMIT)
+            '';
           });
           "acl" = pkgs.writeText "acl.nix"
             (builtins.toJSON (import ./nixosModules/wirenix/acl.nix {
