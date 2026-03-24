@@ -114,6 +114,37 @@ in
   };
   systemd.services.ssv-node.enable = false;
 
+  systemd.services.reth =
+    let
+      baseDir = "/var/mnt/nvme/ethereum/mainnet/reth";
+    in
+    {
+      enable = true;
+
+      script = ''${outputs.packages.x86_64-linux.reth-tip}/bin/reth node \
+        --authrpc.addr ${infra.ip} \
+        --authrpc.jwtsecret /var/mnt/nvme/ethereum/mainnet/jwt.hex \
+        --authrpc.port 8551 \
+        --chain mainnet \
+        --color never \
+        --datadir ${baseDir} \
+        --datadir.pprof-dumps ${baseDir}/pprof_dumps \
+        --datadir.static-files ${baseDir}/static_files \
+        --engine.persistence-threshold 128 \
+        --engine.state-provider-metrics \
+        --http --http.api all --http.addr ${infra.ip} \
+        --metrics 127.0.0.1:7384 \
+        --rpc-cache.max-receipts 60000 \
+        --rpc.max-blocks-per-filter 360000 \
+        --rpc.max-logs-per-response 360000 \
+        --storage.v2 true \
+        --ws --ws.addr ${infra.ip} --ws.origins "*" --ws.api all
+      '';
+      serviceConfig.Restart = "always";
+
+      wantedBy = [ "multi-user.target" ];
+    };
+
   systemd.network = {
     enable = true;
     networks = {
