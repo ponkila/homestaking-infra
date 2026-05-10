@@ -73,7 +73,7 @@ in
     podman.enable = true;
     oci-containers.containers = {
       keep-core = {
-        image = "localhost/keep-core/v2.5.0:latest";
+        image = "localhost/keep-core/v2.5.2:latest";
         environmentFiles = [
           config.sops.secrets."keep-network/env".path
         ];
@@ -104,7 +104,7 @@ in
     };
   };
   systemd.services.podman-keep-core.preStart = ''
-    ${pkgs.podman}/bin/podman load -i /var/mnt/keep-network/v2.5.0/keep-core-v2.5.0.tar
+    ${pkgs.podman}/bin/podman load -i /var/mnt/keep-network/v2.5.2/keep-core-v2.5.2.tar
   '';
 
   systemd.services.mitmproxy-ponkila = {
