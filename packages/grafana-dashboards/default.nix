@@ -98,4 +98,13 @@ in
     name = "cgroup";
     src = ./cgroup-services-dashboard.json;
   };
+  coredns = processDashboard {
+    name = "coredns";
+    src = fetchGrafanaDashboard {
+      id = 15762;
+      revision = 22;
+      sha256 = "sha256-pYYIAoDAkRlU7QOUuDSRlmQjaAV/99AQ29jM1djh0b8=";
+      name = "coredns.json";
+    };
+  };
 }

@@ -89,7 +89,6 @@ in
               path /skydns
               endpoint ${lib.concatStringsSep " " config.services.etcd.listenClientUrls}
             }
-            prometheus
             loadbalance
           }
           ''}
@@ -97,6 +96,9 @@ in
           .:1053 {
             forward . 1.1.1.2 2606:4700:4700::1112
             cache
+            prometheus
+            log
+            errors
           }
         '';
       };
@@ -155,6 +157,10 @@ in
             {
               inherit static_configs;
               job_name = "alertmanager";
+            }
+            {
+              job_name = "coredns";
+              static_configs = [{ targets = [ "127.0.0.1:9153" ]; }];
             }
             (mkIf config.services.etcd.enable {
               job_name = "etcd";
