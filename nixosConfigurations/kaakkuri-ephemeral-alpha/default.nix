@@ -121,7 +121,7 @@ in
     {
       enable = true;
 
-      script = ''${outputs.packages.x86_64-linux.reth-tip}/bin/reth node \
+      script = ''${outputs.packages.x86_64-linux.reth}/bin/reth node \
         --authrpc.addr ${infra.ip} \
         --authrpc.jwtsecret /var/mnt/nvme/ethereum/mainnet/jwt.hex \
         --authrpc.port 8551 \
@@ -422,7 +422,4 @@ in
 
   system.stateVersion = "25.05";
 
-  environment.systemPackages = [
-    outputs.packages.x86_64-linux.reth-tip
-  ];
 }
