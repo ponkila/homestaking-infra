@@ -79,6 +79,16 @@ in
     };
 
     services = {
+      chrony = {
+        # mesh networking benefits from more precise clock
+        enable = true;
+        servers = [
+          "time.cloudflare.com"
+          "ntp1.hetzner.de"
+          "time.mikes.fi"
+        ];
+        autotrimThreshold = 3; # save time occasionally to RTC
+      };
       coredns = {
         enable = true;
         # Note: etcd is not a hard requirement if it's already on > 3 hosts

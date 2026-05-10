@@ -266,16 +266,6 @@ in
     };
   };
 
-  services.chrony = {
-    enable = true;
-    servers = [
-      "time.cloudflare.com"
-      "ntp1.hetzner.de"
-      "time.mikes.fi"
-    ];
-    autotrimThreshold = 3;
-  };
-
   monitoring = {
     enable = true;
     grafana = {

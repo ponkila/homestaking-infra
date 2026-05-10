@@ -60,15 +60,6 @@ in
     '';
   };
 
-  services.chrony = {
-    enable = true;
-    servers = [
-      "time.cloudflare.com"
-      "ntp1.hetzner.de"
-      "time.mikes.fi"
-    ];
-  };
-
   virtualisation = {
     podman.enable = true;
     oci-containers.containers = {
