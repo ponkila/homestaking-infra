@@ -364,12 +364,19 @@ in
     };
     scrapeConfigs =
       let
+        defaultConfig = job_name: {
+          inherit job_name;
+          static_configs = [{ targets = [ "localhost:${port job_name}" ]; }];
+        };
+        overrides = {
+          ipmi = defaultConfig "ipmi" // {
+            scrape_interval = "120s";
+            scrape_timeout = "60s";
+          };
+        };
         port = n: toString fixpoint.${n}.port;
         srapeConfigs' = lib.mapAttrsToList
-          (job_name: _: {
-            inherit job_name;
-            static_configs = [{ targets = [ "localhost:${port job_name}" ]; }];
-          })
+          (job_name: _: overrides.${job_name} or (defaultConfig job_name))
           exporters; # <- exporters defined above
       in
       srapeConfigs' ++ [
