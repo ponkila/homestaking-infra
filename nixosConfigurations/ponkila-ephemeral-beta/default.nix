@@ -90,6 +90,7 @@ in
     enable = true;
     prune = "disable";
     dataDir = "/var/mnt/kioxia/bitcoin/bitcoind";
+    dbCache = 1024;
     extraCmdlineOptions = [
       "-server=1"
       "-txindex=1"
