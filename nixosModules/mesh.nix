@@ -104,7 +104,9 @@ in
           ''}
 
           .:1053 {
-            forward . 1.1.1.2 2606:4700:4700::1112
+            forward . tls://1.1.1.2 tls://2606:4700:4700::1112 {
+              tls_servername cloudflare-dns.com
+            }
             cache
             prometheus
             log

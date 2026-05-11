@@ -161,10 +161,14 @@ in
         dhcpV6Config = {
           DUIDType = "link-layer";
         };
+        dns = [ "127.0.0.1:1053" ];
       };
       "50-simple" = {
         dns = [ "127.0.0.1:1053" ];
         domains = [ "ponkila.nix" ];
+        networkConfig = {
+          DNSDefaultRoute = false;
+        };
       };
     };
   };
@@ -392,6 +396,7 @@ in
     name = "default";
     options.path = pkgs.linkFarm "grafana-dashboards" [
       { name = "cgroup.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-cgroup; }
+      { name = "coredns.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-coredns; }
       { name = "ebpf-biolatency.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-ebpf-biolatency; }
       { name = "etcd.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-etcd; }
       { name = "node-exporter.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-node-exporter; }

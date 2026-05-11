@@ -182,10 +182,14 @@ in
           IPv6AcceptRA = true;
         };
         address = [ "192.168.17.20/24" ];
+        dns = [ "127.0.0.1:1053" ];
       };
       "50-simple" = {
         dns = [ "127.0.0.1:1053" ];
         domains = [ "ponkila.nix" ];
+        networkConfig = {
+          DNSDefaultRoute = false;
+        };
       };
     };
   };
@@ -409,12 +413,13 @@ in
   services.grafana.provision.dashboards.settings.providers = [{
     name = "default";
     options.path = pkgs.linkFarm "grafana-dashboards" [
-      { name = "node-exporter.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-node-exporter; }
-      { name = "ebpf-biolatency.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-ebpf-biolatency; }
-      { name = "smartctl.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-smartctl; }
-      { name = "reth.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-reth; }
-      { name = "etcd.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-etcd; }
       { name = "cgroup.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-cgroup; }
+      { name = "coredns.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-coredns; }
+      { name = "ebpf-biolatency.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-ebpf-biolatency; }
+      { name = "etcd.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-etcd; }
+      { name = "node-exporter.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-node-exporter; }
+      { name = "reth.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-reth; }
+      { name = "smartctl.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-smartctl; }
     ];
   }];
 
