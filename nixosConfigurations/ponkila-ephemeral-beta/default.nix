@@ -125,6 +125,7 @@ in
         --datadir ${baseDir} \
         --datadir.pprof-dumps ${baseDir}/pprof-dumps \
         --datadir.static-files ${baseDir}/static-files \
+        --engine.persistence-backpressure-threshold 160 \
         --engine.persistence-threshold 128 \
         --engine.state-provider-metrics \
         --http --http.api all --http.addr ${infra.ip} \

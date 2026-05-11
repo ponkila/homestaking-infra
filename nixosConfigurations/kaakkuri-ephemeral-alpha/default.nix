@@ -130,6 +130,7 @@ in
         --datadir ${baseDir} \
         --datadir.pprof-dumps ${baseDir}/pprof_dumps \
         --datadir.static-files ${baseDir}/static_files \
+        --engine.persistence-backpressure-threshold 160 \
         --engine.persistence-threshold 128 \
         --engine.state-provider-metrics \
         --http --http.api all --http.addr ${infra.ip} \
