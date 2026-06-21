@@ -4,266 +4,290 @@
 {
   description = "Ethereum home-staking infrastructure powered by Nix";
 
-  nixConfig = {
-    extra-substituters = [
-      "https://cache.nixos.org"
-      "https://devenv.cachix.org"
-      "https://nix-community.cachix.org"
-    ];
-    extra-trusted-public-keys = [
-      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-      "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
-      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-    ];
-  };
-
   inputs = {
     agenix-rekey.inputs.nixpkgs.follows = "nixpkgs";
     agenix-rekey.url = "github:oddlama/agenix-rekey";
+    agenix.inputs.nixpkgs.follows = "nixpkgs";
     agenix.url = "github:ryantm/agenix";
     clib.url = "github:nix-community/nixpkgs.lib";
-    devenv.url = "github:cachix/devenv";
     flake-parts.url = "github:hercules-ci/flake-parts";
     homestakeros-base.inputs.nixpkgs.follows = "nixpkgs";
     homestakeros-base.url = "github:ponkila/HomestakerOS?dir=nixosModules/base";
+    homestakeros.inputs.nixpkgs.follows = "nixpkgs";
     homestakeros.url = "github:ponkila/HomestakerOS";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+    sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     sops-nix.url = "github:Mic92/sops-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.url = "github:numtide/treefmt-nix";
+    wirenix.inputs.nixpkgs.follows = "nixpkgs";
     wirenix.url = "sourcehut:~msalerno/wirenix";
+    cgroup-exporter.inputs.nixpkgs.follows = "nixpkgs";
+    cgroup-exporter.url = "github:arianvp/cgroup-exporter";
+    git-hooks.inputs.nixpkgs.follows = "nixpkgs";
+    git-hooks.url = "github:cachix/git-hooks.nix";
   };
 
   # Add the inputs declared above to the argument attribute set
-  outputs = { self, ... }@inputs:
-    inputs.flake-parts.lib.mkFlake { inherit inputs; } rec {
-      systems = inputs.nixpkgs.lib.systems.flakeExposed;
-      imports = [
-        inputs.agenix-rekey.flakeModule
-        inputs.devenv.flakeModule
-        inputs.treefmt-nix.flakeModule
-      ];
+  outputs = { self, ... }@inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } rec {
 
-      perSystem =
-        { self'
-        , pkgs
-        , lib
-        , config
-        , system
-        , ...
-        }: {
-          # Overlays
-          _module.args.pkgs = import inputs.nixpkgs {
-            inherit system;
-            overlays = [
-              inputs.homestakeros.overlays.default
-            ];
-            config = { };
-          };
+    systems = inputs.nixpkgs.lib.systems.flakeExposed;
+    imports = [
+      inputs.agenix-rekey.flakeModule
+      inputs.git-hooks.flakeModule
+      inputs.treefmt-nix.flakeModule
+    ];
 
-          # Nix code formatter, accessible through 'nix fmt'
-          treefmt.config = {
-            projectRootFile = "flake.nix";
-            flakeFormatter = true;
-            flakeCheck = true;
-            programs = {
-              deadnix.enable = true;
-              nixpkgs-fmt.enable = true;
-              statix.enable = true;
-            };
-            settings.global.excludes = [ "devShells/keep-core/flake.nix" ];
-          };
+    perSystem = { pkgs, config, system, lib, ... }: {
 
-          # Development shell
-          # Accessible trough 'nix develop .# --impure' or 'direnv allow'
-          devenv.shells = {
-            default = {
-              packages = with pkgs; [
-                config.agenix-rekey.package
-                jq
-                self'.packages.nsq
-                sops
-                ssh-to-age
-              ];
-              env = {
-                NIX_CONFIG = ''
-                  accept-flake-config = true
-                  extra-experimental-features = flakes nix-command
-                  warn-dirty = false
-                '';
-              };
-              enterShell = ''
-                cat <<INFO
+      # Overlays
+      _module.args.pkgs = import inputs.nixpkgs {
+        inherit system;
+        overlays = [
+          inputs.homestakeros.overlays.default
+        ];
+        config = { };
+      };
 
-                ### homestaking-infra ###
-
-                Available commands:
-
-                  nsq         : Get and update the nix-store queries
-                  lens        : Update web UI assets
-
-                INFO
-              '';
-              pre-commit.hooks = {
-                nixpkgs-fmt.enable = true;
-                shellcheck.enable = true;
-              };
-              # Workaround for https://github.com/cachix/devenv/issues/760
-              containers = pkgs.lib.mkForce { };
-              scripts.lens.exec = ''
-                nix eval --no-warn-dirty --json github:ponkila/homestakeros#schema | jq > nixosModules/homestakeros/options.json \
-                && nix run --no-warn-dirty github:ponkila/homestakeros#update-json
-              '';
-            };
-          };
-
-          # Custom packages, accessible trough 'nix build', 'nix run', etc.
-          packages =
-            rec {
-              "nsq" = pkgs.callPackage ./packages/nsq { };
-            }
-            # Entrypoint aliases, accessible trough 'nix build'
-            // (with flake.nixosConfigurations; {
-              "hetzner-ephemeral-alpha" = hetzner-ephemeral-alpha.config.system.build.kexecTree;
-              "kaakkuri-ephemeral-alpha" = kaakkuri-ephemeral-alpha.config.system.build.kexecTree;
-              "ponkila-ephemeral-beta" = ponkila-ephemeral-beta.config.system.build.kexecTree;
-              "ponkila-ephemeral-sigma" = ponkila-ephemeral-sigma.config.system.build.kexecTree;
-            });
+      # Nix code formatter, accessible through 'nix fmt'
+      treefmt.config = {
+        projectRootFile = "flake.nix";
+        flakeFormatter = true;
+        flakeCheck = true;
+        programs = {
+          deadnix.enable = true;
+          nixpkgs-fmt.enable = true;
+          statix.enable = true;
         };
-      flake =
+        settings.global.excludes = [ "devShells/keep-core/flake.nix" ];
+      };
+
+      # Pre-commit hooks
+      pre-commit.check.enable = false;
+      pre-commit.settings.hooks.treefmt = {
+        enable = true;
+        package = config.treefmt.build.wrapper;
+      };
+
+      # Development shell
+      devShells.default =
         let
-          inherit (self) outputs;
-          jesse = {
-            identity = ./nixosModules/agenix-rekey/masterIdentities/jesse.hmac;
-            pubkey = "age1fm70hduvuy5mu5n9jhv7l4u6d9pqclj2ef9jq6w2ptpatjsm25ysdx3py9";
-          };
-          juuso = {
-            identity = ./nixosModules/agenix-rekey/masterIdentities/juuso.hmac;
-            pubkey = "age12lz3jyd2weej5c4mgmwlwsl0zmk2tdgvtflctgryx6gjcaf3yfsqgt7rnz";
-          };
+          lens = pkgs.writeShellScriptBin "lens" ''
+            nix eval --no-warn-dirty --json github:ponkila/homestakeros#schema | jq > nixosModules/homestakeros/options.json \
+            && nix run --no-warn-dirty github:ponkila/homestakeros#update-json
+          '';
+          nsq = pkgs.writeShellScriptBin "nsq" ''
+            exec ${config.packages.nsq}/bin/nsq "$@"
+          '';
+        in
+        pkgs.mkShell {
+          packages = [
+            config.agenix-rekey.package
+            config.pre-commit.settings.package
+            lens
+            nsq
+            pkgs.jq
+            pkgs.sops
+            pkgs.ssh-to-age
+          ];
+          shellHook = ''
+            ${config.pre-commit.installationScript}
+            echo ""
+            echo " homestaking-infra devshell"
+            echo ""
+            echo " commands:"
+            echo "   lens  - Update web UI assets"
+            echo "   nsq   - Get and update the nix-store queries"
+            echo ""
+          '';
+        };
 
-          ponkila-ephemeral-beta = {
-            system = "x86_64-linux";
-            specialArgs = { inherit inputs outputs; };
-            modules = [
-              ./nixosConfigurations/ponkila-ephemeral-beta
-              inputs.homestakeros-base.nixosModules.base
-              inputs.homestakeros-base.nixosModules.kexecTree
-              inputs.homestakeros.nixosModules.homestakeros
-
-              inputs.agenix-rekey.nixosModules.default
-              inputs.agenix.nixosModules.default
-              inputs.sops-nix.nixosModules.sops
-              inputs.wirenix.nixosModules.default
-              {
-                nixpkgs.overlays = [
-                  inputs.homestakeros.overlays.default
-                ];
-                boot.loader.grub.enable = false;
-                age.rekey = {
-                  localStorageDir = ./nixosConfigurations/ponkila-ephemeral-beta/secrets/agenix-rekey;
-                  masterIdentities = [{
-                    identity = ./nixosModules/agenix-rekey/masterIdentities/juuso.hmac;
-                    pubkey = "age12lz3jyd2weej5c4mgmwlwsl0zmk2tdgvtflctgryx6gjcaf3yfsqgt7rnz";
-                  }];
-                  storageMode = "local";
-                };
-              }
-            ];
-          };
-
-          kaakkuri-ephemeral-alpha = {
-            system = "x86_64-linux";
-            specialArgs = { inherit inputs outputs; };
-            modules = [
-              ./nixosConfigurations/kaakkuri-ephemeral-alpha
-              inputs.homestakeros-base.nixosModules.base
-              inputs.homestakeros-base.nixosModules.kexecTree
-              inputs.homestakeros.nixosModules.homestakeros
-
-              inputs.agenix-rekey.nixosModules.default
-              inputs.agenix.nixosModules.default
-              inputs.sops-nix.nixosModules.sops
-              inputs.wirenix.nixosModules.default
-              {
-                nixpkgs.overlays = [
-                  inputs.homestakeros.overlays.default
-                ];
-                boot.loader.grub.enable = false;
-                age.rekey = {
-                  localStorageDir = ./nixosConfigurations/kaakkuri-ephemeral-alpha/secrets/agenix-rekey;
-                  masterIdentities = [ jesse juuso ];
-                  storageMode = "local";
-                };
-              }
-            ];
-          };
-
-          hetzner-ephemeral-alpha = {
-            system = "x86_64-linux";
-            specialArgs = { inherit inputs outputs; };
-            modules = [
-              ./nixosConfigurations/hetzner-ephemeral-alpha
-              inputs.homestakeros-base.nixosModules.base
-              inputs.homestakeros-base.nixosModules.kexecTree
-              inputs.homestakeros.nixosModules.homestakeros
-
-              inputs.agenix-rekey.nixosModules.default
-              inputs.agenix.nixosModules.default
-              inputs.sops-nix.nixosModules.sops
-              inputs.wirenix.nixosModules.default
-              {
-                nixpkgs.overlays = [
-                  inputs.homestakeros.overlays.default
-                ];
-                boot.loader.grub.enable = false;
-                age.rekey = {
-                  localStorageDir = ./nixosConfigurations/hetzner-ephemeral-alpha/secrets/agenix-rekey;
-                  masterIdentities = [{
-                    identity = ./nixosModules/agenix-rekey/masterIdentities/juuso.hmac;
-                    pubkey = "age12lz3jyd2weej5c4mgmwlwsl0zmk2tdgvtflctgryx6gjcaf3yfsqgt7rnz";
-                  }];
-                  storageMode = "local";
-                };
-              }
-            ];
-          };
-
-          ponkila-ephemeral-sigma = {
-            system = "x86_64-linux";
-            specialArgs = { inherit inputs outputs; };
-            modules = [
-              ./nixosConfigurations/ponkila-ephemeral-sigma
-              inputs.homestakeros-base.nixosModules.base
-              inputs.homestakeros-base.nixosModules.kexecTree
-              inputs.homestakeros.nixosModules.homestakeros
-
-              inputs.agenix-rekey.nixosModules.default
-              inputs.agenix.nixosModules.default
-              inputs.wirenix.nixosModules.default
-              {
-                nixpkgs.overlays = [
-                  inputs.homestakeros.overlays.default
-                ];
-                boot.loader.grub.enable = false;
-                age.rekey = {
-                  localStorageDir = ./nixosConfigurations/ponkila-ephemeral-sigma/secrets/agenix-rekey;
-                  masterIdentities = [ jesse juuso ];
-                  storageMode = "local";
-                };
-              }
-            ];
-          };
-
+      # Custom packages, accessible trough 'nix build', 'nix run', etc.
+      packages =
+        let
+          dashboards = pkgs.callPackages ./packages/grafana-dashboards { };
+          alerts = pkgs.callPackages ./packages/prometheus-alerts { };
         in
         {
-          # NixOS configuration entrypoints
-          nixosConfigurations = with inputs.nixpkgs.lib; {
-            "hetzner-ephemeral-alpha" = nixosSystem hetzner-ephemeral-alpha;
-            "kaakkuri-ephemeral-alpha" = nixosSystem kaakkuri-ephemeral-alpha;
-            "ponkila-ephemeral-beta" = nixosSystem ponkila-ephemeral-beta;
-            "ponkila-ephemeral-sigma" = nixosSystem ponkila-ephemeral-sigma;
+          "nsq" = pkgs.callPackage ./packages/nsq { };
+          "reth" = pkgs.reth.overrideAttrs (_: {
+            cargoBuildType = "maxperf";
+          });
+          "acl" = pkgs.writeText "acl.nix"
+            (builtins.toJSON (import ./nixosModules/wirenix/acl.nix {
+              inherit (flake) nixosConfigurations;
+              inherit lib;
+              subnetName = "simple";
+            }));
+          # useful to check that each dashboard evaluates
+          "grafana-dashboards-all" = pkgs.linkFarm "grafana-dashboards" (
+            lib.mapAttrsToList
+              (dashboardName: drv: {
+                name = dashboardName;
+                path = drv;
+              })
+              dashboards
+          );
+          "awesome-prometheus-alerts" = pkgs.callPackage ./packages/awesome-prometheus-alerts { };
+          "prometheus-alerts-all" = pkgs.linkFarm "prometheus-alerts" (
+            lib.mapAttrsToList
+              (alertName: drv: {
+                name = alertName;
+                path = drv;
+              })
+              alerts
+          );
+        }
+        # generator for each individual dashboard
+        // (lib.mapAttrs' (name: drv: lib.nameValuePair "grafana-dashboard-${name}" drv) dashboards)
+        // (lib.mapAttrs' (name: drv: lib.nameValuePair "prometheus-alert-${name}" drv) alerts)
+        # Entrypoint aliases, accessible trough 'nix build'
+        // (with flake.nixosConfigurations; {
+          "hetzner-ephemeral-alpha" = hetzner-ephemeral-alpha.config.system.build.kexecTree;
+          "kaakkuri-ephemeral-alpha" = kaakkuri-ephemeral-alpha.config.system.build.kexecTree;
+          "ponkila-ephemeral-beta" = ponkila-ephemeral-beta.config.system.build.kexecTree;
+          "ponkila-ephemeral-sigma" = ponkila-ephemeral-sigma.config.system.build.kexecTree;
+        });
+    };
+    flake =
+      let
+        inherit (self) outputs;
+        jesse = {
+          identity = ./nixosModules/agenix-rekey/masterIdentities/jesse.hmac;
+          pubkey = "age1fm70hduvuy5mu5n9jhv7l4u6d9pqclj2ef9jq6w2ptpatjsm25ysdx3py9";
+        };
+        juuso = {
+          muro = {
+            identity = ./nixosModules/agenix-rekey/masterIdentities/juuso-muro.hmac;
+            pubkey = "age1des79v6xqh3ylway0lwlggf0ldckcej0w3a4njytvq6us2yp3erszz39uk";
+          };
+          starlabs = {
+            identity = ./nixosModules/agenix-rekey/masterIdentities/juuso-starlabs.hmac;
+            pubkey = "age12lz3jyd2weej5c4mgmwlwsl0zmk2tdgvtflctgryx6gjcaf3yfsqgt7rnz";
           };
         };
-    };
+
+        ponkila-ephemeral-beta = {
+          system = "x86_64-linux";
+          specialArgs = { inherit inputs outputs; };
+          modules = [
+            ./nixosConfigurations/ponkila-ephemeral-beta
+            inputs.homestakeros-base.nixosModules.base
+            inputs.homestakeros-base.nixosModules.kexecTree
+            inputs.homestakeros.nixosModules.homestakeros
+
+            inputs.agenix-rekey.nixosModules.default
+            inputs.agenix.nixosModules.default
+            inputs.cgroup-exporter.nixosModules.default
+            inputs.sops-nix.nixosModules.sops
+            inputs.wirenix.nixosModules.default
+            {
+              nixpkgs.overlays = [
+                inputs.homestakeros.overlays.default
+              ];
+              boot.loader.grub.enable = false;
+              age.rekey = {
+                localStorageDir = ./nixosConfigurations/ponkila-ephemeral-beta/secrets/agenix-rekey;
+                masterIdentities = [ jesse juuso.starlabs juuso.muro ];
+                storageMode = "local";
+              };
+            }
+          ];
+        };
+
+        kaakkuri-ephemeral-alpha = {
+          system = "x86_64-linux";
+          specialArgs = { inherit inputs outputs; };
+          modules = [
+            ./nixosConfigurations/kaakkuri-ephemeral-alpha
+            inputs.homestakeros-base.nixosModules.base
+            inputs.homestakeros-base.nixosModules.kexecTree
+            inputs.homestakeros.nixosModules.homestakeros
+
+            inputs.cgroup-exporter.nixosModules.default
+            inputs.agenix-rekey.nixosModules.default
+            inputs.agenix.nixosModules.default
+            inputs.sops-nix.nixosModules.sops
+            inputs.wirenix.nixosModules.default
+            {
+              nixpkgs.overlays = [
+                inputs.homestakeros.overlays.default
+              ];
+              boot.loader.grub.enable = false;
+              age.rekey = {
+                localStorageDir = ./nixosConfigurations/kaakkuri-ephemeral-alpha/secrets/agenix-rekey;
+                masterIdentities = [ jesse juuso.starlabs juuso.muro ];
+                storageMode = "local";
+              };
+            }
+          ];
+        };
+
+        hetzner-ephemeral-alpha = {
+          system = "x86_64-linux";
+          specialArgs = { inherit inputs outputs; };
+          modules = [
+            ./nixosConfigurations/hetzner-ephemeral-alpha
+            inputs.homestakeros-base.nixosModules.base
+            inputs.homestakeros-base.nixosModules.kexecTree
+            inputs.homestakeros.nixosModules.homestakeros
+
+
+            inputs.cgroup-exporter.nixosModules.default
+            inputs.agenix-rekey.nixosModules.default
+            inputs.agenix.nixosModules.default
+            inputs.sops-nix.nixosModules.sops
+            inputs.wirenix.nixosModules.default
+            {
+              nixpkgs.overlays = [
+                inputs.homestakeros.overlays.default
+              ];
+              boot.loader.grub.enable = false;
+              age.rekey = {
+                localStorageDir = ./nixosConfigurations/hetzner-ephemeral-alpha/secrets/agenix-rekey;
+                masterIdentities = [ jesse juuso.starlabs juuso.muro ];
+                storageMode = "local";
+              };
+            }
+          ];
+        };
+
+        ponkila-ephemeral-sigma = {
+          system = "x86_64-linux";
+          specialArgs = { inherit inputs outputs; };
+          modules = [
+            ./nixosConfigurations/ponkila-ephemeral-sigma
+            inputs.homestakeros-base.nixosModules.base
+            inputs.homestakeros-base.nixosModules.kexecTree
+            inputs.homestakeros.nixosModules.homestakeros
+
+            inputs.cgroup-exporter.nixosModules.default
+            inputs.agenix-rekey.nixosModules.default
+            inputs.agenix.nixosModules.default
+            inputs.wirenix.nixosModules.default
+            {
+              nixpkgs.overlays = [
+                inputs.homestakeros.overlays.default
+              ];
+              boot.loader.grub.enable = false;
+              age.rekey = {
+                localStorageDir = ./nixosConfigurations/ponkila-ephemeral-sigma/secrets/agenix-rekey;
+                masterIdentities = [ jesse juuso.starlabs juuso.muro ];
+                storageMode = "local";
+              };
+            }
+          ];
+        };
+
+      in
+      {
+        # NixOS configuration entrypoints
+        nixosConfigurations = with inputs.nixpkgs.lib; {
+          "hetzner-ephemeral-alpha" = nixosSystem hetzner-ephemeral-alpha;
+          "kaakkuri-ephemeral-alpha" = nixosSystem kaakkuri-ephemeral-alpha;
+          "ponkila-ephemeral-beta" = nixosSystem ponkila-ephemeral-beta;
+          "ponkila-ephemeral-sigma" = nixosSystem ponkila-ephemeral-sigma;
+        };
+      };
+  };
 }

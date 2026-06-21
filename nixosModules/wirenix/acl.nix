@@ -1,81 +1,32 @@
+{ nixosConfigurations
+, subnetName
+, lib
+}:
+
+let
+  pred = lib.filter (n: nixosConfigurations.${n}.config.mesh.enable) (builtins.attrNames nixosConfigurations);
+  peers = lib.map
+    (n: {
+      name = nixosConfigurations.${n}.config.wirenix.peerName;
+      endpoints = [ nixosConfigurations.${n}.config.mesh.endpoint ];
+      subnets.${subnetName}.listenPort = nixosConfigurations.${n}.config.mesh.endpoint.port;
+    })
+    pred;
+in
 {
+  inherit peers;
   version = "v1";
   subnets = [
     {
-      name = "simple";
-      endpoints = [
-        { }
-      ];
-    }
-  ];
-  peers = [
-    {
-      name = "node1";
-      subnets = {
-        simple = {
-          listenPort = 51820;
-          # no ipAddresses field will auto generate an IPv6 address
-        };
-      };
-      endpoints = [
-        {
-          # no match can be any
-          port = 51820;
-          ip = "hetzner-ephemeral-alpha.ponkila.com";
-        }
-      ];
-    }
-    {
-      name = "node2";
-      subnets = {
-        simple = {
-          listenPort = 51821;
-        };
-      };
-      endpoints = [
-        {
-          # no match field means match all peers
-          port = 51821;
-          ip = "nyt2.ponkila.com";
-        }
-      ];
-    }
-    {
-      name = "ponkila-ephemeral-sigma";
-      subnets = {
-        simple = {
-          listenPort = 51822;
-        };
-      };
-      endpoints = [
-        {
-          # no match field means match all peers
-          port = 51822;
-          ip = "nyt2.ponkila.com";
-        }
-      ];
-    }
-    {
-      name = "kaakkuri";
-      subnets = {
-        simple = {
-          listenPort = 51821;
-        };
-      };
-      endpoints = [
-        {
-          # no match field means match all peers
-          port = 51821;
-          ip = "eth.coditon.com";
-        }
-      ];
+      name = subnetName;
+      endpoints = [{ }];
     }
   ];
   connections = [
     {
-      a = [{ type = "subnet"; rule = "is"; value = "simple"; }];
-      b = [{ type = "subnet"; rule = "is"; value = "simple"; }];
-      subnets = [ "simple" ];
+      a = [{ type = "subnet"; rule = "is"; value = subnetName; }];
+      b = [{ type = "subnet"; rule = "is"; value = subnetName; }];
+      subnets = [ subnetName ];
     }
   ];
 }

@@ -1,32 +1,23 @@
 { pkgs
 , config
 , lib
-, inputs
 , outputs
 , ...
 }:
 let
   # General
   infra.ip = "192.168.100.10";
-  lighthouse.datadir = "/var/mnt/xfs/lighthouse";
   sshKeysPath = "/var/mnt/xfs/secrets/ssh/id_ed25519";
-
-  # Mesh
-  inherit (inputs.clib.lib.network.ipv6) fromString;
-  meshSelf = map (x: x.address) (map fromString config.systemd.network.networks."50-simple".address);
-  clusterAddr = map (node: "${node.wirenix.peerName}=${toString (map (wg: "http://[${wg.address}]") (map fromString node.systemd.network.networks."50-simple".address))}:2380");
-  hetzner = [ outputs.nixosConfigurations."hetzner-ephemeral-alpha".config ];
-  kaakkuri = [ outputs.nixosConfigurations."kaakkuri-ephemeral-alpha".config ];
-  ponkila = [ outputs.nixosConfigurations."ponkila-ephemeral-beta".config ];
 in
 {
   boot.initrd.availableKernelModules = [ "xfs" "dm_mod" "dm-raid" "dm_integrity" "raid0" ];
-  # Workaround for https://github.com/Mic92/sops-nix/issues/24
   fileSystems."/var/mnt/xfs" = lib.mkImageMediaOverride {
     fsType = "xfs";
     device = "/dev/mapper/wd-ethereum";
     neededForBoot = true;
   };
+
+  virtualisation.podman.enable = true;
 
   homestakeros = {
     # Localization options
@@ -40,6 +31,7 @@ in
       authorizedKeys = [
         "sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAIOdsfK46X5IhxxEy81am6A8YnHo2rcF2qZ75cHOKG7ToAAAACHNzaDprYXJp ssh:kari"
         "sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAILn/9IHTGC1sLxnPnLbtJpvF7HgXQ8xNkRwSLq8ay8eJAAAADHNzaDpzdGFybGFicw== ssh:starlabs"
+        "sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAIJuPW2qxz9ZvzcaO5RzcDr99t55PUBjmYC9ADX6sJhbjAAAABHNzaDo= ssh:muro"
       ];
       privateKeyFile = sshKeysPath;
     };
@@ -55,26 +47,17 @@ in
       enable = true;
       endpoint = "http://${infra.ip}:5052";
       execEndpoint = "http://${infra.ip}:8551";
-      dataDir = lighthouse.datadir;
+      dataDir = "/var/mnt/xfs/lighthouse";
       slasher = {
         enable = false;
         historyLength = 256;
         maxDatabaseSize = 16;
       };
       jwtSecretFile = config.age.secrets."mainnet-jwt".path;
-    };
-
-    execution.besu = {
-      enable = true;
-      endpoint = "http://${infra.ip}:8551";
-      dataDir = "/var/mnt/xfs/besu/mainnet";
-      jwtSecretFile = "${config.age.secrets."mainnet-jwt".path}";
       extraOptions = [
-        "--host-allowlist=\"*\""
-        "--nat-method=upnp"
-        "--p2p-port=30303"
-        "--profile=PERFORMANCE"
-        "--sync-mode=SNAP"
+        "--log-format JSON"
+        "--debug-level warn"
+        "--metrics-address ${config.mesh.addressUnliteral}"
       ];
     };
 
@@ -101,39 +84,93 @@ in
       };
     };
   };
+  systemd.services.ssv-node.enable = false;
 
   services.bitcoind."mainnet" = {
     enable = true;
     prune = "disable";
     dataDir = "/var/mnt/kioxia/bitcoin/bitcoind";
+    dbCache = 1024;
     extraCmdlineOptions = [
       "-server=1"
-      "-txindex=0"
-      "-rpccookiefile=/var/mnt/kioxia/bitcoin/bitcoind/.cookie"
+      "-txindex=1"
+      "-loglevelalways=1"
+      "-logtimestamps=0"
+      "-onlynet=ipv4"
+      "-listen=0"
     ];
+    rpc = {
+      port = 8332;
+      users.core = {
+        name = "core";
+        passwordHMAC = "056759579170ff4e4204fa0e088787d5$f393d0f49d1067332a735619903d7a187bc198377f6b4d910f80b539c39854a6";
+      };
+    };
   };
   systemd.services.bitcoind-mainnet.requires = [ "var-mnt-kioxia.mount" ];
   systemd.services.bitcoind-mainnet.after = [ "var-mnt-kioxia.mount" ];
 
-  systemd.services.electrs = {
-    enable = true;
+  systemd.services.reth =
+    let
+      baseDir = "/var/mnt/xfs/reth";
+    in
+    {
+      enable = true;
 
-    description = "electrum rpc";
-    requires = [ "wg-quick-wg0.service" "bitcoind-mainnet.service" ];
-    after = [ "wg-quick-wg0.service" "bitcoind-mainnet.service" ];
+      script = ''${outputs.packages.x86_64-linux.reth}/bin/reth node \
+        --authrpc.addr ${infra.ip} \
+        --authrpc.jwtsecret ${config.age.secrets."mainnet-jwt".path} \
+        --authrpc.port 8551 \
+        --chain mainnet \
+        --color never \
+        --datadir ${baseDir} \
+        --datadir.pprof-dumps ${baseDir}/pprof-dumps \
+        --datadir.static-files ${baseDir}/static-files \
+        --engine.persistence-backpressure-threshold 160 \
+        --engine.persistence-threshold 128 \
+        --engine.state-provider-metrics \
+        --http --http.api all --http.addr ${infra.ip} \
+        --metrics 127.0.0.1:7384 \
+        --rpc.max-blocks-per-filter 360000 \
+        --rpc.max-logs-per-response 360000 \
+        --tracing-otlp=http://localhost:4318/v1/traces \
+        --ws --ws.addr ${infra.ip} --ws.origins "*" --ws.api all
+      '';
+      serviceConfig.Restart = "always";
 
-    script = ''${pkgs.electrs}/bin/electrs \
-      --db-dir /var/mnt/kioxia/bitcoin/electrs/db \
-      --cookie-file /var/mnt/kioxia/bitcoin/bitcoind/.cookie \
-      --network bitcoin \
-      --electrum-rpc-addr 192.168.100.10:50001
+      after = [ "wg-quick-wg0.service" ];
+      wantedBy = [ "multi-user.target" ];
+    };
+
+  systemd.services.fulcrum =
+    let
+      cfg = pkgs.writeText "fulcum.conf" ''
+        peering = false
+      '';
+    in
+    {
+      enable = true;
+
+      description = "fulcrum rpc";
+      requires = [ "wg-quick-wg0.service" "bitcoind-mainnet.service" ];
+      after = [ "wg-quick-wg0.service" "bitcoind-mainnet.service" ];
+
+      script = ''${pkgs.fulcrum}/bin/Fulcrum \
+      --datadir /var/mnt/kioxia/bitcoin/fulcrum \
+      --tcp ${infra.ip}:50001 \
+      --stats 127.0.0.1:4225 \
+      --bitcoind 127.0.0.1:8332 \
+      --rpcuser core \
+      --ts-format none \
+      ${cfg}
     '';
-    serviceConfig.Restart = "on-failure";
-    serviceConfig.User = "bitcoind-mainnet";
-    serviceConfig.Group = "bitcoind-mainnet";
+      serviceConfig.Restart = "on-failure";
+      serviceConfig.User = "bitcoind-mainnet";
+      serviceConfig.Group = "bitcoind-mainnet";
+      serviceConfig.EnvironmentFile = config.age.secrets.bitcoinConf.path;
 
-    wantedBy = [ "multi-user.target" ];
-  };
+      wantedBy = [ "multi-user.target" ];
+    };
 
   systemd.network = {
     enable = true;
@@ -146,17 +183,31 @@ in
           IPv6AcceptRA = true;
         };
         address = [ "192.168.17.20/24" ];
+        dns = [ "127.0.0.1:1053" ];
       };
       "50-simple" = {
         dns = [ "127.0.0.1:1053" ];
         domains = [ "ponkila.nix" ];
+        networkConfig = {
+          DNSDefaultRoute = false;
+        };
       };
     };
   };
   networking = {
     firewall = {
-      allowedTCPPorts = [ 50001 30303 8546 ];
-      allowedUDPPorts = [ 50001 30303 8546 51821 ];
+      allowedTCPPorts = [
+        50001
+        30303
+        8546
+      ];
+      allowedUDPPorts = [
+        30303
+        8546
+      ];
+      interfaces."simple".allowedTCPPorts = [
+        5054 # lighthouse
+      ];
     };
     nameservers = [ "localhost:1053" ];
     useDHCP = false;
@@ -174,14 +225,15 @@ in
         rekeyFile = ./secrets/agenix/mainnet-jwt.age;
         generator.script = "jwt";
       };
+      bitcoinConf = {
+        rekeyFile = ./secrets/agenix/bitcoin/rpcpassword.age;
+        owner = config.services.bitcoind."mainnet".user;
+        inherit (config.services.bitcoind."mainnet") group;
+      };
     };
   };
   sops = {
     defaultSopsFile = ./secrets/default.yaml;
-    secrets."netdata/health_alarm_notify.conf" = {
-      owner = "netdata";
-      group = "netdata";
-    };
     secrets."nix-serve/secretKeyFile" = { };
     secrets."ssvnode/password" = {
       path = "/var/mnt/kioxia/ssv/password";
@@ -196,67 +248,181 @@ in
     age.sshKeyPaths = [ sshKeysPath ];
   };
 
-  services.netdata = {
-    enable = true;
-    configDir = {
-      "health_alarm_notify.conf" = config.sops.secrets."netdata/health_alarm_notify.conf".path;
-      "go.d/prometheus.conf" = pkgs.writeText "go.d/prometheus.conf" ''
-        jobs:
-          - name: etcd
-            url: http://[${lib.concatStrings meshSelf}]:2379/metrics
-      '';
-    };
-  };
-
   systemd.tmpfiles.rules = [
     "d ${config.services.etcd.dataDir} 0755 etcd etcd -" # upsert directory
     "Z ${config.services.etcd.dataDir} - etcd etcd -" # recursively chown to user
     "Z ${config.services.bitcoind."mainnet".dataDir} - bitcoind-mainnet bitcoind-mainnet -"
     "Z /var/mnt/kioxia/bitcoin/electrs - bitcoind-mainnet bitcoind-mainnet -"
+    "Z /var/mnt/kioxia/bitcoin/fulcrum - bitcoind-mainnet bitcoind-mainnet -"
   ];
 
-  wirenix = {
+  imports = [
+    ../../nixosModules/mesh.nix
+    ../../nixosModules/monitoring.nix
+  ];
+  mesh = {
     enable = true;
-    peerName = "node2"; # defaults to hostname otherwise
-    configurer = "networkd"; # defaults to "static", could also be "networkd"
-    keyProviders = [ "agenix-rekey" ]; # could also be ["agenix-rekey"] or ["acl" "agenix-rekey"]
-    secretsDir = ../../nixosModules/wirenix/agenix; # only if you're using agenix-rekey
-    aclConfig = import ../../nixosModules/wirenix/acl.nix;
+    endpoint = {
+      ip = "nyt2.ponkila.com";
+      port = 51821;
+    };
+    etcd = {
+      enable = true;
+      dataDir = "/var/mnt/xfs/etcd";
+      openFirewall = true;
+    };
   };
 
-  services.etcd = {
+  monitoring = {
     enable = true;
-    name = config.wirenix.peerName;
-    listenPeerUrls = map (x: "http://[${x}]:2380") meshSelf;
-    listenClientUrls = map (x: "http://[${x}]:2379") meshSelf;
-    initialClusterToken = "etcd-cluster-1";
-    initialClusterState = "new";
-    initialCluster =
-      clusterAddr hetzner ++
-      clusterAddr kaakkuri ++
-      clusterAddr ponkila;
-    dataDir = "/var/mnt/xfs/etcd";
-    openFirewall = true;
+    grafana = {
+      enable = true;
+      address = infra.ip;
+    };
+    logs = true;
+    traces = true;
+    alerts = true;
   };
 
-  services.coredns = {
+  environment.systemPackages = with pkgs; [
+    freeipmi
+  ];
+
+  services.prometheus = let fixpoint = config.services.prometheus.exporters; in rec {
     enable = true;
-    config = ''
-      ponkila.nix:1053 {
-        etcd {
-          path /skydns
-          endpoint ${lib.concatStringsSep " " config.services.etcd.listenClientUrls}
+    alertmanager = {
+      enable = true;
+      configuration = {
+        route = {
+          receiver = "telegram";
+        };
+        receivers = [
+          {
+            name = "telegram";
+            telegram_configs = [{
+              send_resolved = true;
+              bot_token_file = "/var/mnt/xfs/secrets/telegram.txt";
+              chat_id = -1003849721555;
+            }];
+          }
+        ];
+      };
+    };
+    exporters = {
+      ebpf = {
+        enable = true;
+        names = [
+          "biolatency"
+        ];
+      };
+      node = {
+        enable = true;
+        enabledCollectors = [
+          "diskstats"
+          "filesystem"
+          "cpu"
+          "meminfo"
+          "systemd"
+          "cgroups"
+        ];
+      };
+      smartctl = {
+        enable = true;
+        user = "root";
+      };
+      ipmi =
+        let
+          ipmiExporterConfig = pkgs.writeText "ipmi-exporter.yml" ''
+            modules:
+              default:
+                collectors:
+                  - ipmi
+                  - bmc
+                  - bmc-watchdog
+                  - sel
+                  - sel-events
+          '';
+        in
+        {
+          enable = true;
+          user = "root";
+          group = "root";
+          configFile = ipmiExporterConfig;
+        };
+      rasdaemon.enable = true;
+      cgroup.enable = true;
+      bitcoin = {
+        user = "bitcoind-mainnet";
+        rpcUser = "core";
+        group = "bitcoind-mainnet";
+        rpcPasswordFile = config.age.secrets.bitcoinConf.path; # no-op
+        enable = true;
+      };
+    };
+    scrapeConfigs =
+      let
+        defaultConfig = job_name: {
+          inherit job_name;
+          static_configs = [{ targets = [ "localhost:${port job_name}" ]; }];
+        };
+        overrides = {
+          ipmi = defaultConfig "ipmi" // {
+            scrape_interval = "120s";
+            scrape_timeout = "60s";
+          };
+        };
+        port = n: toString fixpoint.${n}.port;
+        srapeConfigs' = lib.mapAttrsToList
+          (job_name: _: overrides.${job_name} or (defaultConfig job_name))
+          exporters; # <- exporters defined above
+      in
+      srapeConfigs' ++ [
+        {
+          job_name = "reth";
+          static_configs = [{ targets = [ "127.0.0.1:7384" ]; }];
         }
-        prometheus
-        loadbalance
-      }
-
-      .:1053 {
-        forward . 1.1.1.2 2606:4700:4700::1112
-        cache
-      }
-    '';
+        {
+          job_name = "lighthouse";
+          static_configs = [{
+            targets = [
+              "${config.mesh.address}:5054"
+              "${outputs.nixosConfigurations.kaakkuri-ephemeral-alpha.config.mesh.address}:5054"
+            ];
+          }];
+        }
+      ];
+    ruleFiles = with outputs.packages.x86_64-linux; [
+      prometheus-alert-ipmi.outPath
+      prometheus-alert-rasdaemon.outPath
+      prometheus-alert-lighthouse.outPath
+    ];
   };
+  systemd.services.prometheus-ipmi-exporter.serviceConfig = {
+    DynamicUser = lib.mkForce false;
+    PrivateDevices = lib.mkForce false;
+    DeviceAllow = lib.mkForce [ "/dev/ipmi0 rw" ];
+    ProtectKernelModules = lib.mkForce false;
+    ProtectKernelTunables = lib.mkForce false;
+  };
+  systemd.services.prometheus-bitcoin-exporter = {
+    script = lib.mkForce ''
+      exec ${config.services.prometheus.exporters.bitcoin.package}/bin/bitcoind-monitor.py
+    '';
+    serviceConfig.EnvironmentFile = config.age.secrets.bitcoinConf.path;
+  };
+
+  services.grafana.provision.dashboards.settings.providers = [{
+    name = "default";
+    options.path = pkgs.linkFarm "grafana-dashboards" [
+      { name = "cgroup.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-cgroup; }
+      { name = "coredns.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-coredns; }
+      { name = "ebpf-biolatency.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-ebpf-biolatency; }
+      { name = "etcd.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-etcd; }
+      { name = "node-exporter.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-node-exporter; }
+      { name = "reth.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-reth; }
+      { name = "smartctl.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-smartctl; }
+    ];
+  }];
 
   system.stateVersion = "25.05";
 }

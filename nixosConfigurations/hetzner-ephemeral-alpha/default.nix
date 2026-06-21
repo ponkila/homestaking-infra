@@ -1,21 +1,12 @@
 { pkgs
 , config
 , lib
-, inputs
 , outputs
 , ...
 }:
 let
   # General
   sshKeysPath = "/var/mnt/secrets/ssh/id_ed25519";
-
-  # Mesh network
-  inherit (inputs.clib.lib.network.ipv6) fromString;
-  meshSelf = map (x: x.address) (map fromString config.systemd.network.networks."50-simple".address);
-  clusterAddr = map (node: "${node.wirenix.peerName}=${toString (map (wg: "http://[${wg.address}]") (map fromString node.systemd.network.networks."50-simple".address))}:2380");
-  hetzner = [ outputs.nixosConfigurations."hetzner-ephemeral-alpha".config ];
-  kaakkuri = [ outputs.nixosConfigurations."kaakkuri-ephemeral-alpha".config ];
-  ponkila = [ outputs.nixosConfigurations."ponkila-ephemeral-beta".config ];
 in
 {
   boot.initrd.availableKernelModules = [
@@ -31,7 +22,6 @@ in
     "dm_mod"
     "btrfs"
   ];
-  # Workaround for https://github.com/Mic92/sops-nix/issues/24
   fileSystems."/var/mnt/secrets" = lib.mkImageMediaOverride {
     fsType = "btrfs";
     device = "/dev/sda";
@@ -40,24 +30,28 @@ in
   };
 
   environment.systemPackages = [ pkgs.wireguard-tools ];
-  environment.etc."Caddyfile" = {
-    text = ''
-       {
-        auto_https off
-        servers {
-          metrics
-        }
+  services.caddy = {
+    enable = true;
+    globalConfig = ''
+      auto_https off
+      servers {
+        metrics
       }
-
+    '';
+    extraConfig = ''
       http://192.168.100.40:8545 {
 
-        reverse_proxy {
-          to 192.168.100.10:8546 192.168.100.50:8546
+        log {
+          output stdout
+          format json
+        }
 
-          health_uri /eth/v1/node/syncing
-          health_port 5052
-          health_interval 11s
-          health_body `"is_syncing":false,"is_optimistic":false,"el_offline":false`
+        reverse_proxy {
+          to localhost:8547 192.168.100.50:8546
+          lb_policy first
+
+          health_interval 10s
+          health_timeout 5s
 
           fail_duration 30s
           unhealthy_latency 300ms
@@ -65,32 +59,60 @@ in
       }
     '';
   };
-  services.caddy = {
-    enable = true;
-    configFile = "/etc/Caddyfile";
+
+  virtualisation = {
+    podman.enable = true;
+    oci-containers.containers = {
+      keep-core = {
+        image = "localhost/keep-core/v2.5.2:latest";
+        environmentFiles = [
+          config.sops.secrets."keep-network/env".path
+        ];
+        extraOptions = [
+          "--network=host"
+        ];
+        environment = {
+          GOLOG_LOG_FMT = "json";
+        };
+        pull = "never";
+        user = "1000:1000";
+        volumes = [
+          "/var/mnt/keep-network:/var/mnt/keep-network"
+          "/run/secrets/keep-network/operator-key:/run/secrets/keep-network/operator-key"
+        ];
+        cmd = [
+          "start"
+          "--ethereum.url"
+          "ws://192.168.100.40:8545"
+          "--ethereum.keyFile"
+          "/run/secrets/keep-network/operator-key"
+          "--bitcoin.electrum.url"
+          "tcp://192.168.100.40:50001"
+          "--storage.dir"
+          "/var/mnt/keep-network"
+        ];
+      };
+    };
   };
+  systemd.services.podman-keep-core.preStart = ''
+    ${pkgs.podman}/bin/podman load -i /var/mnt/keep-network/v2.5.2/keep-core-v2.5.2.tar
+  '';
 
-  systemd.services.keep-network = {
+  systemd.services.mitmproxy-ponkila = {
+
     enable = true;
-
-    description = "keep-network bridge service";
-    requires = [ "caddy.service" "nginx.service" ];
-    after = [ "caddy.service" "nginx.service" ];
-
     serviceConfig = {
-      EnvironmentFile = ''${config.sops.secrets."keep-network/env".path}'';
       Restart = "always";
       RestartSec = "5s";
-      User = "core";
-      Group = "core";
       Type = "simple";
     };
 
-    script = ''/var/mnt/keep-network/v2.3.1/keep-client start \
-      --ethereum.url ws://192.168.100.40:8545 \
-      --ethereum.keyFile /run/secrets/keep-network/operator-key \
-      --bitcoin.electrum.url tcp://192.168.100.40:50001 \
-      --storage.dir /var/mnt/keep-network
+    script = ''${pkgs.mitmproxy}/bin/mitmdump \
+      --mode reverse:http://192.168.100.10:8546 \
+      --listen-port 8547 \
+      --set websocket=true \
+      --set flow_detail=3 \
+      -w /var/log/mitmproxy/ponkila.log
     '';
 
     wantedBy = [ "multi-user.target" ];
@@ -195,10 +217,6 @@ in
       owner = "core";
       group = "core";
     };
-    secrets."netdata/health_alarm_notify.conf" = {
-      owner = "netdata";
-      group = "netdata";
-    };
     secrets."holesky/ssvnode/password" = { };
     secrets."holesky/ssvnode/privateKey" = { };
     secrets."holesky/ssvnode/publicKey" = { };
@@ -233,11 +251,6 @@ in
         # https://docs.threshold.network/staking-and-running-a-node/tbtc-v2-node-setup/network-configuration
         3919
         9601
-        # https://docs.ssv.network/operator-user-guides/operator-node/enabling-dkg
-        3030
-      ];
-      allowedUDPPorts = [
-        51820
       ];
       interfaces."wg0" = {
         allowedTCPPorts = [
@@ -254,93 +267,93 @@ in
     useDHCP = false;
   };
 
-  services.netdata = {
-    enable = true;
-    configDir = {
-      "health_alarm_notify.conf" = config.sops.secrets."netdata/health_alarm_notify.conf".path;
-      "go.d/prometheus.conf" = pkgs.writeText "go.d/prometheus.conf" ''
-        jobs:
-          - name: keep-core
-            url: http://127.0.0.1:9601/metrics
-          - name: caddy
-            url: http://127.0.0.1:2019/metrics
-      '';
-      "health.d/btc_connectivity.conf" = pkgs.writeText "health.d/btc_connectivity.conf" ''
-        alarm: juuso: btc_connectivity
-        on: prometheus_keep-core.btc_connectivity
-        lookup: min -10s
-        every: 10s
-        crit: $this == 0
-      '';
-      "health.d/eth_connectivity.conf" = pkgs.writeText "health.d/eth_connectivity.conf" ''
-        alarm: juuso: eth_connectivity
-        lookup: min -10s
-        on: prometheus_keep-core.eth_connectivity
-        every: 10s
-        crit: $this == 0
-      '';
-      "health.d/upstream_192.168.100.10.conf" = pkgs.writeText "health.d/upstream_192.168.100.10.conf" ''
-        alarm: juuso: healthy-upstream_192.168.100.10
-        lookup: min -10s
-        on: prometheus_caddy.caddy_reverse_proxy_upstreams_healthy-upstream_192.168.100.10_8546
-        every: 10s
-        warn: $this == 0
-      '';
-      "health.d/upstream_192.168.100.50.conf" = pkgs.writeText "health.d/upstream_192.168.100.50.conf" ''
-        alarm: jesse: healthy-upstream_192.168.100.50
-        lookup: min -10s
-        on: prometheus_caddy.caddy_reverse_proxy_upstreams_healthy-upstream_192.168.100.50_8546
-        every: 10s
-        warn: $this == 0
-      '';
-    };
-  };
-
   # Hetzner console access
   services.getty.autologinUser = "core";
 
-  wirenix = {
+  imports = [
+    ../../nixosModules/mesh.nix
+    ../../nixosModules/monitoring.nix
+  ];
+
+  mesh = {
     enable = true;
-    peerName = "node1"; # defaults to hostname otherwise
-    configurer = "networkd"; # defaults to "static", could also be "networkd"
-    keyProviders = [ "agenix-rekey" ]; # could also be ["agenix-rekey"] or ["acl" "agenix-rekey"]
-    secretsDir = ../../nixosModules/wirenix/agenix; # only if you're using agenix-rekey
-    aclConfig = import ../../nixosModules/wirenix/acl.nix;
+    endpoint = {
+      ip = "hetzner-ephemeral-alpha.ponkila.com";
+      port = 51820;
+    };
+    etcd = {
+      enable = true;
+      dataDir = "/var/mnt/etcd";
+      openFirewall = true;
+    };
   };
 
-  services.etcd = {
+  monitoring = {
     enable = true;
-    name = config.wirenix.peerName;
-    listenPeerUrls = map (x: "http://[${x}]:2380") meshSelf;
-    listenClientUrls = map (x: "http://[${x}]:2379") meshSelf;
-    initialClusterToken = "etcd-cluster-1";
-    initialClusterState = "new";
-    initialCluster =
-      clusterAddr hetzner ++
-      clusterAddr kaakkuri ++
-      clusterAddr ponkila;
-    dataDir = "/var/mnt/etcd";
-    openFirewall = true;
+    grafana = {
+      enable = true;
+      address = "192.168.100.40";
+    };
+    logs = true;
+    traces = false;
+    alerts = true;
   };
 
-  services.coredns = {
+  services.prometheus = let fixpoint = config.services.prometheus.exporters; in rec  {
     enable = true;
-    config = ''
-      ponkila.nix:1053 {
-        etcd {
-          path /skydns
-          endpoint ${lib.concatStringsSep " " config.services.etcd.listenClientUrls}
+    alertmanager = {
+      enable = true;
+      configuration = {
+        route = {
+          receiver = "telegram";
+        };
+        receivers = [
+          {
+            name = "telegram";
+            telegram_configs = [{
+              send_resolved = true;
+              bot_token_file = "/var/mnt/secrets/telegram.txt";
+              chat_id = -1003849721555;
+            }];
+          }
+        ];
+      };
+    };
+    exporters = {
+      cgroup.enable = true;
+    };
+    scrapeConfigs =
+      let
+        port = n: toString fixpoint.${n}.port;
+        srapeConfigs' = lib.mapAttrsToList
+          (job_name: _: {
+            inherit job_name;
+            static_configs = [{ targets = [ "localhost:${port job_name}" ]; }];
+          })
+          exporters; # <- exporters defined above
+      in
+      srapeConfigs' ++ [
+        {
+          job_name = "keep-core";
+          static_configs = [{ targets = [ "127.0.0.1:9601" ]; }];
         }
-        prometheus
-        loadbalance
-      }
-
-      .:1053 {
-        forward . 1.1.1.2 2606:4700:4700::1112
-        cache
-      }
-    '';
+        {
+          job_name = "caddy";
+          static_configs = [{ targets = [ "127.0.0.1:2019" ]; }];
+        }
+      ];
+    ruleFiles = [
+      "${outputs.packages.x86_64-linux.awesome-prometheus-alerts.outPath}/caddy/embedded-exporter.yml"
+    ];
   };
+
+  services.grafana.provision.dashboards.settings.providers = [{
+    name = "default";
+    options.path = pkgs.linkFarm "grafana-dashboards" [
+      { name = "tbtc.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-tbtc; }
+      { name = "cgroup.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-cgroup; }
+    ];
+  }];
 
   system.stateVersion = "25.05";
 }
