@@ -5,6 +5,7 @@
   description = "Ethereum home-staking infrastructure powered by Nix";
 
   inputs = {
+    actions-nix.url = "github:nialov/actions.nix";
     agenix-rekey.inputs.nixpkgs.follows = "nixpkgs";
     agenix-rekey.url = "github:oddlama/agenix-rekey";
     agenix.inputs.nixpkgs.follows = "nixpkgs";
@@ -24,8 +25,7 @@
     wirenix.url = "sourcehut:~msalerno/wirenix";
     cgroup-exporter.inputs.nixpkgs.follows = "nixpkgs";
     cgroup-exporter.url = "github:arianvp/cgroup-exporter";
-    git-hooks.inputs.nixpkgs.follows = "nixpkgs";
-    git-hooks.url = "github:cachix/git-hooks.nix";
+    git-hooks.follows = "actions-nix/git-hooks";
   };
 
   # Add the inputs declared above to the argument attribute set
@@ -33,6 +33,7 @@
 
     systems = inputs.nixpkgs.lib.systems.flakeExposed;
     imports = [
+      inputs.actions-nix.flakeModules.default
       inputs.agenix-rekey.flakeModule
       inputs.git-hooks.flakeModule
       inputs.treefmt-nix.flakeModule
@@ -281,6 +282,35 @@
 
       in
       {
+        # nix run .#render-workflows
+        actions-nix = {
+          defaultValues = {
+            jobs = {
+              timeout-minutes = 30;
+              runs-on = "ubuntu-latest";
+            };
+          };
+          pre-commit.enable = true;
+          workflows = {
+            ".github/workflows/main.yaml" = {
+              on = {
+                push.branches = [ "main" ];
+                workflow_dispatch = { };
+                pull_request = { };
+              };
+              jobs = {
+                nix-flake-check = {
+                  steps = with inputs.actions-nix.lib.steps; [
+                    actionsCheckout
+                    DeterminateSystemsNixInstallerAction
+                    runNixFlakeCheck
+                  ];
+                };
+              };
+            };
+          };
+        };
+
         # NixOS configuration entrypoints
         nixosConfigurations = with inputs.nixpkgs.lib; {
           "hetzner-ephemeral-alpha" = nixosSystem hetzner-ephemeral-alpha;

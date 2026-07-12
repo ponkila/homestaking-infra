@@ -1,4 +1,7 @@
 # Homestaking-infra
+
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/ponkila/homestaking-infra/main.yaml?logo=github&label=nix%20flake%20check)
+
 Ethereum home-staking infrastructure powered by Nix
 
 ## About
