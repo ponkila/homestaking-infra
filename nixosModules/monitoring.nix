@@ -27,7 +27,7 @@ in
 
   config = mkIf cfg.enable {
 
-    services.prometheus = mkIf cfg.alerts {
+    services.prometheus = {
       enable = true;
       globalConfig = {
         scrape_interval = "15s";
@@ -38,22 +38,23 @@ in
       ] ++ (lib.optionals cfg.traces [
         "--web.enable-remote-write-receiver"
       ]);
-      alertmanager = {
+      alertmanager = mkIf cfg.alerts {
         enable = true;
       };
-      ruleFiles = [
-        outputs.packages.x86_64-linux.prometheus-alert-systemd.outPath
-      ] ++
-      (lib.optionals config.services.prometheus.exporters.node.enable [
-        "${outputs.packages.x86_64-linux.awesome-prometheus-alerts.outPath}/host-and-hardware/node-exporter.yml"
-      ]) ++
-      (lib.optionals config.services.prometheus.exporters.smartctl.enable [
-        "${outputs.packages.x86_64-linux.awesome-prometheus-alerts.outPath}/s.m.a.r.t-device-monitoring/smartctl-exporter.yml"
-      ]) ++
-      (lib.optionals config.mesh.etcd.enable [
-        "${outputs.packages.x86_64-linux.awesome-prometheus-alerts.outPath}/etcd/embedded-exporter.yml"
-      ])
-      ;
+      ruleFiles = lib.optionals cfg.alerts (
+        [
+          outputs.packages.x86_64-linux.prometheus-alert-systemd.outPath
+        ] ++
+        (lib.optionals config.services.prometheus.exporters.node.enable [
+          "${outputs.packages.x86_64-linux.awesome-prometheus-alerts.outPath}/host-and-hardware/node-exporter.yml"
+        ]) ++
+        (lib.optionals config.services.prometheus.exporters.smartctl.enable [
+          "${outputs.packages.x86_64-linux.awesome-prometheus-alerts.outPath}/s.m.a.r.t-device-monitoring/smartctl-exporter.yml"
+        ]) ++
+        (lib.optionals config.mesh.etcd.enable [
+          "${outputs.packages.x86_64-linux.awesome-prometheus-alerts.outPath}/etcd/embedded-exporter.yml"
+        ])
+      );
     };
 
     services.tempo = mkIf cfg.traces {

@@ -288,6 +288,10 @@
           "ponkila-ephemeral-beta" = nixosSystem ponkila-ephemeral-beta;
           "ponkila-ephemeral-sigma" = nixosSystem ponkila-ephemeral-sigma;
         };
+
+        nixosModules = {
+          monitoring = { imports = [ ./nixosModules/monitoring.nix ]; };
+        };
       };
   };
 }
