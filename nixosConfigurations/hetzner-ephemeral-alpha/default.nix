@@ -64,12 +64,13 @@ in
     podman.enable = true;
     oci-containers.containers = {
       keep-core = {
-        image = "localhost/keep-core/v2.5.2:latest";
+        image = "docker.io/thresholdnetwork/keep-client:v2.7.0";
         environmentFiles = [
           config.sops.secrets."keep-network/env".path
         ];
         extraOptions = [
           "--network=host"
+          "--pull=never"
         ];
         environment = {
           GOLOG_LOG_FMT = "json";
@@ -90,12 +91,14 @@ in
           "tcp://192.168.100.40:50001"
           "--storage.dir"
           "/var/mnt/keep-network"
+          "--network.announcedAddresses"
+          "/dns4/keep.ponkila.com/tcp/3919"
         ];
       };
     };
   };
   systemd.services.podman-keep-core.preStart = ''
-    ${pkgs.podman}/bin/podman load -i /var/mnt/keep-network/v2.5.2/keep-core-v2.5.2.tar
+    ${pkgs.podman}/bin/podman load -i /var/mnt/keep-network/v2.7.0/keep-core-v2.7.0.tar.gz
   '';
 
   systemd.services.mitmproxy-ponkila = {
