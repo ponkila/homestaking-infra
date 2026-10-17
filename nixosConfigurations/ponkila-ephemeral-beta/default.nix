@@ -126,11 +126,10 @@ in
         --datadir ${baseDir} \
         --datadir.pprof-dumps ${baseDir}/pprof-dumps \
         --datadir.static-files ${baseDir}/static-files \
-        --engine.persistence-backpressure-threshold 160 \
-        --engine.persistence-threshold 128 \
         --engine.state-provider-metrics \
         --http --http.api all --http.addr ${infra.ip} \
         --metrics 127.0.0.1:7384 \
+        --rpc-cache.max-receipts 60000 \
         --rpc.max-blocks-per-filter 360000 \
         --rpc.max-logs-per-response 360000 \
         --tracing-otlp=http://localhost:4318/v1/traces \

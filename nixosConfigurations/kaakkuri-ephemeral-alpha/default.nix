@@ -55,30 +55,6 @@ in
       ];
     };
 
-    # Besu options
-    execution.besu = {
-      enable = false;
-      endpoint = "http://${infra.ip}:8551";
-      dataDir = "/var/mnt/nvme/ethereum/mainnet/besu";
-      jwtSecretFile = "/var/mnt/nvme/ethereum/mainnet/jwt.hex";
-      extraOptions = [
-        "--bonsai-historical-block-limit=60000"
-        "--bonsai-limit-trie-logs-enabled=false"
-        "--cache-last-blocks=37000"
-        "--host-allowlist=\"*\""
-        "--logging=WARN"
-        "--metrics-category=BLOCKCHAIN,ETHEREUM,EXECUTORS,JVM,NETWORK,PEERS,PERMISSIONING,PROCESS,PRUNER,RPC,SYNCHRONIZER,TRANSACTION_POOL,KVSTORE_ROCKSDB,KVSTORE_PRIVATE_ROCKSDB,KVSTORE_ROCKSDB_STATS,KVSTORE_PRIVATE_ROCKSDB_STATS"
-        "--metrics-host=${config.mesh.address}"
-        "--metrics-port=9545"
-        "--nat-method=upnp"
-        "--p2p-port=30303"
-        "--profile=PERFORMANCE"
-        "--rpc-http-api=ETH,NET,WEB3,ADMIN"
-        "--rpc-max-logs-range=60000"
-        "--sync-mode=SNAP"
-      ];
-    };
-
     # Addons
     addons.mev-boost = {
       enable = true;
@@ -130,8 +106,6 @@ in
         --datadir ${baseDir} \
         --datadir.pprof-dumps ${baseDir}/pprof_dumps \
         --datadir.static-files ${baseDir}/static_files \
-        --engine.persistence-backpressure-threshold 160 \
-        --engine.persistence-threshold 128 \
         --engine.state-provider-metrics \
         --http --http.api all --http.addr ${infra.ip} \
         --metrics 127.0.0.1:7384 \
