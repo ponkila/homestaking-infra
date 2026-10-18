@@ -583,11 +583,11 @@
       },
       "locked": {
         "dir": "nixosModules/base",
-        "lastModified": 1771327189,
-        "narHash": "sha256-ekIxs68dzMi8tBMtCqeLVIzSv2czyI+LVSmTpTeP4DM=",
+        "lastModified": 1792277438,
+        "narHash": "sha256-73VYUK/J2r7lOUwdfXIMcLfnSR9ph+QSavEnmq7u3kE=",
         "owner": "ponkila",
         "repo": "HomestakerOS",
-        "rev": "f5696984a21893ec2ed700d6b359aa44950eb821",
+        "rev": "f21cdabd1b6b6dae38238119f9f38b9b0496528d",
         "type": "github"
       },
       "original": {
