@@ -168,13 +168,16 @@
       srapeConfigs';
   };
 
-  services.grafana.provision.dashboards.settings.providers = [{
-    name = "default";
-    options.path = pkgs.linkFarm "grafana-dashboards" [
-      { name = "node-exporter.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-node-exporter; }
-      { name = "cgroup.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-cgroup; }
-    ];
-  }];
+  services.grafana = {
+    settings.security.secret_key = "$__file{${config.age.secrets.grafana_secret_key.path}}";
+    provision.dashboards.settings.providers = [{
+      name = "default";
+      options.path = pkgs.linkFarm "grafana-dashboards" [
+        { name = "node-exporter.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-node-exporter; }
+        { name = "cgroup.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-cgroup; }
+      ];
+    }];
+  };
 
   systemd.services.ipv6-exporter = {
     wantedBy = [ "multi-user.target" ];
@@ -190,6 +193,7 @@
   };
 
   age = {
+    generators.jwt = { pkgs, ... }: "${pkgs.openssl}/bin/openssl rand -hex 32";
     rekey = {
       agePlugins = [ pkgs.age-plugin-fido2-hmac ];
       hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINMEbHrkxwZAsdv+V9moza0VTKY97R/qeennww20FUID";
@@ -197,6 +201,12 @@
     secrets = {
       "alertmanager/telegram" = {
         rekeyFile = ./secrets/agenix/alertmanager/telegram.age;
+      };
+      grafana_secret_key = {
+        rekeyFile = ./secrets/agenix/grafana/secret_key.age;
+        generator.script = "jwt";
+        owner = "grafana";
+        group = "grafana";
       };
     };
   };

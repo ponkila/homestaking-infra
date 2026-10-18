@@ -16,7 +16,7 @@
     homestakeros-base.url = "github:ponkila/HomestakerOS?dir=nixosModules/base";
     homestakeros.inputs.nixpkgs.follows = "nixpkgs";
     homestakeros.url = "github:ponkila/HomestakerOS";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     sops-nix.url = "github:Mic92/sops-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";

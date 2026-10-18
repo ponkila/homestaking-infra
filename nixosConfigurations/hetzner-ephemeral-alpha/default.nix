@@ -204,9 +204,18 @@ in
 
   # Secrets
   age = {
+    generators.jwt = { pkgs, ... }: "${pkgs.openssl}/bin/openssl rand -hex 32";
     rekey = {
       agePlugins = [ pkgs.age-plugin-fido2-hmac ];
       hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKfkQ9dHiYK8LUsjM06dHKI1z/Gh7IiG0rUH3sxj4Stc";
+    };
+    secrets = {
+      grafana_secret_key = {
+        rekeyFile = ./secrets/agenix/grafana/secret_key.age;
+        generator.script = "jwt";
+        owner = "grafana";
+        group = "grafana";
+      };
     };
   };
   sops = {
@@ -350,13 +359,16 @@ in
     ];
   };
 
-  services.grafana.provision.dashboards.settings.providers = [{
-    name = "default";
-    options.path = pkgs.linkFarm "grafana-dashboards" [
-      { name = "tbtc.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-tbtc; }
-      { name = "cgroup.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-cgroup; }
-    ];
-  }];
+  services.grafana = {
+    settings.security.secret_key = "$__file{${config.age.secrets.grafana_secret_key.path}}";
+    provision.dashboards.settings.providers = [{
+      name = "default";
+      options.path = pkgs.linkFarm "grafana-dashboards" [
+        { name = "tbtc.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-tbtc; }
+        { name = "cgroup.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-cgroup; }
+      ];
+    }];
+  };
 
   system.stateVersion = "25.05";
 }

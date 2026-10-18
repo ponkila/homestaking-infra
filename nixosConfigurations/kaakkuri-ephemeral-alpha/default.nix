@@ -241,6 +241,12 @@ in
         owner = config.services.bitcoind."mainnet".user;
         inherit (config.services.bitcoind."mainnet") group;
       };
+      grafana_secret_key = {
+        rekeyFile = ./secrets/agenix/grafana/secret_key.age;
+        generator.script = "jwt";
+        owner = "grafana";
+        group = "grafana";
+      };
     };
   };
   sops = {
@@ -366,18 +372,21 @@ in
     serviceConfig.EnvironmentFile = config.age.secrets.bitcoinConf.path;
   };
 
-  services.grafana.provision.dashboards.settings.providers = [{
-    name = "default";
-    options.path = pkgs.linkFarm "grafana-dashboards" [
-      { name = "cgroup.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-cgroup; }
-      { name = "coredns.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-coredns; }
-      { name = "ebpf-biolatency.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-ebpf-biolatency; }
-      { name = "etcd.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-etcd; }
-      { name = "node-exporter.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-node-exporter; }
-      { name = "reth.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-reth; }
-      { name = "smartctl.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-smartctl; }
-    ];
-  }];
+  services.grafana = {
+    settings.security.secret_key = "$__file{${config.age.secrets.grafana_secret_key.path}}";
+    provision.dashboards.settings.providers = [{
+      name = "default";
+      options.path = pkgs.linkFarm "grafana-dashboards" [
+        { name = "cgroup.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-cgroup; }
+        { name = "coredns.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-coredns; }
+        { name = "ebpf-biolatency.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-ebpf-biolatency; }
+        { name = "etcd.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-etcd; }
+        { name = "node-exporter.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-node-exporter; }
+        { name = "reth.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-reth; }
+        { name = "smartctl.json"; path = outputs.packages.x86_64-linux.grafana-dashboard-smartctl; }
+      ];
+    }];
+  };
 
   # Fix hardware quirk of Micron MTA9ASF2G72AZ-3G2F1 that reports critical temperature as 0 Celsius.
   # Max operating temperature is 95.
