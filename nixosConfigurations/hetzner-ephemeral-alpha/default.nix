@@ -28,8 +28,18 @@ in
     options = [ "subvolid=256" ];
     neededForBoot = true;
   };
+  fileSystems."/var/log/journal" = lib.mkImageMediaOverride {
+    fsType = "btrfs";
+    device = "/dev/sda";
+    options = [ "subvol=journald" ];
+    neededForBoot = true;
+  };
 
-  environment.systemPackages = [ pkgs.wireguard-tools ];
+  environment.systemPackages = [
+    pkgs.bpftools
+    pkgs.wireguard-tools
+  ];
+
   services.caddy = {
     enable = true;
     globalConfig = ''
@@ -64,6 +74,7 @@ in
     podman.enable = true;
     oci-containers.containers = {
       keep-core = {
+        autoStart = true;
         image = "docker.io/thresholdnetwork/keep-client:v2.7.0";
         environmentFiles = [
           config.sops.secrets."keep-network/env".path
@@ -369,6 +380,10 @@ in
       ];
     }];
   };
+
+  services.journald.extraConfig = ''
+    Storage=persistent
+  '';
 
   system.stateVersion = "25.05";
 }
