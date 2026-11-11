@@ -562,11 +562,11 @@
         "treefmt-nix": "treefmt-nix_4"
       },
       "locked": {
-        "lastModified": 1792277438,
-        "narHash": "sha256-73VYUK/J2r7lOUwdfXIMcLfnSR9ph+QSavEnmq7u3kE=",
+        "lastModified": 1794397732,
+        "narHash": "sha256-QwPDLYLAyHXKA+6RCUu66hPbNo36EDMm9ZIulaaCe4k=",
         "owner": "ponkila",
         "repo": "HomestakerOS",
-        "rev": "f21cdabd1b6b6dae38238119f9f38b9b0496528d",
+        "rev": "b90dfb05d4ac6e9988f5d8973d14c191bb8feeda",
         "type": "github"
       },
       "original": {
