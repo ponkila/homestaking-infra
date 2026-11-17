@@ -108,9 +108,15 @@ in
       };
     };
   };
-  systemd.services.podman-keep-core.preStart = ''
-    ${pkgs.podman}/bin/podman load -i /var/mnt/keep-network/v2.7.0/keep-core-v2.7.0.tar.gz
-  '';
+  systemd.services.podman-keep-core = {
+    preStart = ''
+      ${pkgs.podman}/bin/podman load -i /var/mnt/keep-network/v2.7.0/keep-core-v2.7.0.tar.gz
+    '';
+    serviceConfig = {
+      Restart = lib.mkForce "no";
+      TimeoutStopSec = lib.mkForce "infinity";
+    };
+  };
 
   systemd.services.mitmproxy-ponkila = {
 
